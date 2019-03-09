@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == ADD_TASK && resultCode == Activity.RESULT_OK) {
-            Toast.makeText(this,"Save task",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Save task", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -68,9 +68,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setNewTab(context: Context, tabHost: TabHost, tag: String, title: Int, icon: Int, contentID: Int) {
         val tabSpec = tabHost.newTabSpec(tag)
-        val titleString = getString(title)
-        tabSpec.setContent(contentID)
-        tabSpec.setIndicator(titleString, context.resources.getDrawable(icon, null))
+        tabSpec.apply {
+            setContent(contentID)
+            setIndicator(getString(title), context.resources.getDrawable(icon, null))
+        }
         tabHost.addTab(tabSpec)
     }
 }
