@@ -9,4 +9,9 @@
     <string name="addTaskToolbarTitle">Add Task</string>
     <string name="taskAddTitle">Title</string>
     <string name="taskAddDescription">Description</string>
+    <string name="listItemMore">More</string>
+    <string name="taskMenuEdit">Edit Task</string>
+    <string name="taskMenuRemove">Remove Task</string>
+    <string name="taskMenuFavorite">Add to Favorite</string>
+    <string name="taskMenuDone">Done</string>
 </resources>

@@ -1,0 +1,23 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        >
+    <item
+            android:id="@+id/editTaskButton"
+            android:icon="@drawable/ic_edit"
+            android:title="@string/taskMenuEdit"
+            android:orderInCategory="0"/>
+    <item
+            android:id="@+id/removeTaskButton"
+            android:icon="@drawable/ic_delete"
+            android:title="@string/taskMenuRemove"
+            android:orderInCategory="1"/>
+    <item
+            android:id="@+id/favoriteTaskButton"
+            android:icon="@drawable/ic_fav"
+            android:title="@string/taskMenuFavorite"
+            android:orderInCategory="2"/>
+    <item
+            android:id="@+id/doneTaskButton"
+            android:icon="@drawable/ic_done"
+            android:title="@string/taskMenuDone"
+            android:orderInCategory="3"/>
+</menu>
