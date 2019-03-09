@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Planner</string>
+    <string name="action_settings">Settings</string>
+    <string name="mainToolbarTitle">Tasks</string>
+    <string name="settingsNavMenuTitle">Settings</string>
+    <string name="tasksNavMenuTitle">Tasks</string>
+    <string name="menuNavMenuTitle">Menu</string>
+    <string name="textTabAllTasks">All</string>
+</resources>
