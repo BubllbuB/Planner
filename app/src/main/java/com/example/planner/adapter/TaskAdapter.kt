@@ -69,7 +69,6 @@ class TaskAdapter(private val context: Context, private val taskList: ArrayList<
                     presenter.updateTask(context.resources.getInteger(R.integer.taskRemove), task)
                 }
             }
-
             true
         })
         popup.show()
