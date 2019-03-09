@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
         fab.setOnClickListener {
             val intent = Intent(this, AddTaskActivity::class.java)
-            intent.putExtra("TitleActionBar", "Add Task")
+            intent.putExtra("TitleActionBar", R.string.taskAddTitle)
             startActivityForResult(intent, ADD_TASK)
         }
 
