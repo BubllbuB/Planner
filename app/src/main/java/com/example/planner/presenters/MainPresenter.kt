@@ -5,11 +5,12 @@ import com.example.planner.R
 import com.example.planner.observer.StorageObserver
 import com.example.planner.storages.CacheStorage
 import com.example.planner.storages.Storage
+import com.example.planner.storages.StorageFactory
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
 
 class MainPresenter(private val view: MainView, private val resources: Resources): StorageObserver, IMainPresenter {
-    private val storage: Storage = CacheStorage
+    private val storage: Storage = StorageFactory.getStorage()
 
     override fun onUpdateList(list: ArrayList<Task>) {
         view.onListUpdate(list)
