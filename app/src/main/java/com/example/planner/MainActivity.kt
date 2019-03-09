@@ -9,14 +9,19 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.widget.ListView
 import android.widget.TabHost
-import android.widget.Toast
+import com.example.planner.adapter.TaskAdapter
+import com.example.planner.presenters.MainPresenter
+import com.example.planner.task.Task
+import com.example.planner.viewer.MainView
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val ADD_TASK = 1
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MainView {
     private lateinit var drawerLayout: DrawerLayout
+    private lateinit var presenter: MainPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
-
+        presenter = MainPresenter(this, this.applicationContext.resources)
         drawerLayout = findViewById(R.id.drawer_layout)
 
         fab.setOnClickListener {
@@ -52,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == ADD_TASK && resultCode == Activity.RESULT_OK) {
-            Toast.makeText(this, "Save task", Toast.LENGTH_SHORT).show()
+            presenter.onUpdaterList()
         }
     }
 
@@ -73,5 +78,11 @@ class MainActivity : AppCompatActivity() {
             setIndicator(getString(title), context.resources.getDrawable(icon, null))
         }
         tabHost.addTab(tabSpec)
+    }
+
+    override fun onListUpdate(tasks: ArrayList<Task>?) {
+        val listView = findViewById<ListView>(R.id.taskListView)
+        val notesAdapter = TaskAdapter(this, tasks, presenter)
+        listView.adapter = notesAdapter
     }
 }
