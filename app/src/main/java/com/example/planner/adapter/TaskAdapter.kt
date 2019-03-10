@@ -50,7 +50,6 @@ class TaskAdapter(
                             or(Paint.STRIKE_THRU_TEXT_FLAG))
                 }
             }
-
         }
 
         vh.titleTextView?.text = taskList?.get(position)?.title
