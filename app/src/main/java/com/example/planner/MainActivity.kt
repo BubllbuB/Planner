@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
@@ -21,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 const val ADD_TASK = 1
 const val EDIT_TASK = 2
 
-class MainActivity : AppCompatActivity(), MainView {
+class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationItemSelectedListener {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var presenter: IMainPresenter
     private lateinit var listViewAll: ListView
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity(), MainView {
         }
         presenter = MainPresenter(this, this.applicationContext.resources)
         presenter.startListenStorage()
+        presenter = MainPresenter(this, this@MainActivity, this.applicationContext.resources)
         drawerLayout = findViewById(R.id.drawer_layout)
         listViewAll = findViewById(R.id.taskListView)
         listViewFav = findViewById(R.id.taskFavListView)
@@ -67,6 +69,9 @@ class MainActivity : AppCompatActivity(), MainView {
             android.R.drawable.star_on,
             R.id.tab2
         )
+
+        nav_view.setNavigationItemSelectedListener(this)
+        presenter.onUpdaterList()
     }
 
     override fun onStart() {
@@ -94,6 +99,19 @@ class MainActivity : AppCompatActivity(), MainView {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.nav_tasks -> {
+            }
+            R.id.nav_settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+            }
+        }
+        drawer_layout.closeDrawer(GravityCompat.START)
+        return true
     }
 
     private fun setNewTab(context: Context, tabHost: TabHost, tag: String, title: Int, icon: Int, contentID: Int) {
