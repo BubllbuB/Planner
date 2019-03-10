@@ -62,6 +62,11 @@ class TaskAdapter(
         val popup: PopupMenu?
         popup = PopupMenu(context, view)
         popup.inflate(R.menu.task)
+        val favItem = popup.menu.findItem(R.id.favoriteTaskButton)
+        task?.let {
+            if(!it.favorite) favItem.title = context.resources.getString(R.string.taskMenuAddFavorite)
+            else favItem.title = context.resources.getString(R.string.taskMenuRemoveFavorite)
+        }
 
         task?.let {
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
@@ -72,6 +77,12 @@ class TaskAdapter(
                     }
                     R.id.removeTaskButton -> {
                         presenter.updateTask(TASK_REMOVE, it)
+                    }
+                    R.id.favoriteTaskButton -> {
+                        task?.let {
+                            it.favorite = !it.favorite
+                        }
+                        presenter.updateTask(context.resources.getInteger(R.integer.setFavorite), task)
                     }
                 }
                 true
