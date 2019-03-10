@@ -43,7 +43,6 @@ class TaskAdapter(private val context: Context, private val taskList: ArrayList<
                             or(Paint.STRIKE_THRU_TEXT_FLAG))
                 }
             }
-
         }
 
         vh.moreImageView.setOnClickListener {
