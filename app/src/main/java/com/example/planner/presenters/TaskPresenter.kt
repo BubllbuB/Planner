@@ -7,7 +7,7 @@ import com.example.planner.storages.StorageFactory
 import com.example.planner.task.Task
 
 class TaskPresenter(private val view: AppCompatActivity) {
-    private val storage: Storage = StorageFactory.getStorage()
+    private val storage: Storage = StorageFactory.getStorage(view.applicationContext)
 
     fun updateTask(actionId: Int, task: Task?) {
         when (actionId) {

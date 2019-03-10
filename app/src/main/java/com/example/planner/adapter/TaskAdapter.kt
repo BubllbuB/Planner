@@ -1,6 +1,7 @@
 package com.example.planner.adapter
 
 import android.content.Context
+import android.graphics.Paint
 import android.support.v7.widget.PopupMenu
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -30,9 +31,19 @@ class TaskAdapter(private val context: Context, private val taskList: ArrayList<
             view = convertView
             vh = view.tag as ViewHolder
         }
-        taskList.let {
-            vh.titleTextView.text = it?.get(position)?.title
-            vh.descriptionTextView.text = it?.get(position)?.description
+        taskList.let { list ->
+            vh.titleTextView.text = list?.get(position)?.title
+            vh.descriptionTextView.text = list?.get(position)?.description
+
+            list?.get(position)?.let {
+                if(it.done) {
+                    vh.titleTextView.paintFlags = (vh.titleTextView.paintFlags
+                            or(Paint.STRIKE_THRU_TEXT_FLAG))
+                    vh.descriptionTextView.paintFlags = (vh.descriptionTextView.paintFlags
+                            or(Paint.STRIKE_THRU_TEXT_FLAG))
+                }
+            }
+
         }
 
         vh.moreImageView.setOnClickListener {
@@ -59,9 +70,13 @@ class TaskAdapter(private val context: Context, private val taskList: ArrayList<
         popup = PopupMenu(context, view)
         popup.inflate(R.menu.task)
         val favItem = popup.menu.findItem(R.id.favoriteTaskButton)
+        val doneItem = popup.menu.findItem(R.id.doneTaskButton)
         task?.let {
             if(!it.favorite) favItem.title = context.resources.getString(R.string.taskMenuAddFavorite)
             else favItem.title = context.resources.getString(R.string.taskMenuRemoveFavorite)
+
+            if(!it.done) doneItem.title = context.resources.getString(R.string.taskMenuDone)
+            else doneItem.title = context.resources.getString(R.string.taskMenuUndone)
         }
 
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
@@ -78,6 +93,12 @@ class TaskAdapter(private val context: Context, private val taskList: ArrayList<
                         it.favorite = !it.favorite
                     }
                     presenter.updateTask(context.resources.getInteger(R.integer.setFavorite), task)
+                }
+                R.id.doneTaskButton -> {
+                    task?.let {
+                        it.done = !it.done
+                    }
+                    presenter.updateTask(context.resources.getInteger(R.integer.setDone), task)
                 }
             }
             true
