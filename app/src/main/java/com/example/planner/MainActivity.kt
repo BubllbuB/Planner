@@ -56,6 +56,14 @@ class MainActivity : AppCompatActivity(), MainView {
             android.R.drawable.star_on,
             R.id.tab1
         )
+        this.setNewTab(
+            this@MainActivity,
+            tabHost,
+            "tabFavorite",
+            R.string.textTabFavoriteTasks,
+            android.R.drawable.star_on,
+            R.id.tab2
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -84,13 +92,20 @@ class MainActivity : AppCompatActivity(), MainView {
     }
 
     override fun onListUpdate(tasks: SortedMap<Int,Task>?) {
-        val listView = findViewById<ListView>(R.id.taskListView)
+        val allListView = findViewById<ListView>(R.id.taskListView)
+        val favoriteListView = findViewById<ListView>(R.id.taskFavListView)
+
         val listTasks = arrayListOf<Task>()
         tasks?.values?.let {
             listTasks.addAll(it.toTypedArray())
         }
-        val notesAdapter = TaskAdapter(this, listTasks, presenter)
-        listView.adapter = notesAdapter
+        val taskAllAdapter = TaskAdapter(this, listTasks, presenter)
+        allListView.adapter = taskAllAdapter
+
+        val listFavoriteTasks = arrayListOf<Task>()
+        listFavoriteTasks.addAll(listTasks.filter{ it.favorite })
+        val taskFavoriteAdapter = TaskAdapter(this, listFavoriteTasks, presenter)
+        favoriteListView.adapter = taskFavoriteAdapter
     }
 
     override fun editSelectedTask(task: Task?) {

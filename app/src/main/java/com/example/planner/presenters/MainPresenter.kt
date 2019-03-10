@@ -19,6 +19,7 @@ class MainPresenter(private val view: MainView, private val resources: Resources
             resources.getInteger(R.integer.taskAdd) -> storage.addTask(task)
             resources.getInteger(R.integer.taskEdit) -> storage.editTask(task)
             resources.getInteger(R.integer.taskRemove) -> storage.removeTask(task)
+            resources.getInteger(R.integer.setFavorite) -> storage.editTask(task)
         }
         onUpdaterList()
     }

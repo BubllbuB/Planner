@@ -13,7 +13,7 @@
     <item
             android:id="@+id/favoriteTaskButton"
             android:icon="@drawable/ic_fav"
-            android:title="@string/taskMenuFavorite"
+            android:title="@string/taskMenuAddFavorite"
             android:orderInCategory="2"/>
     <item
             android:id="@+id/doneTaskButton"

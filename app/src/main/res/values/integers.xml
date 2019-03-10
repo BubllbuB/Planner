@@ -3,4 +3,5 @@
     <integer name="taskAdd">1</integer>
     <integer name="taskEdit">2</integer>
     <integer name="taskRemove">3</integer>
+    <integer name="setFavorite">4</integer>
 </resources>

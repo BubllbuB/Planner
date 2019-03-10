@@ -42,6 +42,18 @@
                             android:layout_height="match_parent"/>
 
                 </LinearLayout>
+                <LinearLayout
+                        android:id="@+id/tab2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:ignore="UselessParent">
+
+                    <ListView
+                            android:id="@+id/taskFavListView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+
+                </LinearLayout>
             </FrameLayout>
         </LinearLayout>
     </TabHost>
