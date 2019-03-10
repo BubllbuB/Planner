@@ -63,7 +63,7 @@ class TaskAdapter(private val context: Context, private val taskList: ArrayList<
 
             when (item!!.itemId) {
                 R.id.editTaskButton -> {
-                    //presenter.updateTask(context.resources.getInteger(R.integer.taskEdit),task)
+                    presenter.editTask(task)
                 }
                 R.id.removeTaskButton -> {
                     presenter.updateTask(context.resources.getInteger(R.integer.taskRemove), task)

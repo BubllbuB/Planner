@@ -22,4 +22,8 @@ class MainPresenter(private val view: MainView, private val resources: Resources
         }
         onUpdaterList()
     }
+
+    fun editTask(task: Task?) {
+        view.editSelectedTask(task)
+    }
 }

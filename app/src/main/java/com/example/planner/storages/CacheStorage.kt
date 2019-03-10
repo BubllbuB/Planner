@@ -1,29 +1,26 @@
 package com.example.planner.storages
 
 import com.example.planner.task.Task
+import java.util.*
 
 object CacheStorage: Storage {
-    private var tasksList = arrayListOf<Task>()
+    private var tasksList = sortedMapOf<Int,Task>()
+    private var taskId = 0
 
     override fun addTask(task: Task?) {
-        task?.id = tasksList.size+1
-        task?.let {
-            tasksList.add(task)
-        }
-
+        task?.id = taskId++
+        tasksList[task?.id] = task
     }
 
     override fun removeTask(task: Task?) {
-        tasksList.remove(task)
+        tasksList.remove(task?.id)
     }
 
     override fun editTask(task: Task?) {
-        task?.let {
-            tasksList[task.id] = task
-        }
+        tasksList[task?.id] = task
     }
 
-    override fun getList(): ArrayList<Task>? {
+    override fun getList(): SortedMap<Int, Task>? {
         return tasksList
     }
 }

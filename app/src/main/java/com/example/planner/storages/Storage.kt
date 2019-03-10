@@ -1,6 +1,7 @@
 package com.example.planner.storages
 
 import com.example.planner.task.Task
+import java.util.*
 
 interface Storage {
     fun addTask(task: Task?)
@@ -9,5 +10,5 @@ interface Storage {
 
     fun editTask(task: Task?)
 
-    fun getList():ArrayList<Task>?
+    fun getList(): SortedMap<Int, Task>?
 }
