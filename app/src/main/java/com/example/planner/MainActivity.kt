@@ -17,8 +17,10 @@ import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 const val ADD_TASK = 1
+const val EDIT_TASK = 2
 
 class MainActivity : AppCompatActivity(), MainView {
     private lateinit var drawerLayout: DrawerLayout
@@ -42,7 +44,8 @@ class MainActivity : AppCompatActivity(), MainView {
 
         fab.setOnClickListener {
             val intent = Intent(this, AddTaskActivity::class.java)
-            intent.putExtra("TitleActionBar", R.string.taskAddTitle)
+            intent.putExtra("Action","Add")
+            intent.putExtra("TitleActionBar", R.string.addTaskToolbarTitle)
             startActivityForResult(intent, ADD_TASK)
         }
 
@@ -71,8 +74,8 @@ class MainActivity : AppCompatActivity(), MainView {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == ADD_TASK && resultCode == Activity.RESULT_OK) {
-            presenter.getTasksList()
+        if (resultCode == Activity.RESULT_OK) {
+            presenter.onUpdaterList()
         }
     }
 
@@ -95,7 +98,19 @@ class MainActivity : AppCompatActivity(), MainView {
         tabHost.addTab(tabSpec)
     }
 
-    override fun onListUpdate(tasks: ArrayList<Task>?) {
+    override fun onListUpdate(tasks: SortedMap<Int,Task>?) {
+        val listTasks = arrayListOf<Task>()
+        tasks?.values?.let {
+            listTasks.addAll(it.toTypedArray())
+        }
         listViewAll.adapter = TaskAdapter(this, tasks, presenter)
+    }
+
+    override fun editSelectedTask(task: Task?) {
+        val intent = Intent(this, AddTaskActivity::class.java)
+        intent.putExtra("Action","Edit")
+        intent.putExtra("TitleActionBar", R.string.editTaskToolbarTitle)
+        intent.putExtra("Task", task)
+        startActivityForResult(intent, EDIT_TASK)
     }
 }

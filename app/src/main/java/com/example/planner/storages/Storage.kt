@@ -1,6 +1,5 @@
 package com.example.planner.storages
 
-import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 
 interface Storage {

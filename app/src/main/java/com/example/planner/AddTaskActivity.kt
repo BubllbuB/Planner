@@ -14,12 +14,15 @@ import com.example.planner.viewer.AddView
 
 class AddTaskActivity : AppCompatActivity(), AddView {
     private lateinit var presenter: ITaskPresenter
+    private lateinit var editTask: TextInputLayout
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
         presenter = TaskPresenter(this)
+        editTask = findViewById(R.id.taskTitleTextLayout)
         presenter.startListenStorage()
 
         val actionbar: ActionBar? = supportActionBar
@@ -27,6 +30,13 @@ class AddTaskActivity : AppCompatActivity(), AddView {
             title = intent.getStringExtra("TitleActionBar")
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
+        }
+        val task = intent.getParcelableExtra<Task>("Task")
+        editTask.editText?.setText(task?.title)
+        findViewById<TextInputLayout>(R.id.taskDescriptionTextLayout).editText?.setText(task?.description)
+
+        editTask.editText?.setOnClickListener {
+            editTask.error = null
         }
     }
 
@@ -49,8 +59,25 @@ class AddTaskActivity : AppCompatActivity(), AddView {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.saveTaskButton -> {
-                val title = findViewById<TextInputLayout>(R.id.taskTitleTextLayout).editText?.text.toString()
+                val title = editTask.editText?.text.toString()
                 val desc = findViewById<TextInputLayout>(R.id.taskDescriptionTextLayout).editText?.text.toString()
+                if(title.isBlank()) {
+                    editTask.error = "Title empty"
+                    return false
+                }
+
+                when(intent.getStringExtra("Action")) {
+                    "Add" -> {
+                        val task = Task(title, desc)
+                        presenter.updateTask(1, task)
+                    }
+                    "Edit" -> {
+                        val task = intent.getParcelableExtra<Task>("Task")
+                        task.title = title
+                        task.description = desc
+                        presenter.updateTask(2, task)
+                    }
+                }
                 val task = Task(title, desc)
                 presenter.updateTask(1, task)
                 true

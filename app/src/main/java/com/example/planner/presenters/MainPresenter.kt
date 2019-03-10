@@ -34,4 +34,8 @@ class MainPresenter(private val view: MainView, private val resources: Resources
     override fun stopListenStorage() {
         storage.removeObserver(this)
     }
+
+    fun editTask(task: Task?) {
+        view.editSelectedTask(task)
+    }
 }

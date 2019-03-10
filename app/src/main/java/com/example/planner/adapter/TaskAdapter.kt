@@ -12,7 +12,6 @@ import android.widget.TextView
 import com.example.planner.R
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.task.Task
-
 const val TASK_EDIT = 2
 const val TASK_REMOVE = 3
 
@@ -24,6 +23,7 @@ class TaskAdapter(
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
+
         val view: View
         val vh: ViewHolder
 
