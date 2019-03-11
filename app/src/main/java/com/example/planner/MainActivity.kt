@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.v4.app.LoaderManager
+import android.support.v4.content.Loader
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
@@ -13,6 +15,7 @@ import android.view.MenuItem
 import android.widget.ListView
 import android.widget.TabHost
 import com.example.planner.adapter.TaskAdapter
+import com.example.planner.asyncLoaders.SharedLoader
 import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
@@ -22,9 +25,10 @@ import java.util.*
 const val ADD_TASK = 1
 const val EDIT_TASK = 2
 
-class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var presenter: MainPresenter
+    private lateinit var taskAllAdapter: TaskAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +72,28 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
 
         nav_view.setNavigationItemSelectedListener(this)
         presenter.onUpdaterList()
+
+        @Suppress("DEPRECATION")
+        supportLoaderManager.initLoader(0, null, this@MainActivity).forceLoad()
+    }
+
+    override fun onCreateLoader(p0: Int, p1: Bundle?): Loader<SortedMap<Int, Task>> {
+        return SharedLoader(this@MainActivity)
+    }
+
+    override fun onLoadFinished(p0: Loader<SortedMap<Int, Task>>, tasks: SortedMap<Int, Task>?) {
+        val allListView = findViewById<ListView>(R.id.taskListView)
+        val listTasks = arrayListOf<Task>()
+        tasks?.values?.let {
+            listTasks.addAll(it.toTypedArray())
+        }
+        taskAllAdapter = TaskAdapter(this, listTasks, presenter)
+        allListView.adapter = taskAllAdapter
+    }
+
+    override fun onLoaderReset(p0: Loader<SortedMap<Int, Task>>) {
+        val allListView = findViewById<ListView>(R.id.taskListView)
+        allListView.adapter = null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -116,7 +142,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         tasks?.values?.let {
             listTasks.addAll(it.toTypedArray())
         }
-        val taskAllAdapter = TaskAdapter(this, listTasks, presenter)
+        taskAllAdapter = TaskAdapter(this, listTasks, presenter)
         allListView.adapter = taskAllAdapter
 
         val listFavoriteTasks = arrayListOf<Task>()
