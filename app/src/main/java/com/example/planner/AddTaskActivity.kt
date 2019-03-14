@@ -29,7 +29,7 @@ class AddTaskActivity : AppCompatActivity(), AddView {
         editTaskTitle = findViewById(R.id.taskTitleTextLayout)
         editTaskDescription = findViewById(R.id.taskDescriptionTextLayout)
 
-        presenter = TaskPresenter(this, this@AddTaskActivity)
+        presenter = TaskPresenter(this, this@AddTaskActivity, supportLoaderManager)
         presenter.startListenStorage()
 
         val task = intent.getParcelableExtra<Task>("Task")
@@ -104,6 +104,8 @@ class AddTaskActivity : AppCompatActivity(), AddView {
                         presenter.updateTask(2, task)
                     }
                 }
+                setResult(RESULT_OK)
+                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)

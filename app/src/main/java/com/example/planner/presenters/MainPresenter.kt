@@ -2,6 +2,7 @@ package com.example.planner.presenters
 
 import android.content.Context
 import android.content.res.Resources
+import android.support.v4.app.LoaderManager
 import com.example.planner.R
 import com.example.planner.observer.StorageObserver
 import com.example.planner.storages.CacheStorage
@@ -9,8 +10,9 @@ import com.example.planner.storages.Storage
 import com.example.planner.storages.StorageFactory
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
+import java.util.*
 
-class MainPresenter(private val view: MainView, context: Context, private val resources: Resources): StorageObserver, IMainPresenter {
+class MainPresenter(private val view: MainView, context: Context, loaderManager: LoaderManager, private val resources: Resources): StorageObserver, IMainPresenter {
     private val storage: Storage = StorageFactory.getStorage(context)
 
 

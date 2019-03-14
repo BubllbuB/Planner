@@ -5,12 +5,16 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.v4.app.LoaderManager
+import android.support.v4.content.Loader
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.view.View
 import android.widget.ListView
+import android.widget.ProgressBar
 import android.widget.TabHost
 import com.example.planner.adapter.TaskAdapter
 import com.example.planner.presenters.IMainPresenter
@@ -39,7 +43,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
 
-        presenter = MainPresenter(this, this@MainActivity, this.applicationContext.resources)
+        presenter = MainPresenter(this, this@MainActivity, supportLoaderManager, this.applicationContext.resources)
         presenter.startListenStorage()
 
         drawerLayout = findViewById(R.id.drawer_layout)

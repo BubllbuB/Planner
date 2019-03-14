@@ -18,6 +18,11 @@ class SharedLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(con
     override fun loadInBackground(): SortedMap<Int, Task>? {
         val sharedFile = sharedPreferences
         val savedTasksJsonString = sharedFile.getString(SHARED_PREFERENCES_KEY_TASK_LIST, "")
+
+        val editor = sharedFile.edit()
+        editor.putString(SHARED_PREFERENCES_KEY_TASK_LIST, "")
+        editor.apply()
+
         gson = GsonBuilder().setPrettyPrinting().create()
         val itemType = object : TypeToken<SortedMap<Int, Task>>() {}.type
         savedTasksJsonString?.let {
