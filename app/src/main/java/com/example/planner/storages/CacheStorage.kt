@@ -1,5 +1,6 @@
 package com.example.planner.storages
 
+import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 import java.util.*
 
@@ -20,7 +21,7 @@ object CacheStorage: Storage {
         tasksList[task?.id] = task
     }
 
-    override fun getList(): SortedMap<Int, Task>? {
+    override fun getList(presenter: MainPresenter): SortedMap<Int, Task>? {
         return tasksList
     }
 }

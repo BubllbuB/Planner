@@ -12,7 +12,9 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.view.View
 import android.widget.ListView
+import android.widget.ProgressBar
 import android.widget.TabHost
 import com.example.planner.adapter.TaskAdapter
 import com.example.planner.asyncLoaders.SharedLoader
@@ -25,7 +27,7 @@ import java.util.*
 const val ADD_TASK = 1
 const val EDIT_TASK = 2
 
-class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
+class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationItemSelectedListener {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var presenter: MainPresenter
     private lateinit var taskAllAdapter: TaskAdapter
@@ -40,7 +42,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
-        presenter = MainPresenter(this, this@MainActivity, this.applicationContext.resources)
+        presenter = MainPresenter(this, this@MainActivity, supportLoaderManager, this.applicationContext.resources)
         drawerLayout = findViewById(R.id.drawer_layout)
 
         fab.setOnClickListener {
@@ -71,34 +73,31 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         )
 
         nav_view.setNavigationItemSelectedListener(this)
-        presenter.onUpdaterList()
-
-        @Suppress("DEPRECATION")
-        supportLoaderManager.initLoader(0, null, this@MainActivity).forceLoad()
+        presenter.getTasksList()
     }
 
-    override fun onCreateLoader(p0: Int, p1: Bundle?): Loader<SortedMap<Int, Task>> {
-        return SharedLoader(this@MainActivity)
-    }
+    //override fun onCreateLoader(p0: Int, p1: Bundle?): Loader<SortedMap<Int, Task>> {
+    //    return SharedLoader(this@MainActivity)
+    //}
 
-    override fun onLoadFinished(p0: Loader<SortedMap<Int, Task>>, tasks: SortedMap<Int, Task>?) {
-        val allListView = findViewById<ListView>(R.id.taskListView)
-        val listTasks = arrayListOf<Task>()
-        tasks?.values?.let {
-            listTasks.addAll(it.toTypedArray())
-        }
-        taskAllAdapter = TaskAdapter(this, listTasks, presenter)
-        allListView.adapter = taskAllAdapter
-    }
+    //override fun onLoadFinished(p0: Loader<SortedMap<Int, Task>>, tasks: SortedMap<Int, Task>?) {
+    //    val allListView = findViewById<ListView>(R.id.taskListView)
+    //    val listTasks = arrayListOf<Task>()
+    //    tasks?.values?.let {
+    //        listTasks.addAll(it.toTypedArray())
+    //    }
+    //    taskAllAdapter = TaskAdapter(this, listTasks, presenter)
+    //    allListView.adapter = taskAllAdapter
+    //}
 
-    override fun onLoaderReset(p0: Loader<SortedMap<Int, Task>>) {
-        val allListView = findViewById<ListView>(R.id.taskListView)
-        allListView.adapter = null
-    }
+    //override fun onLoaderReset(p0: Loader<SortedMap<Int, Task>>) {
+    //    val allListView = findViewById<ListView>(R.id.taskListView)
+    //    allListView.adapter = null
+    //}
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
-            presenter.onUpdaterList()
+            presenter.getTasksList()
         }
     }
 
@@ -135,6 +134,9 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     }
 
     override fun onListUpdate(tasks: SortedMap<Int, Task>?) {
+        findViewById<ProgressBar>(R.id.progressBarAll).visibility = View.GONE
+        findViewById<ProgressBar>(R.id.progressBarFav).visibility = View.GONE
+
         val allListView = findViewById<ListView>(R.id.taskListView)
         val favoriteListView = findViewById<ListView>(R.id.taskFavListView)
 

@@ -1,13 +1,14 @@
 package com.example.planner.presenters
 
+import android.support.v4.app.LoaderManager
 import android.support.v7.app.AppCompatActivity
 import com.example.planner.R
 import com.example.planner.storages.Storage
 import com.example.planner.storages.StorageFactory
 import com.example.planner.task.Task
 
-class TaskPresenter(private val view: AppCompatActivity) {
-    private val storage: Storage = StorageFactory.getStorage(view.applicationContext)
+class TaskPresenter(private val view: AppCompatActivity, loaderManager: LoaderManager) {
+    private val storage: Storage = StorageFactory.getStorage(view.applicationContext, loaderManager)
 
     fun updateTask(actionId: Int, task: Task?) {
         when (actionId) {

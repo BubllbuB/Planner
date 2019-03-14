@@ -1,48 +1,67 @@
 package com.example.planner.storages
 
 import android.content.Context
+import android.os.Bundle
+import android.support.v4.app.LoaderManager
+import android.support.v4.content.Loader
+import com.example.planner.asyncLoaders.SharedLoader
+import com.example.planner.asyncLoaders.SharedWriter
+import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import java.util.*
 
 
 const val SHARED_PREFERENCES_FILE_TASKS = "tasksList"
 const val SHARED_PREFERENCES_KEY_TASK_LIST = "tasks"
 const val SHARED_PREFERENCES_KEY_LAST_ID = "lastId"
+const val SHARED_LOADER = 0
+const val SHARED_WRITER = 1
+const val PARCEBLE_TASK = "task"
 
-class SharedPreferencesStorage(private val context: Context, private val tasksList: SortedMap<Int, Task>) : Storage {
+class SharedPreferencesStorage(
+    private val context: Context,
+    private val loaderManager: LoaderManager,
+    private val tasksList: SortedMap<Int, Task>
+) : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
     private var gson = Gson()
     var taskListJsonString = ""
+    var taskMap = sortedMapOf<Int, Task>()
+    private lateinit var presenterView: MainPresenter
+
+    override fun onCreateLoader(id: Int, bundle: Bundle?): Loader<SortedMap<Int, Task>> {
+        return when(id) {
+            SHARED_LOADER -> SharedLoader(context)
+            SHARED_WRITER -> SharedWriter(context, bundle?.getString(PARCEBLE_TASK))
+            else -> Loader(context)
+        }
+    }
+
+    override fun onLoadFinished(loader: Loader<SortedMap<Int, Task>>, tasks: SortedMap<Int, Task>?) {
+        if(loader is SharedLoader) {
+            taskMap = tasks ?: sortedMapOf()
+            presenterView.onUpdaterList(taskMap)
+        }
+    }
+
+    override fun onLoaderReset(loader: Loader<SortedMap<Int, Task>>) {
+        taskMap = sortedMapOf()
+    }
 
     override fun addTask(task: Task?) {
+        val bundle = Bundle()
         val sharedFile = context.getSharedPreferences(SHARED_PREFERENCES_FILE_TASKS, 0)
-        val editor = sharedFile.edit()
-
         val lastId = sharedFile.getInt(SHARED_PREFERENCES_KEY_LAST_ID, 0)
 
         task?.id = lastId + 1
         tasksList[task?.id] = task
 
-        for(a in 1 .. 90000) {
-            task?.id = lastId + a
-            task?.title = (lastId + a).toString()
-            tasksList[task?.id] = task
-        }
-
         taskListJsonString = gson.toJson(tasksList)
 
-        var savedTasksJsonString = sharedFile.getString(SHARED_PREFERENCES_KEY_TASK_LIST, "")
-        if (!savedTasksJsonString.isNullOrEmpty()) {
-            taskListJsonString = taskListJsonString.removeRange(0, 1)
-            savedTasksJsonString = savedTasksJsonString.dropLast(1)
-            editor.putString(SHARED_PREFERENCES_KEY_TASK_LIST, "$savedTasksJsonString,$taskListJsonString")
-        } else
-            editor.putString(SHARED_PREFERENCES_KEY_TASK_LIST, taskListJsonString)
+        bundle.putString(PARCEBLE_TASK, taskListJsonString)
+        loaderManager.initLoader(SHARED_WRITER, bundle, this).forceLoad()
 
-        editor.putInt(SHARED_PREFERENCES_KEY_LAST_ID, lastId + 1)
-        editor.apply()
+
     }
 
     override fun removeTask(task: Task?) {
@@ -73,7 +92,9 @@ class SharedPreferencesStorage(private val context: Context, private val tasksLi
         editor.apply()
     }
 
-    override fun getList(): SortedMap<Int, Task>? {
+    override fun getList(presenter: MainPresenter): SortedMap<Int, Task>? {
+        presenterView = presenter
+        loaderManager.initLoader(SHARED_LOADER, null, this).forceLoad()
         //val loader = SharedLoader(context.getSharedPreferences(SHARED_PREFERENCES_FILE_TASKS, 0))
         //tasksList = loader.execute().get()
 
@@ -89,6 +110,6 @@ class SharedPreferencesStorage(private val context: Context, private val tasksLi
         //    }
         //}
 
-        return tasksList
+        return taskMap
     }
 }

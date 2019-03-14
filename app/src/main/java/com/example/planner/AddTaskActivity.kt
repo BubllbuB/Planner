@@ -18,7 +18,7 @@ class AddTaskActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
-        presenter = TaskPresenter(this)
+        presenter = TaskPresenter(this, supportLoaderManager)
         editTask = findViewById(R.id.taskTitleTextLayout)
 
         val actionbar: ActionBar? = supportActionBar
