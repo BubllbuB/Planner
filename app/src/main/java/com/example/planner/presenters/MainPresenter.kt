@@ -29,7 +29,6 @@ class MainPresenter(private val view: MainView, context: Context, loaderManager:
             resources.getInteger(R.integer.setFavorite) -> storage.editTask(task)
             resources.getInteger(R.integer.setDone) -> storage.editTask(task)
         }
-        getTasksList()
     }
 
     fun editTask(task: Task?) {
