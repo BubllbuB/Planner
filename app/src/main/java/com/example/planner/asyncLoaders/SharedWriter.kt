@@ -9,7 +9,7 @@ import java.util.*
 
 class SharedWriter(
     context: Context,
-    private val task: Task?,
+    private var task: Task?,
     private val action: Int?,
     private val tasks: SortedMap<Int, Task>
 ) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {
@@ -40,15 +40,6 @@ class SharedWriter(
             }
         }
 
-        //for (a in 1..90000) {
-        //    val t = Task(a.toString(),a.toString())
-        //    t.id = lastId + a
-        //    t.title = (lastId + a).toString()
-        //    tasks[t.id] = t
-
-        //    val taskJson = gson.toJson(t)
-        //    editor.putString(SHARED_PREFERENCES_KEY_TASK + t.id, taskJson)
-        //}
         editor.apply()
         return tasks
     }
