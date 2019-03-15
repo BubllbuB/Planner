@@ -3,7 +3,6 @@ package com.example.planner.asyncLoaders
 import android.content.Context
 import android.support.v4.content.AsyncTaskLoader
 import com.example.planner.storages.SHARED_PREFERENCES_FILE_TASKS
-import com.example.planner.storages.SHARED_PREFERENCES_KEY_TASK_LIST
 import com.example.planner.task.Task
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
