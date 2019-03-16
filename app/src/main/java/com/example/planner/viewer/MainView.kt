@@ -6,4 +6,5 @@ import java.util.*
 interface MainView {
     fun onListUpdate(tasks: SortedMap<Int, Task>?)
     fun editSelectedTask(task: Task?)
+    fun showProgressBars()
 }

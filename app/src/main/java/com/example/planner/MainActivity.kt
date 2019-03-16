@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.LoaderManager
-import android.support.v4.content.Loader
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
@@ -17,7 +16,6 @@ import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.TabHost
 import com.example.planner.adapter.TaskAdapter
-import com.example.planner.asyncLoaders.SharedLoader
 import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
@@ -37,13 +35,19 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        initComponents()
+
+        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this), this.applicationContext.resources)
+        drawerLayout = findViewById(R.id.drawer_layout)
+        presenter.getTasksList()
+    }
+
+    private fun initComponents() {
         val actionbar: ActionBar? = supportActionBar
         actionbar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
-        presenter = MainPresenter(this, this@MainActivity, supportLoaderManager, this.applicationContext.resources)
-        drawerLayout = findViewById(R.id.drawer_layout)
 
         fab.setOnClickListener {
             val intent = Intent(this, AddTaskActivity::class.java)
@@ -73,27 +77,12 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         )
 
         nav_view.setNavigationItemSelectedListener(this)
-        presenter.getTasksList()
     }
 
-    //override fun onCreateLoader(p0: Int, p1: Bundle?): Loader<SortedMap<Int, Task>> {
-    //    return SharedLoader(this@MainActivity)
-    //}
-
-    //override fun onLoadFinished(p0: Loader<SortedMap<Int, Task>>, tasks: SortedMap<Int, Task>?) {
-    //    val allListView = findViewById<ListView>(R.id.taskListView)
-    //    val listTasks = arrayListOf<Task>()
-    //    tasks?.values?.let {
-    //        listTasks.addAll(it.toTypedArray())
-    //    }
-    //    taskAllAdapter = TaskAdapter(this, listTasks, presenter)
-    //    allListView.adapter = taskAllAdapter
-    //}
-
-    //override fun onLoaderReset(p0: Loader<SortedMap<Int, Task>>) {
-    //    val allListView = findViewById<ListView>(R.id.taskListView)
-    //    allListView.adapter = null
-    //}
+    override fun onStart() {
+        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this), this.applicationContext.resources)
+        super.onStart()
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
@@ -134,8 +123,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     }
 
     override fun onListUpdate(tasks: SortedMap<Int, Task>?) {
-        findViewById<ProgressBar>(R.id.progressBarAll).visibility = View.GONE
-        findViewById<ProgressBar>(R.id.progressBarFav).visibility = View.GONE
+        hideProgressBars()
 
         val allListView = findViewById<ListView>(R.id.taskListView)
         val favoriteListView = findViewById<ListView>(R.id.taskFavListView)
@@ -159,5 +147,15 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         intent.putExtra("TitleActionBar", R.string.editTaskToolbarTitle)
         intent.putExtra("Task", task)
         startActivityForResult(intent, EDIT_TASK)
+    }
+
+    override fun showProgressBars() {
+        findViewById<ProgressBar>(R.id.progressBarAll).visibility = View.VISIBLE
+        findViewById<ProgressBar>(R.id.progressBarFav).visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBars() {
+        findViewById<ProgressBar>(R.id.progressBarAll).visibility = View.GONE
+        findViewById<ProgressBar>(R.id.progressBarFav).visibility = View.GONE
     }
 }

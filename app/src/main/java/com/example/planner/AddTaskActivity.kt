@@ -2,6 +2,7 @@ package com.example.planner
 
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
+import android.support.v4.app.LoaderManager
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -18,7 +19,7 @@ class AddTaskActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
-        presenter = TaskPresenter(this, supportLoaderManager)
+        presenter = TaskPresenter(this, LoaderManager.getInstance(this))
         editTask = findViewById(R.id.taskTitleTextLayout)
 
         val actionbar: ActionBar? = supportActionBar

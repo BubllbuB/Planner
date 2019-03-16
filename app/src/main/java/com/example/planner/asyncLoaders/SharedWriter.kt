@@ -16,11 +16,6 @@ class SharedWriter(
     private val sharedPreferences = context.getSharedPreferences(SHARED_PREFERENCES_FILE_TASKS, 0)
     private var gson = Gson()
 
-    override fun onStartLoading() {
-        super.onStartLoading()
-        forceLoad()
-    }
-
     override fun loadInBackground(): SortedMap<Int, Task>? {
         val sharedFile = sharedPreferences
         val editor = sharedFile.edit()
