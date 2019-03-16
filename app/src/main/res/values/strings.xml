@@ -30,4 +30,5 @@
     <string name="prefInternalSummary">Store all tasks in internal file</string>
     <string name="prefSharedSummary">Store all tasks in shared preferences</string>
     <string name="prefCacheSummary">Store all tasks in cache. Clean after reload app.</string>
+    <string name="erorr_external_permission">External storage can\'t possible without storage permissions. Set Shared Preferences storage.</string>
 </resources>

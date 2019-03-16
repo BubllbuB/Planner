@@ -1,20 +1,26 @@
 package com.example.planner
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.LoaderManager
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.preference.PreferenceManager
 import android.view.MenuItem
 import android.view.View
 import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.TabHost
+import android.widget.Toast
 import com.example.planner.adapter.TaskAdapter
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.presenters.MainPresenter
@@ -24,6 +30,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 const val ADD_TASK = 1
 const val EDIT_TASK = 2
+const val CHECK_REQUEST = 3
+const val PREF_SHARED = "storageTypeShared"
+const val PREF_EXTERNAL = "storageTypeExternal"
 
 class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationItemSelectedListener {
     private lateinit var drawerLayout: DrawerLayout
@@ -41,7 +50,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         init()
 
         presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this), this.applicationContext.resources)
-        presenter.startListenStorage()
+        drawerLayout = findViewById(R.id.drawer_layout)
         presenter.getTasksList()
     }
 
@@ -161,5 +170,58 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     private fun hideProgressBars() {
         progressBarAll.visibility = View.GONE
         progressBarFav.visibility = View.GONE
+    }
+
+    private fun checkPermissions() {
+        val pref = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
+        if (pref.getBoolean(PREF_EXTERNAL, false)) {
+            val permissionWrite = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+
+            val permissionRead = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+
+            if (permissionWrite != PackageManager.PERMISSION_GRANTED || permissionRead != PackageManager.PERMISSION_GRANTED
+            ) {
+                makeRequest()
+            } else {
+                presenter.getTasksList()
+            }
+        } else {
+            presenter.getTasksList()
+        }
+    }
+
+    private fun makeRequest() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
+            CHECK_REQUEST
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray
+    ) {
+        when (requestCode) {
+            CHECK_REQUEST -> {
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    val pref = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
+                    val editor = pref.edit()
+                    editor.putBoolean(PREF_SHARED, true)
+                    editor.putBoolean(PREF_EXTERNAL, false)
+                    editor.apply()
+                    Toast.makeText(this@MainActivity, R.string.erorr_external_permission, Toast.LENGTH_SHORT).show()
+                    presenter.getTasksList()
+                } else {
+                    presenter.getTasksList()
+                }
+            }
+        }
     }
 }
