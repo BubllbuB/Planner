@@ -16,7 +16,9 @@ const val SHARED_PREFERENCES_FILE_TASKS = "tasksList"
 const val SHARED_PREFERENCES_KEY_TASK = "task_"
 const val SHARED_PREFERENCES_KEY_LAST_ID = "lastId"
 const val SHARED_LOADER = 0
-const val SHARED_WRITER = 1
+const val SHARED_EDIT = 2
+const val SHARED_REMOVE = 3
+const val SHARED_ADD = 4
 const val PARCELABLE_TASK = "task"
 const val WRITER_ACTION = "action"
 const val WRITER_ADD = 1
@@ -40,13 +42,13 @@ object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
     override fun onCreateLoader(id: Int, bundle: Bundle?): Loader<SortedMap<Int, Task>> {
         context.get()?.let {
             return when (id) {
-                SHARED_WRITER -> SharedWriter(
+                SHARED_LOADER -> SharedLoader(it)
+                else -> SharedWriter(
                     it,
                     bundle?.getParcelable(PARCELABLE_TASK),
                     bundle?.getInt(WRITER_ACTION),
                     taskMap
                 )
-                else -> SharedLoader(it)
             }
         }
         return Loader(context.get()!!)
@@ -65,14 +67,14 @@ object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
         val bundle = Bundle()
         bundle.putParcelable(PARCELABLE_TASK, task)
         bundle.putInt(WRITER_ACTION, WRITER_ADD)
-        loaderManager.restartLoader(SHARED_WRITER, bundle, this)
+        loaderManager.restartLoader(SHARED_ADD, bundle, this).forceLoad()
     }
 
     override fun removeTask(task: Task?) {
         val bundle = Bundle()
         bundle.putParcelable(PARCELABLE_TASK, task)
         bundle.putInt(WRITER_ACTION, WRITER_REMOVE)
-        loaderManager.restartLoader(SHARED_WRITER, bundle, this)
+        loaderManager.restartLoader(SHARED_REMOVE, bundle, this).forceLoad()
 
     }
 
@@ -80,12 +82,13 @@ object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
         val bundle = Bundle()
         bundle.putParcelable(PARCELABLE_TASK, task)
         bundle.putInt(WRITER_ACTION, WRITER_EDIT)
-        loaderManager.restartLoader(SHARED_WRITER, bundle, this)
+        loaderManager.restartLoader(SHARED_EDIT, bundle, this).forceLoad()
     }
 
     override fun getList(presenter: MainPresenter): SortedMap<Int, Task>? {
+        presenterView = presenter
+
         if (taskMap.isEmpty()) {
-            presenterView = presenter
             loaderManager.initLoader(SHARED_LOADER, null, this).forceLoad()
         } else {
             presenter.onUpdaterList(taskMap)

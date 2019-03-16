@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.LoaderManager
-import android.support.v4.content.Loader
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
@@ -129,6 +128,8 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     }
 
     override fun onListUpdate(tasks: Map<Int, Task>) {
+        hideProgressBars()
+
         val listTasks = arrayListOf<Task>()
         listTasks.addAll(tasks.values.toTypedArray())
         listViewAll.adapter = TaskAdapter(this, listTasks, presenter)
@@ -142,5 +143,15 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         val intent = Intent(this, AddTaskActivity::class.java)
         intent.putExtra("Task", task)
         startActivityForResult(intent, EDIT_TASK)
+    }
+
+    override fun showProgressBars() {
+        findViewById<ProgressBar>(R.id.progressBarAll).visibility = View.VISIBLE
+        findViewById<ProgressBar>(R.id.progressBarFav).visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBars() {
+        findViewById<ProgressBar>(R.id.progressBarAll).visibility = View.GONE
+        findViewById<ProgressBar>(R.id.progressBarFav).visibility = View.GONE
     }
 }

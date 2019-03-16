@@ -2,13 +2,15 @@ package com.example.planner.storages
 
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
+import java.util.*
 
 object CacheStorage: Storage {
     private var tasksList = sortedMapOf<Int,Task>()
+    private var taskId = 0
     private val observers: MutableList<StorageObserver> = ArrayList()
 
     override fun addTask(task: Task) {
-        task.id = tasksList.size+1
+        task.id = taskId++
         tasksList[task.id] = task
         notifyObservers(tasksList)
     }

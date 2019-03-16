@@ -25,6 +25,8 @@ class MainPresenter(private val view: MainView, context: Context, loaderManager:
     }
 
     override fun updateTask(actionId: Int, task: Task) {
+        view.showProgressBars()
+
         when (actionId) {
             resources.getInteger(R.integer.taskAdd) -> storage.addTask(task)
             resources.getInteger(R.integer.taskEdit) -> storage.editTask(task)

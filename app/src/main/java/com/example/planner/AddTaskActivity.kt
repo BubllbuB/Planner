@@ -2,6 +2,7 @@ package com.example.planner
 
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
+import android.support.v4.app.LoaderManager
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
@@ -29,7 +30,7 @@ class AddTaskActivity : AppCompatActivity(), AddView {
         editTaskTitle = findViewById(R.id.taskTitleTextLayout)
         editTaskDescription = findViewById(R.id.taskDescriptionTextLayout)
 
-        presenter = TaskPresenter(this, this@AddTaskActivity, supportLoaderManager)
+        presenter = TaskPresenter(this, LoaderManager.getInstance(this), this@AddTaskActivity)
         presenter.startListenStorage()
 
         val task = intent.getParcelableExtra<Task>("Task")

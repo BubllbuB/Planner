@@ -1,5 +1,6 @@
 package com.example.planner.presenters
 
+import android.support.v4.app.LoaderManager
 import android.support.v7.app.AppCompatActivity
 import com.example.planner.R
 import com.example.planner.storages.Storage
