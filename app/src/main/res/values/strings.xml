@@ -6,4 +6,7 @@
     <string name="tasksNavMenuTitle">Tasks</string>
     <string name="menuNavMenuTitle">Menu</string>
     <string name="textTabAllTasks">All</string>
+    <string name="addTaskToolbarTitle">Add Task</string>
+    <string name="taskAddTitle">Title</string>
+    <string name="taskAddDescription">Description</string>
 </resources>
