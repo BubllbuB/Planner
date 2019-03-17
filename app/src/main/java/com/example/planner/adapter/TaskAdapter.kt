@@ -21,11 +21,9 @@ class TaskAdapter(
     private val taskList: ArrayList<Task>?,
     private val presenter: IMainPresenter
 ) : BaseAdapter() {
-
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
-
         val view: View
         val vh: ViewHolder
 
@@ -40,7 +38,6 @@ class TaskAdapter(
 
         vh.titleTextView?.text = taskList?.get(position)?.title
         vh.descriptionTextView?.text = taskList?.get(position)?.description
-
 
         vh.moreImageView?.setOnClickListener {
             showPopup(context, it, taskList?.get(position))
