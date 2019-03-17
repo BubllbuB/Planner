@@ -32,7 +32,6 @@ object InternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, T
     fun init(context: WeakReference<Context>, loaderManager: LoaderManager): InternalStorage {
         this.context = context
         this.loaderManager = loaderManager
-
         return this
     }
 
