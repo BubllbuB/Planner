@@ -25,9 +25,7 @@ class ExternalWriter(
         val file = File(
             Environment.getExternalStorageDirectory(), EXTERNAL_FILE_TASKS
         )
-
         val osw = OutputStreamWriter(FileOutputStream(file))
-
         val lastId = if(tasks.isEmpty()) 0 else tasks.lastKey()
 
         when (action) {
