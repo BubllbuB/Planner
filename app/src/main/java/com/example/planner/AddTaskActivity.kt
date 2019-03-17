@@ -18,13 +18,7 @@ class AddTaskActivity : AppCompatActivity() {
             title = intent.getStringExtra("TitleActionBar")
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            setHomeAsUpIndicator(R.drawable.ic_arrow_back)
         }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
