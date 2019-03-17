@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity(), MainView {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var presenter: IMainPresenter
     private lateinit var listViewAll: ListView
+    private lateinit var listViewFav: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity(), MainView {
         presenter.startListenStorage()
         drawerLayout = findViewById(R.id.drawer_layout)
         listViewAll = findViewById(R.id.taskListView)
+        listViewFav = findViewById(R.id.taskFavListView)
 
         fab.setOnClickListener {
             val intent = Intent(this, AddTaskActivity::class.java)
@@ -104,22 +106,14 @@ class MainActivity : AppCompatActivity(), MainView {
     }
 
     override fun onListUpdate(tasks: Map<Int, Task>) {
-        val allListView = findViewById<ListView>(R.id.taskListView)
-        val favoriteListView = findViewById<ListView>(R.id.taskFavListView)
-
         val listTasks = arrayListOf<Task>()
         listTasks.addAll(tasks.values.toTypedArray())
         listViewAll.adapter = TaskAdapter(this, listTasks, presenter)
-        tasks?.values?.let {
-            listTasks.addAll(it.toTypedArray())
-        }
-        val taskAllAdapter = TaskAdapter(this, listTasks, presenter)
-        allListView.adapter = taskAllAdapter
+
 
         val listFavoriteTasks = arrayListOf<Task>()
         listFavoriteTasks.addAll(listTasks.filter{ it.favorite })
-        val taskFavoriteAdapter = TaskAdapter(this, listFavoriteTasks, presenter)
-        favoriteListView.adapter = taskFavoriteAdapter
+        listViewFav.adapter = TaskAdapter(this, listFavoriteTasks, presenter)
     }
 
     override fun editSelectedTask(task: Task?) {

@@ -12,8 +12,10 @@ import android.widget.TextView
 import com.example.planner.R
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.task.Task
+
 const val TASK_EDIT = 2
 const val TASK_REMOVE = 3
+const val TASK_FAVORITE = 4
 
 class TaskAdapter(
     private val context: Context,
@@ -64,8 +66,8 @@ class TaskAdapter(
         popup.inflate(R.menu.task)
         val favItem = popup.menu.findItem(R.id.favoriteTaskButton)
         task?.let {
-            if(!it.favorite) favItem.title = context.resources.getString(R.string.taskMenuAddFavorite)
-            else favItem.title = context.resources.getString(R.string.taskMenuRemoveFavorite)
+            favItem.title = if (it.favorite) context.resources.getString(R.string.taskMenuRemoveFavorite)
+            else context.resources.getString(R.string.taskMenuAddFavorite)
         }
 
         task?.let {
@@ -79,10 +81,8 @@ class TaskAdapter(
                         presenter.updateTask(TASK_REMOVE, it)
                     }
                     R.id.favoriteTaskButton -> {
-                        task?.let {
-                            it.favorite = !it.favorite
-                        }
-                        presenter.updateTask(context.resources.getInteger(R.integer.setFavorite), task)
+                        task.favorite = !task.favorite
+                        presenter.updateTask(TASK_FAVORITE, task)
                     }
                 }
                 true
