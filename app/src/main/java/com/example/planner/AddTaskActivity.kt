@@ -86,6 +86,7 @@ class AddTaskActivity : AppCompatActivity(), AddView {
             R.id.saveTaskButton -> {
                 val title = editTaskTitle.editText?.text.toString()
                 val desc = editTaskDescription.editText?.text.toString()
+
                 if (title.isBlank()) {
                     editTaskTitle.error = "Title empty"
                     return true
