@@ -30,7 +30,10 @@ class SettingsActivity : PreferenceActivity(), NavigationView.OnNavigationItemSe
         getDelegate().onCreate(savedInstanceState)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+
         addPreferencesFromResource(R.xml.preferences)
+        PreferenceManager.setDefaultValues(this,R.xml.preferences,false)
+
         drawerLayout = findViewById(R.id.drawer_layout_settings)
 
         val actionbar: ActionBar? = getDelegate().supportActionBar
@@ -41,7 +44,6 @@ class SettingsActivity : PreferenceActivity(), NavigationView.OnNavigationItemSe
         }
 
         nav_viewSettings.setNavigationItemSelectedListener(this)
-        PreferenceManager.setDefaultValues(this,R.xml.preferences,false)
 
         initCheckboxes()
     }
