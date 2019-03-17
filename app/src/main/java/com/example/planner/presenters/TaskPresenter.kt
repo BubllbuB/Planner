@@ -1,18 +1,19 @@
 package com.example.planner.presenters
 
+import android.content.Context
 import com.example.planner.observer.StorageObserver
-import com.example.planner.storages.CacheStorage
 import com.example.planner.storages.Storage
+import com.example.planner.storages.StorageFactory
 import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
 
 const val TASK_ADD = 1
 const val TASK_EDIT = 2
 
-class TaskPresenter(private val view: AppCompatActivity) {
-    private val storage: Storage = StorageFactory.getStorage()
+class TaskPresenter(private val view: AddView, context: Context) : StorageObserver, ITaskPresenter {
+    private val storage: Storage = StorageFactory.getStorage(context)
 
-    override fun onUpdateList(list: Map<Int,Task>) {
+    override fun onUpdateList(list: Map<Int, Task>) {
         view.onTaskSaveSuccess()
     }
 

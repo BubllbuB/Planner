@@ -38,9 +38,10 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
-        presenter = MainPresenter(this, this.applicationContext.resources)
-        presenter.startListenStorage()
+
         presenter = MainPresenter(this, this@MainActivity, this.applicationContext.resources)
+        presenter.startListenStorage()
+
         drawerLayout = findViewById(R.id.drawer_layout)
         listViewAll = findViewById(R.id.taskListView)
         listViewFav = findViewById(R.id.taskFavListView)
@@ -71,11 +72,11 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         )
 
         nav_view.setNavigationItemSelectedListener(this)
-        presenter.onUpdaterList()
+        presenter.getTasksList()
     }
 
     override fun onStart() {
-        presenter = MainPresenter(this, this.applicationContext.resources)
+        presenter = MainPresenter(this, this@MainActivity, this.applicationContext.resources)
         presenter.startListenStorage()
         super.onStart()
     }

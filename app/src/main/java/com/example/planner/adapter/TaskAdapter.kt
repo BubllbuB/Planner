@@ -38,24 +38,20 @@ class TaskAdapter(
             view = convertView
             vh = view.tag as ViewHolder
         }
-        taskList.let { list ->
-            vh.titleTextView.text = list?.get(position)?.title
-            vh.descriptionTextView.text = list?.get(position)?.description
 
-            list?.get(position)?.let {
-                if(it.done) {
-                    vh.titleTextView.paintFlags = (vh.titleTextView.paintFlags
-                            or(Paint.STRIKE_THRU_TEXT_FLAG))
-                    vh.descriptionTextView.paintFlags = (vh.descriptionTextView.paintFlags
-                            or(Paint.STRIKE_THRU_TEXT_FLAG))
-                }
+        vh.titleTextView.text = taskList?.get(position)?.title
+        vh.descriptionTextView.text = taskList?.get(position)?.description
+
+        taskList?.get(position)?.let {
+            if (it.done) {
+                vh.titleTextView.paintFlags = (vh.titleTextView.paintFlags
+                        or (Paint.STRIKE_THRU_TEXT_FLAG))
+                vh.descriptionTextView.paintFlags = (vh.descriptionTextView.paintFlags
+                        or (Paint.STRIKE_THRU_TEXT_FLAG))
             }
         }
 
-        vh.titleTextView?.text = taskList?.get(position)?.title
-        vh.descriptionTextView?.text = taskList?.get(position)?.description
-
-        vh.moreImageView?.setOnClickListener {
+        vh.moreImageView.setOnClickListener {
             showPopup(context, it, taskList?.get(position))
         }
 
@@ -83,19 +79,11 @@ class TaskAdapter(
         task?.let {
             favItem.title = if (it.favorite) context.resources.getString(R.string.taskMenuRemoveFavorite)
             else context.resources.getString(R.string.taskMenuAddFavorite)
-        }
 
-        task?.let {
+            doneItem.title = if (it.done) context.resources.getString(R.string.taskMenuUndone)
+            else context.resources.getString(R.string.taskMenuDone)
+
             popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
-            if(!it.favorite) favItem.title = context.resources.getString(R.string.taskMenuAddFavorite)
-            else favItem.title = context.resources.getString(R.string.taskMenuRemoveFavorite)
-
-            if(!it.done) doneItem.title = context.resources.getString(R.string.taskMenuDone)
-            else doneItem.title = context.resources.getString(R.string.taskMenuUndone)
-        }
-
-        popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
-
                 when (item!!.itemId) {
                     R.id.editTaskButton -> {
                         presenter.editTask(task)
@@ -108,9 +96,7 @@ class TaskAdapter(
                         presenter.updateTask(TASK_FAVORITE, task)
                     }
                     R.id.doneTaskButton -> {
-                        task?.let {
-                            it.done = !it.done
-                        }
+                        task.done = !task.done
                         presenter.updateTask(context.resources.getInteger(R.integer.setDone), task)
                     }
                 }
@@ -121,8 +107,8 @@ class TaskAdapter(
     }
 
     private class ViewHolder(view: View?) {
-        var titleTextView: TextView? = view?.findViewById(R.id.listTaskTitle)
-        var descriptionTextView: TextView? = view?.findViewById(R.id.listTaskDescription)
-        var moreImageView: Button? = view?.findViewById(R.id.listMoreButton)
+        var titleTextView: TextView = view?.findViewById(R.id.listTaskTitle) as TextView
+        var descriptionTextView: TextView = view?.findViewById(R.id.listTaskDescription) as TextView
+        var moreImageView: Button = view?.findViewById(R.id.listMoreButton) as Button
     }
 }
