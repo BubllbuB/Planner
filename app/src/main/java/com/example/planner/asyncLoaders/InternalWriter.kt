@@ -9,8 +9,6 @@ import com.example.planner.storages.INTERNAL_WRITER_EDIT
 import com.example.planner.storages.INTERNAL_WRITER_REMOVE
 import com.example.planner.task.Task
 import com.google.gson.Gson
-import java.io.File
-import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.util.*
 

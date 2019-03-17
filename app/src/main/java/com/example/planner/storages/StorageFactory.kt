@@ -14,7 +14,7 @@ class StorageFactory {
                 pref.getBoolean("storageTypeShared",false) -> return SharedPreferencesStorage.init(WeakReference(context), loaderManager)
                 pref.getBoolean("storageTypeInternal",false) -> return InternalStorage.init(WeakReference(context), loaderManager)
                 pref.getBoolean("storageTypeExternal",false) -> return ExternalStorage.init(WeakReference(context), loaderManager)
-                pref.getBoolean("storageTypeDatabase",false) -> return CacheStorage
+                pref.getBoolean("storageTypeDatabase",false) -> return DatabaseStorage.init(WeakReference(context), loaderManager)
             }
             return CacheStorage
         }
