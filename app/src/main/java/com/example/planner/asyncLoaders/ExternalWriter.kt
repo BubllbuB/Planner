@@ -20,7 +20,6 @@ class ExternalWriter(
     private val action: Int?,
     private val tasks: SortedMap<Int, Task>
 ) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {
-    private var gson = Gson()
 
     override fun loadInBackground(): SortedMap<Int, Task>? {
         val file = File(
@@ -44,7 +43,7 @@ class ExternalWriter(
             }
         }
 
-        val taskListString = gson.toJson(tasks)
+        val taskListString = Gson().toJson(tasks)
 
         osw.write(taskListString)
         osw.close()

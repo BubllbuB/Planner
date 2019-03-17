@@ -14,7 +14,6 @@ class SharedWriter(
     private val tasks: SortedMap<Int, Task>
 ) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {
     private val sharedPreferences = context.getSharedPreferences(SHARED_PREFERENCES_FILE_TASKS, 0)
-    private var gson = Gson()
 
     override fun loadInBackground(): SortedMap<Int, Task>? {
         val editor = sharedPreferences.edit()
@@ -24,7 +23,7 @@ class SharedWriter(
             WRITER_ADD -> {
                 task?.id = lastId + 1
                 tasks[task?.id] = task
-                val taskJson = gson.toJson(task)
+                val taskJson = Gson().toJson(task)
                 editor.putString(SHARED_PREFERENCES_KEY_TASK + task?.id, taskJson)
                 editor.putInt(SHARED_PREFERENCES_KEY_LAST_ID, lastId + 1)
             }
@@ -34,7 +33,7 @@ class SharedWriter(
             }
             WRITER_EDIT -> {
                 tasks[task?.id] = task
-                val taskJson = gson.toJson(task)
+                val taskJson = Gson().toJson(task)
                 editor.putString(SHARED_PREFERENCES_KEY_TASK + task?.id, taskJson)
             }
         }

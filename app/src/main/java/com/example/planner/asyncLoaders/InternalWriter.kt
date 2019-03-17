@@ -20,7 +20,6 @@ class InternalWriter(
     private val action: Int?,
     private val tasks: SortedMap<Int, Task>
 ) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {
-    private var gson = Gson()
 
     override fun loadInBackground(): SortedMap<Int, Task>? {
         val osw = OutputStreamWriter(context.openFileOutput(INTERNAL_FILE_TASKS,0))
@@ -40,7 +39,7 @@ class InternalWriter(
             }
         }
 
-        val taskListString = gson.toJson(tasks)
+        val taskListString = Gson().toJson(tasks)
 
         osw.write(taskListString)
         osw.close()

@@ -15,7 +15,6 @@ import java.util.*
 
 class ExternalLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {
     private var tasksList = sortedMapOf<Int, Task>()
-    private var gson = Gson()
 
     override fun loadInBackground(): SortedMap<Int, Task>? {
         val file = File(
@@ -26,7 +25,7 @@ class ExternalLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(c
             val buffStream = BufferedReader(InputStreamReader(FileInputStream(file)))
             val tasksString = buffStream.readLine()
             val itemType = object : TypeToken<SortedMap<Int, Task>>() {}.type
-            tasksList = gson.fromJson<SortedMap<Int, Task>>(tasksString, itemType)
+            tasksList = Gson().fromJson<SortedMap<Int, Task>>(tasksString, itemType)
 
             buffStream.close()
         }
