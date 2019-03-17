@@ -15,14 +15,10 @@ class InternalLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(c
     private var gson = Gson()
 
     override fun loadInBackground(): SortedMap<Int, Task>? {
-        val file = File(
-            context.getExternalFilesDir(
-                Environment.DIRECTORY_DOCUMENTS
-            ), INTERNAL_FILE_TASKS
-        )
+        val file = File(context.filesDir, INTERNAL_FILE_TASKS)
 
         if(file.exists() && file.length() > 0) {
-            val buffStream = BufferedReader(InputStreamReader(FileInputStream(file)))
+            val buffStream = BufferedReader(InputStreamReader(context.openFileInput(INTERNAL_FILE_TASKS)))
             val tasksString = buffStream.readLine ()
             val itemType = object : TypeToken<SortedMap<Int, Task>>() {}.type
             tasksList = gson.fromJson<SortedMap<Int, Task>>(tasksString,itemType)

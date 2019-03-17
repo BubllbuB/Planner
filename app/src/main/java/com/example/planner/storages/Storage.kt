@@ -15,6 +15,4 @@ interface Storage {
     fun addObserver(observer: StorageObserver)
 
     fun removeObserver(observer: StorageObserver)
-
-    fun notifyObservers(tasks: Map<Int,Task>)
 }

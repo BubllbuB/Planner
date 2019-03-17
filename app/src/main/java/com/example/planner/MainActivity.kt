@@ -162,6 +162,8 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     }
 
     override fun showProgressBars() {
+        listViewAll.adapter = null
+        listViewFav.adapter = null
         progressBarAll.visibility = View.VISIBLE
         progressBarFav.visibility = View.VISIBLE
     }

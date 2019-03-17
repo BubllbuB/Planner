@@ -25,6 +25,7 @@ class MainPresenter(
     }
 
     override fun getTasksList() {
+        view.showProgressBars()
         storage.getList()
     }
 

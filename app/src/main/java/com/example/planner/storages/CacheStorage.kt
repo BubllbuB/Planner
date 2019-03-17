@@ -37,7 +37,7 @@ object CacheStorage: Storage {
         observers.remove(observer)
     }
 
-    override fun notifyObservers(tasks: Map<Int,Task>) {
+    private fun notifyObservers(tasks: Map<Int,Task>) {
         observers.forEach { it.onUpdateList(tasks) }
     }
 }

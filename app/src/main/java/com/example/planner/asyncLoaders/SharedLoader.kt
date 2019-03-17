@@ -12,9 +12,7 @@ class SharedLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(con
     private var tasksList = sortedMapOf<Int, Task>()
 
     override fun loadInBackground(): SortedMap<Int, Task>? {
-        val sharedFile = sharedPreferences
-
-        val strings = sharedFile.all
+        val strings = sharedPreferences.all
         strings.remove("lastId")
 
         val gson = GsonBuilder().setPrettyPrinting().create()

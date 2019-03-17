@@ -23,14 +23,7 @@ class InternalWriter(
     private var gson = Gson()
 
     override fun loadInBackground(): SortedMap<Int, Task>? {
-        val file = File(
-            context.getExternalFilesDir(
-                Environment.DIRECTORY_DOCUMENTS
-            ), INTERNAL_FILE_TASKS
-        )
-
-        val osw = OutputStreamWriter(FileOutputStream(file))
-
+        val osw = OutputStreamWriter(context.openFileOutput(INTERNAL_FILE_TASKS,0))
 
         val lastId = if(tasks.isEmpty()) 0 else tasks.lastKey()
 

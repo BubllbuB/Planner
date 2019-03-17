@@ -17,9 +17,8 @@ class SharedWriter(
     private var gson = Gson()
 
     override fun loadInBackground(): SortedMap<Int, Task>? {
-        val sharedFile = sharedPreferences
-        val editor = sharedFile.edit()
-        val lastId = sharedFile.getInt(SHARED_PREFERENCES_KEY_LAST_ID, 0)
+        val editor = sharedPreferences.edit()
+        val lastId = sharedPreferences.getInt(SHARED_PREFERENCES_KEY_LAST_ID, 0)
 
         when (action) {
             WRITER_ADD -> {

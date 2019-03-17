@@ -99,7 +99,7 @@ object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
         observers.remove(observer)
     }
 
-    override fun notifyObservers(tasks: Map<Int, Task>) {
+    private fun notifyObservers(tasks: Map<Int, Task>) {
         observers.forEach { it.onUpdateList(tasks) }
     }
 }
