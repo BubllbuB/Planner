@@ -14,7 +14,6 @@ import com.example.planner.R
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.task.Task
 
-const val TASK_EDIT = 2
 const val TASK_REMOVE = 3
 const val TASK_FAVORITE = 4
 const val TASK_DONE = 5

@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
 
     override fun onStart() {
         super.onStart()
-        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this), this.applicationContext.resources)
+        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this))
         presenter.onStart()
         checkPermissions()
     }
@@ -209,8 +209,8 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
                     editor.putBoolean(PREF_SHARED, true)
                     editor.putBoolean(PREF_EXTERNAL, false)
                     editor.apply()
-                    Toast.makeText(this@MainActivity, R.string.erorr_external_permission, Toast.LENGTH_SHORT).show()
-                    presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this), this.applicationContext.resources)
+                    Toast.makeText(this@MainActivity, R.string.error_external_permission, Toast.LENGTH_SHORT).show()
+                    presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this))
                     presenter.onStart()
                     presenter.getTasksList()
                 } else {

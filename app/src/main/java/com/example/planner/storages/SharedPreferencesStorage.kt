@@ -85,7 +85,7 @@ object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
 
     override fun getList() {
         if (taskMap.isEmpty()) {
-            loaderManager.initLoader(SHARED_LOADER, null, this).forceLoad()
+            loaderManager.restartLoader(SHARED_LOADER, null, this).forceLoad()
         } else {
             notifyObservers(taskMap)
         }

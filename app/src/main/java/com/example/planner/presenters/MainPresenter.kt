@@ -1,20 +1,21 @@
 package com.example.planner.presenters
 
 import android.content.Context
-import android.content.res.Resources
 import android.support.v4.app.LoaderManager
-import com.example.planner.R
 import com.example.planner.observer.StorageObserver
 import com.example.planner.storages.Storage
 import com.example.planner.storages.StorageFactory
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
 
+const val TASK_REMOVE = 3
+const val TASK_FAVORITE = 4
+const val TASK_DONE = 5
+
 class MainPresenter(
     private val view: MainView,
     context: Context,
-    loaderManager: LoaderManager,
-    private val resources: Resources
+    loaderManager: LoaderManager
 ) : StorageObserver, IMainPresenter {
     private val storage: Storage = StorageFactory.getStorage(context, loaderManager)
 
@@ -31,11 +32,11 @@ class MainPresenter(
         view.showProgressBars()
 
         when (actionId) {
-            resources.getInteger(R.integer.taskAdd) -> storage.addTask(task)
-            resources.getInteger(R.integer.taskEdit) -> storage.editTask(task)
-            resources.getInteger(R.integer.taskRemove) -> storage.removeTask(task)
-            resources.getInteger(R.integer.setFavorite) -> storage.editTask(task)
-            resources.getInteger(R.integer.setDone) -> storage.editTask(task)
+            TASK_ADD -> storage.addTask(task)
+            TASK_EDIT -> storage.editTask(task)
+            TASK_REMOVE -> storage.removeTask(task)
+            TASK_FAVORITE -> storage.editTask(task)
+            TASK_DONE -> storage.editTask(task)
         }
     }
 

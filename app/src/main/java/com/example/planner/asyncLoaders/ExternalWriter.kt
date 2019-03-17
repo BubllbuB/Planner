@@ -29,7 +29,7 @@ class ExternalWriter(
 
         val osw = OutputStreamWriter(FileOutputStream(file))
 
-        val lastId = if (!tasks.isEmpty()) tasks.lastKey() else 0
+        val lastId = if(tasks.isEmpty()) 0 else tasks.lastKey()
 
         when (action) {
             EXTERNAL_WRITER_ADD -> {

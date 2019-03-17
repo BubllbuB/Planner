@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <integer name="taskAdd">1</integer>
-    <integer name="taskEdit">2</integer>
-    <integer name="taskRemove">3</integer>
-    <integer name="setFavorite">4</integer>
-    <integer name="setDone">5</integer>
-</resources>

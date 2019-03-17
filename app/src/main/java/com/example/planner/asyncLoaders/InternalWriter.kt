@@ -31,7 +31,8 @@ class InternalWriter(
 
         val osw = OutputStreamWriter(FileOutputStream(file))
 
-        val lastId = tasks.lastKey()
+
+        val lastId = if(tasks.isEmpty()) 0 else tasks.lastKey()
 
         when (action) {
             INTERNAL_WRITER_ADD -> {

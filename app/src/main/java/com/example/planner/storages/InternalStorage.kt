@@ -83,7 +83,7 @@ object InternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, T
 
     override fun getList() {
         if (taskMap.isEmpty()) {
-            loaderManager.initLoader(INTERNAL_LOADER, null, this).forceLoad()
+            loaderManager.restartLoader(INTERNAL_LOADER, null, this).forceLoad()
         } else {
             notifyObservers(taskMap)
         }

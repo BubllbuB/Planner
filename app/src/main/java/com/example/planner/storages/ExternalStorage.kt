@@ -84,7 +84,7 @@ object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, T
 
     override fun getList() {
         if (taskMap.isEmpty()) {
-            loaderManager.initLoader(EXTERNAL_LOADER, null, this).forceLoad()
+            loaderManager.restartLoader(EXTERNAL_LOADER, null, this).forceLoad()
         } else {
             notifyObservers(taskMap)
         }
