@@ -27,6 +27,8 @@ class ExternalLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(c
             val tasksString = buffStream.readLine()
             val itemType = object : TypeToken<SortedMap<Int, Task>>() {}.type
             tasksList = gson.fromJson<SortedMap<Int, Task>>(tasksString, itemType)
+
+            buffStream.close()
         }
 
         return tasksList

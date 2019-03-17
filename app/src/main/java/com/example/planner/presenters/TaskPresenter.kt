@@ -26,11 +26,11 @@ class TaskPresenter(private val view: AddView, context: Context, loaderManager: 
         }
     }
 
-    override fun startListenStorage() {
+    override fun onStart() {
         storage.addObserver(this)
     }
 
-    override fun stopListenStorage() {
+    override fun onStop() {
         storage.removeObserver(this)
     }
 }

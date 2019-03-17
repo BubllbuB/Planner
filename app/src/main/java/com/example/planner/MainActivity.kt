@@ -49,9 +49,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
 
         init()
 
-        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this), this.applicationContext.resources)
         drawerLayout = findViewById(R.id.drawer_layout)
-        presenter.getTasksList()
     }
 
     private fun init() {
@@ -96,14 +94,15 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     }
 
     override fun onStart() {
-        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this), this.applicationContext.resources)
-        presenter.startListenStorage()
         super.onStart()
+        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this), this.applicationContext.resources)
+        presenter.onStart()
+        checkPermissions()
     }
 
-    override fun onDestroy() {
-        presenter.stopListenStorage()
-        super.onDestroy()
+    override fun onStop() {
+        super.onStop()
+        presenter.onStop()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -180,13 +179,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
 
-            val permissionRead = ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-
-            if (permissionWrite != PackageManager.PERMISSION_GRANTED || permissionRead != PackageManager.PERMISSION_GRANTED
-            ) {
+            if (permissionWrite != PackageManager.PERMISSION_GRANTED) {
                 makeRequest()
             } else {
                 presenter.getTasksList()
@@ -199,7 +192,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     private fun makeRequest() {
         ActivityCompat.requestPermissions(
             this,
-            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
             CHECK_REQUEST
         )
     }
@@ -217,6 +210,8 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
                     editor.putBoolean(PREF_EXTERNAL, false)
                     editor.apply()
                     Toast.makeText(this@MainActivity, R.string.erorr_external_permission, Toast.LENGTH_SHORT).show()
+                    presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this), this.applicationContext.resources)
+                    presenter.onStart()
                     presenter.getTasksList()
                 } else {
                     presenter.getTasksList()

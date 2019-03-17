@@ -92,14 +92,14 @@ object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
     }
 
     override fun addObserver(observer: StorageObserver) {
-        this.observers.add(observer)
+        observers.add(observer)
     }
 
     override fun removeObserver(observer: StorageObserver) {
-        this.observers.remove(observer)
+        observers.remove(observer)
     }
 
     override fun notifyObservers(tasks: Map<Int, Task>) {
-        this.observers.forEach { it.onUpdateList(tasks) }
+        observers.forEach { it.onUpdateList(tasks) }
     }
 }

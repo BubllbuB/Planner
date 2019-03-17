@@ -5,7 +5,7 @@ import com.example.planner.task.Task
 interface IMainPresenter {
     fun getTasksList()
     fun updateTask(actionId: Int, task: Task)
-    fun startListenStorage()
-    fun stopListenStorage()
+    fun onStart()
+    fun onStop()
     fun editTask(task: Task)
 }

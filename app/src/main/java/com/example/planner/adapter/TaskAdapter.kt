@@ -17,6 +17,7 @@ import com.example.planner.task.Task
 const val TASK_EDIT = 2
 const val TASK_REMOVE = 3
 const val TASK_FAVORITE = 4
+const val TASK_DONE = 5
 
 class TaskAdapter(
     private val context: Context,
@@ -97,7 +98,7 @@ class TaskAdapter(
                     }
                     R.id.doneTaskButton -> {
                         task.done = !task.done
-                        presenter.updateTask(context.resources.getInteger(R.integer.setDone), task)
+                        presenter.updateTask(TASK_DONE, task)
                     }
                 }
                 true

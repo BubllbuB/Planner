@@ -31,7 +31,7 @@ class AddTaskActivity : AppCompatActivity(), AddView {
         editTaskDescription = findViewById(R.id.taskDescriptionTextLayout)
 
         presenter = TaskPresenter(this, this@AddTaskActivity, LoaderManager.getInstance(this))
-        presenter.startListenStorage()
+        presenter.onStart()
 
         val task = intent.getParcelableExtra<Task>("Task")
         if (task != null) action = TASK_EDIT
@@ -67,14 +67,14 @@ class AddTaskActivity : AppCompatActivity(), AddView {
     }
 
     override fun onStart() {
-        presenter = TaskPresenter(this, this@AddTaskActivity, LoaderManager.getInstance(this))
-        presenter.startListenStorage()
         super.onStart()
+        presenter = TaskPresenter(this, this@AddTaskActivity, LoaderManager.getInstance(this))
+        presenter.onStart()
     }
 
     override fun onDestroy() {
-        presenter.stopListenStorage()
         super.onDestroy()
+        presenter.onStop()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

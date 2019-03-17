@@ -6,7 +6,7 @@ import android.support.v4.app.LoaderManager
 import android.support.v4.content.Loader
 import com.example.planner.asyncLoaders.ExternalLoader
 import com.example.planner.asyncLoaders.ExternalWriter
-import com.example.planner.presenters.MainPresenter
+import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import java.lang.ref.WeakReference
 import java.util.*
@@ -24,7 +24,7 @@ const val EXTERNAL_WRITER_EDIT = 3
 
 object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
     var taskMap = sortedMapOf<Int, Task>()
-    private lateinit var presenterView: MainPresenter
+    private val observers: MutableList<StorageObserver> = ArrayList()
 
     private lateinit var context: WeakReference<Context>
     private lateinit var loaderManager: LoaderManager
@@ -53,21 +53,21 @@ object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, T
 
     override fun onLoadFinished(loader: Loader<SortedMap<Int, Task>>, tasks: SortedMap<Int, Task>?) {
         taskMap = tasks ?: sortedMapOf()
-        presenterView.onUpdaterList(taskMap)
+        notifyObservers(taskMap)
     }
 
     override fun onLoaderReset(loader: Loader<SortedMap<Int, Task>>) {
         taskMap = sortedMapOf()
     }
 
-    override fun addTask(task: Task?) {
+    override fun addTask(task: Task) {
         val bundle = Bundle()
         bundle.putParcelable(EXTERNAL_PARCELABLE_TASK, task)
         bundle.putInt(EXTERNAL_WRITER_ACTION, EXTERNAL_WRITER_ADD)
         loaderManager.restartLoader(EXTERNAL_ADD, bundle, this).forceLoad()
     }
 
-    override fun removeTask(task: Task?) {
+    override fun removeTask(task: Task) {
         val bundle = Bundle()
         bundle.putParcelable(PARCELABLE_TASK, task)
         bundle.putInt(EXTERNAL_WRITER_ACTION, EXTERNAL_WRITER_REMOVE)
@@ -75,21 +75,30 @@ object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, T
 
     }
 
-    override fun editTask(task: Task?) {
+    override fun editTask(task: Task) {
         val bundle = Bundle()
         bundle.putParcelable(PARCELABLE_TASK, task)
         bundle.putInt(EXTERNAL_WRITER_ACTION, EXTERNAL_WRITER_EDIT)
         loaderManager.restartLoader(EXTERNAL_EDIT, bundle, this).forceLoad()
     }
 
-    override fun getList(presenter: MainPresenter): SortedMap<Int, Task>? {
-        presenterView = presenter
-
+    override fun getList() {
         if (taskMap.isEmpty()) {
             loaderManager.initLoader(EXTERNAL_LOADER, null, this).forceLoad()
         } else {
-            presenter.onUpdaterList(taskMap)
+            notifyObservers(taskMap)
         }
-        return taskMap
+    }
+
+    override fun addObserver(observer: StorageObserver) {
+        observers.add(observer)
+    }
+
+    override fun removeObserver(observer: StorageObserver) {
+        observers.remove(observer)
+    }
+
+    override fun notifyObservers(tasks: Map<Int, Task>) {
+        observers.forEach { it.onUpdateList(tasks) }
     }
 }

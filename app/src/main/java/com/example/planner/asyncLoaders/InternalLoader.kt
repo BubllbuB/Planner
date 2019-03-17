@@ -21,11 +21,13 @@ class InternalLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(c
             ), INTERNAL_FILE_TASKS
         )
 
-        if(file.exists()) {
+        if(file.exists() && file.length() > 0) {
             val buffStream = BufferedReader(InputStreamReader(FileInputStream(file)))
             val tasksString = buffStream.readLine ()
             val itemType = object : TypeToken<SortedMap<Int, Task>>() {}.type
             tasksList = gson.fromJson<SortedMap<Int, Task>>(tasksString,itemType)
+
+            buffStream.close()
         }
 
         return tasksList
