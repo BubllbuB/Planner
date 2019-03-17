@@ -7,4 +7,5 @@ interface IMainPresenter {
     fun updateTask(actionId: Int, task: Task)
     fun startListenStorage()
     fun stopListenStorage()
+    fun editTask(task: Task)
 }

@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.support.design.widget.TextInputLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import com.example.planner.presenters.ITaskPresenter
@@ -11,33 +13,56 @@ import com.example.planner.presenters.TaskPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
 
+const val TASK_ADD = 1
+const val TASK_EDIT = 2
 
 class AddTaskActivity : AppCompatActivity(), AddView {
     private lateinit var presenter: ITaskPresenter
-    private lateinit var editTask: TextInputLayout
-
+    private lateinit var editTaskTitle: TextInputLayout
+    private lateinit var editTaskDescription: TextInputLayout
+    private var action = TASK_ADD
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
+        editTaskTitle = findViewById(R.id.taskTitleTextLayout)
+        editTaskDescription = findViewById(R.id.taskDescriptionTextLayout)
+
         presenter = TaskPresenter(this)
-        editTask = findViewById(R.id.taskTitleTextLayout)
         presenter.startListenStorage()
+
+        val task = intent.getParcelableExtra<Task>("Task")
+        if (task != null) action = TASK_EDIT
 
         val actionbar: ActionBar? = supportActionBar
         actionbar?.apply {
-            title = intent.getStringExtra("TitleActionBar")
+            title =
+                if (action == TASK_ADD) getString(R.string.addTaskToolbarTitle)
+                else getString(R.string.editTaskToolbarTitle)
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
-        val task = intent.getParcelableExtra<Task>("Task")
-        editTask.editText?.setText(task?.title)
-        findViewById<TextInputLayout>(R.id.taskDescriptionTextLayout).editText?.setText(task?.description)
 
-        editTask.editText?.setOnClickListener {
-            editTask.error = null
+
+        editTaskTitle.editText?.setText(task?.title)
+        editTaskDescription.editText?.setText(task?.description)
+
+        editTaskTitle.editText?.setOnClickListener {
+            editTaskTitle.error = null
         }
+
+        editTaskTitle.editText?.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                editTaskTitle.error = null
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+        })
     }
 
     override fun onStart() {
@@ -59,27 +84,25 @@ class AddTaskActivity : AppCompatActivity(), AddView {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.saveTaskButton -> {
-                val title = editTask.editText?.text.toString()
-                val desc = findViewById<TextInputLayout>(R.id.taskDescriptionTextLayout).editText?.text.toString()
-                if(title.isBlank()) {
-                    editTask.error = "Title empty"
-                    return false
+                val title = editTaskTitle.editText?.text.toString()
+                val desc = editTaskDescription.editText?.text.toString()
+                if (title.isBlank()) {
+                    editTaskTitle.error = "Title empty"
+                    return true
                 }
 
-                when(intent.getStringExtra("Action")) {
-                    "Add" -> {
+                when (action) {
+                    TASK_ADD -> {
                         val task = Task(title, desc)
                         presenter.updateTask(1, task)
                     }
-                    "Edit" -> {
+                    TASK_EDIT -> {
                         val task = intent.getParcelableExtra<Task>("Task")
                         task.title = title
                         task.description = desc
                         presenter.updateTask(2, task)
                     }
                 }
-                val task = Task(title, desc)
-                presenter.updateTask(1, task)
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -68,7 +68,7 @@ class TaskAdapter(
 
                 when (item!!.itemId) {
                     R.id.editTaskButton -> {
-                        //presenter.updateTask(TASK_EDIT,task)
+                        presenter.editTask(task)
                     }
                     R.id.removeTaskButton -> {
                         presenter.updateTask(TASK_REMOVE, it)
@@ -77,8 +77,6 @@ class TaskAdapter(
                 true
             })
         }
-
-
         popup.show()
     }
 

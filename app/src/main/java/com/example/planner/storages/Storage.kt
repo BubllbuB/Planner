@@ -1,5 +1,6 @@
 package com.example.planner.storages
 
+import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 
 interface Storage {
@@ -15,5 +16,5 @@ interface Storage {
 
     fun removeObserver(observer: StorageObserver)
 
-    fun notifyObservers(tasks: ArrayList<Task>)
+    fun notifyObservers(tasks: Map<Int,Task>)
 }

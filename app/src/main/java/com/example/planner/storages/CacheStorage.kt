@@ -4,17 +4,17 @@ import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 
 object CacheStorage: Storage {
-    private var tasksList = arrayListOf<Task>()
+    private var tasksList = sortedMapOf<Int,Task>()
     private val observers: MutableList<StorageObserver> = ArrayList()
 
     override fun addTask(task: Task) {
         task.id = tasksList.size+1
-        tasksList.add(task)
+        tasksList[task.id] = task
         notifyObservers(tasksList)
     }
 
     override fun removeTask(task: Task) {
-        tasksList.remove(task)
+        tasksList.remove(task.id)
         notifyObservers(tasksList)
     }
 
@@ -35,7 +35,7 @@ object CacheStorage: Storage {
         observers.remove(observer)
     }
 
-    override fun notifyObservers(tasks: ArrayList<Task>) {
+    override fun notifyObservers(tasks: Map<Int,Task>) {
         observers.forEach { it.onUpdateList(tasks) }
     }
 }

@@ -12,7 +12,7 @@ const val TASK_EDIT = 2
 class TaskPresenter(private val view: AddView) : ITaskPresenter, StorageObserver {
     private val storage: Storage = CacheStorage
 
-    override fun onUpdateList(list: ArrayList<Task>) {
+    override fun onUpdateList(list: Map<Int,Task>) {
         view.onTaskSaveSuccess()
     }
 

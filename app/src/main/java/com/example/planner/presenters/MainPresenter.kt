@@ -11,7 +11,7 @@ import com.example.planner.viewer.MainView
 class MainPresenter(private val view: MainView, private val resources: Resources): StorageObserver, IMainPresenter {
     private val storage: Storage = CacheStorage
 
-    override fun onUpdateList(list: ArrayList<Task>) {
+    override fun onUpdateList(list: Map<Int,Task>) {
         view.onListUpdate(list)
     }
 
@@ -35,7 +35,7 @@ class MainPresenter(private val view: MainView, private val resources: Resources
         storage.removeObserver(this)
     }
 
-    fun editTask(task: Task?) {
+    override fun editTask(task: Task) {
         view.editSelectedTask(task)
     }
 }
