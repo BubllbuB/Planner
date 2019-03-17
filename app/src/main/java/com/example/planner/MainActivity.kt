@@ -30,24 +30,33 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     private lateinit var presenter: IMainPresenter
     private lateinit var listViewAll: ListView
     private lateinit var listViewFav: ListView
+    private lateinit var progressBarAll: ProgressBar
+    private lateinit var progressBarFav: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        init()
+
+        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this), this.applicationContext.resources)
+        presenter.startListenStorage()
+        presenter.getTasksList()
+    }
+
+    private fun init() {
+        drawerLayout = findViewById(R.id.drawer_layout)
+        listViewAll = findViewById(R.id.taskListView)
+        listViewFav = findViewById(R.id.taskFavListView)
+        progressBarAll = findViewById(R.id.progressBarAll)
+        progressBarFav = findViewById(R.id.progressBarFav)
+
         val actionbar: ActionBar? = supportActionBar
         actionbar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
-
-        presenter = MainPresenter(this, this@MainActivity, supportLoaderManager, this.applicationContext.resources)
-        presenter.startListenStorage()
-
-        drawerLayout = findViewById(R.id.drawer_layout)
-        listViewAll = findViewById(R.id.taskListView)
-        listViewFav = findViewById(R.id.taskFavListView)
 
         fab.setOnClickListener {
             val intent = Intent(this, AddTaskActivity::class.java)
@@ -75,11 +84,10 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         )
 
         nav_view.setNavigationItemSelectedListener(this)
-        presenter.getTasksList()
     }
 
     override fun onStart() {
-        presenter = MainPresenter(this, this@MainActivity, this.applicationContext.resources)
+        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this), this.applicationContext.resources)
         presenter.startListenStorage()
         super.onStart()
     }
@@ -146,12 +154,12 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     }
 
     override fun showProgressBars() {
-        findViewById<ProgressBar>(R.id.progressBarAll).visibility = View.VISIBLE
-        findViewById<ProgressBar>(R.id.progressBarFav).visibility = View.VISIBLE
+        progressBarAll.visibility = View.VISIBLE
+        progressBarFav.visibility = View.VISIBLE
     }
 
     private fun hideProgressBars() {
-        findViewById<ProgressBar>(R.id.progressBarAll).visibility = View.GONE
-        findViewById<ProgressBar>(R.id.progressBarFav).visibility = View.GONE
+        progressBarAll.visibility = View.GONE
+        progressBarFav.visibility = View.GONE
     }
 }
