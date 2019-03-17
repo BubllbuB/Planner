@@ -110,7 +110,6 @@ class MainActivity : AppCompatActivity(), MainView {
         listTasks.addAll(tasks.values.toTypedArray())
         listViewAll.adapter = TaskAdapter(this, listTasks, presenter)
 
-
         val listFavoriteTasks = arrayListOf<Task>()
         listFavoriteTasks.addAll(listTasks.filter{ it.favorite })
         listViewFav.adapter = TaskAdapter(this, listFavoriteTasks, presenter)
