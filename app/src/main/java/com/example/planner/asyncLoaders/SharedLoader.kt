@@ -16,6 +16,7 @@ class SharedLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(con
 
         val strings = sharedFile.all
         strings.remove("lastId")
+
         val gson = GsonBuilder().setPrettyPrinting().create()
         for ((_, value) in strings) {
             val taskJ = gson.fromJson<Task>(value.toString(), Task::class.java)
