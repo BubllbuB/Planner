@@ -10,10 +10,17 @@ import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.TextView
 import com.example.planner.R
-import com.example.planner.presenters.MainPresenter
+import com.example.planner.presenters.IMainPresenter
 import com.example.planner.task.Task
 
-class TaskAdapter(private val context: Context, private val taskList: ArrayList<Task>?, private val presenter: MainPresenter) : BaseAdapter() {
+const val TASK_EDIT = 2
+const val TASK_REMOVE = 3
+
+class TaskAdapter(
+    private val context: Context,
+    private val taskList: ArrayList<Task>?,
+    private val presenter: IMainPresenter
+) : BaseAdapter() {
 
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -30,20 +37,20 @@ class TaskAdapter(private val context: Context, private val taskList: ArrayList<
             view = convertView
             vh = view.tag as ViewHolder
         }
-        taskList.let {
-            vh.titleTextView.text = it?.get(position)?.title
-            vh.descriptionTextView.text = it?.get(position)?.description
-        }
 
-        vh.moreImageView.setOnClickListener {
-            showPopup(context, vh.moreImageView, taskList?.get(position))
+        vh.titleTextView?.text = taskList?.get(position)?.title
+        vh.descriptionTextView?.text = taskList?.get(position)?.description
+
+
+        vh.moreImageView?.setOnClickListener {
+            showPopup(context, it, taskList?.get(position))
         }
 
         return view
     }
 
-    override fun getItem(position: Int): Any {
-        return taskList?.get(position) ?: Any()
+    override fun getItem(position: Int): Any? {
+        return taskList?.get(position)
     }
 
     override fun getItemId(position: Int): Long {
@@ -59,24 +66,28 @@ class TaskAdapter(private val context: Context, private val taskList: ArrayList<
         popup = PopupMenu(context, view)
         popup.inflate(R.menu.task)
 
-        popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
+        task?.let {
+            popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
 
-            when (item!!.itemId) {
-                R.id.editTaskButton -> {
-                    //presenter.updateTask(context.resources.getInteger(R.integer.taskEdit),task)
+                when (item!!.itemId) {
+                    R.id.editTaskButton -> {
+                        //presenter.updateTask(TASK_EDIT,task)
+                    }
+                    R.id.removeTaskButton -> {
+                        presenter.updateTask(TASK_REMOVE, it)
+                    }
                 }
-                R.id.removeTaskButton -> {
-                    presenter.updateTask(context.resources.getInteger(R.integer.taskRemove), task)
-                }
-            }
-            true
-        })
+                true
+            })
+        }
+
+
         popup.show()
     }
 
     private class ViewHolder(view: View?) {
-        var titleTextView: TextView = view?.findViewById(R.id.listTaskTitle) as TextView
-        var descriptionTextView: TextView = view?.findViewById(R.id.listTaskDescription) as TextView
-        var moreImageView: Button = view?.findViewById(R.id.listMoreButton) as Button
+        var titleTextView: TextView? = view?.findViewById(R.id.listTaskTitle)
+        var descriptionTextView: TextView? = view?.findViewById(R.id.listTaskDescription)
+        var moreImageView: Button? = view?.findViewById(R.id.listMoreButton)
     }
 }

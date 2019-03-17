@@ -12,6 +12,7 @@ import android.view.MenuItem
 import android.widget.ListView
 import android.widget.TabHost
 import com.example.planner.adapter.TaskAdapter
+import com.example.planner.presenters.IMainPresenter
 import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
@@ -21,7 +22,8 @@ const val ADD_TASK = 1
 
 class MainActivity : AppCompatActivity(), MainView {
     private lateinit var drawerLayout: DrawerLayout
-    private lateinit var presenter: MainPresenter
+    private lateinit var presenter: IMainPresenter
+    private lateinit var listViewAll: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +36,9 @@ class MainActivity : AppCompatActivity(), MainView {
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
         presenter = MainPresenter(this, this.applicationContext.resources)
+        presenter.startListenStorage()
         drawerLayout = findViewById(R.id.drawer_layout)
+        listViewAll = findViewById(R.id.taskListView)
 
         fab.setOnClickListener {
             val intent = Intent(this, AddTaskActivity::class.java)
@@ -55,9 +59,20 @@ class MainActivity : AppCompatActivity(), MainView {
         )
     }
 
+    override fun onStart() {
+        presenter = MainPresenter(this, this.applicationContext.resources)
+        presenter.startListenStorage()
+        super.onStart()
+    }
+
+    override fun onDestroy() {
+        presenter.stopListenStorage()
+        super.onDestroy()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == ADD_TASK && resultCode == Activity.RESULT_OK) {
-            presenter.onUpdaterList()
+            presenter.getTasksList()
         }
     }
 
@@ -81,8 +96,6 @@ class MainActivity : AppCompatActivity(), MainView {
     }
 
     override fun onListUpdate(tasks: ArrayList<Task>?) {
-        val listView = findViewById<ListView>(R.id.taskListView)
-        val notesAdapter = TaskAdapter(this, tasks, presenter)
-        listView.adapter = notesAdapter
+        listViewAll.adapter = TaskAdapter(this, tasks, presenter)
     }
 }

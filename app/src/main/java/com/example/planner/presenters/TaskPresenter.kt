@@ -1,18 +1,33 @@
 package com.example.planner.presenters
 
-import android.support.v7.app.AppCompatActivity
-import com.example.planner.R
+import com.example.planner.observer.StorageObserver
 import com.example.planner.storages.CacheStorage
 import com.example.planner.storages.Storage
 import com.example.planner.task.Task
+import com.example.planner.viewer.AddView
 
-class TaskPresenter(private val view: AppCompatActivity) {
+const val TASK_ADD = 1
+const val TASK_EDIT = 2
+
+class TaskPresenter(private val view: AddView) : ITaskPresenter, StorageObserver {
     private val storage: Storage = CacheStorage
 
-    fun updateTask(actionId: Int, task: Task?) {
+    override fun onUpdateList(list: ArrayList<Task>) {
+        view.onTaskSaveSuccess()
+    }
+
+    override fun updateTask(actionId: Int, task: Task) {
         when (actionId) {
-            view.applicationContext.resources.getInteger(R.integer.taskAdd) -> storage.addTask(task)
-            view.applicationContext.resources.getInteger(R.integer.taskEdit) -> storage.editTask(task)
+            TASK_ADD -> storage.addTask(task)
+            TASK_EDIT -> storage.editTask(task)
         }
+    }
+
+    override fun startListenStorage() {
+        storage.addObserver(this)
+    }
+
+    override fun stopListenStorage() {
+        storage.removeObserver(this)
     }
 }
