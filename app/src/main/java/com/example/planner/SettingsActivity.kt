@@ -60,35 +60,35 @@ class SettingsActivity : PreferenceActivity(), NavigationView.OnNavigationItemSe
                 setAllUnchecked()
                 sCache.isChecked = true
             }
-            true
+            false
         }
         sShared.setOnPreferenceChangeListener{ _, _ ->
             if(!sShared.isChecked) {
                 setAllUnchecked()
                 sShared.isChecked = true
             }
-            true
+            false
         }
         sInternal.setOnPreferenceChangeListener{ _, _ ->
             if(!sInternal.isChecked) {
                 setAllUnchecked()
                 sInternal.isChecked = true
             }
-            true
+            false
         }
         sExternal.setOnPreferenceChangeListener{ _, _ ->
             if(!sExternal.isChecked) {
                 setAllUnchecked()
                 sExternal.isChecked = true
             }
-            true
+            false
         }
         sDatabase.setOnPreferenceChangeListener{ _, _ ->
             if(!sDatabase.isChecked) {
                 setAllUnchecked()
                 sDatabase.isChecked = true
             }
-            true
+            false
         }
     }
 
