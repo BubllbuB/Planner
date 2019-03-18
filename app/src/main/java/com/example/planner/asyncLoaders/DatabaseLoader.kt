@@ -3,6 +3,7 @@ package com.example.planner.asyncLoaders
 import android.content.Context
 import android.database.Cursor
 import android.support.v4.content.AsyncTaskLoader
+import com.example.planner.extensions.parseTask
 import com.example.planner.sqlhelper.DB_TABLE_NAME
 import com.example.planner.sqlhelper.StorageSQLiteOpenHelper
 import com.example.planner.task.Task
@@ -20,7 +21,7 @@ class DatabaseLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(c
         if (cursor.moveToFirst()) {
             do {
                 for (i in 0 until cursor.columnCount) {
-                    val task = parseTask(cursor)
+                    val task = cursor.parseTask()
                     tasksList[task.id] = task
                 }
 
@@ -32,13 +33,5 @@ class DatabaseLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(c
         return tasksList
     }
 
-    private fun parseTask(cursor: Cursor): Task {
-        val id = cursor.getInt(0)
-        val title = cursor.getString(1)
-        val description = cursor.getString(2)
-        val fav = cursor.getInt(3) == 1
-        val done = cursor.getInt(4) == 1
 
-        return Task(title, description, id, fav, done)
-    }
 }

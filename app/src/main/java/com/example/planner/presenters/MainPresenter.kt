@@ -20,8 +20,8 @@ class MainPresenter(
     private val storage: Storage = StorageFactory.getStorage(context, loaderManager)
 
 
-    override fun onUpdateList(list: Map<Int, Task>) {
-        view.onListUpdate(list)
+    override fun onUpdateMap(map: Map<Int, Task>) {
+        view.onListUpdate(map)
     }
 
     override fun getTasksList() {

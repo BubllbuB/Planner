@@ -45,6 +45,7 @@ class ExternalWriter(
         val taskListString = Gson().toJson(tasks)
 
         osw.write(taskListString)
+        osw.flush()
         osw.close()
 
         return tasks

@@ -11,15 +11,15 @@ import com.example.planner.task.Task
 import java.lang.ref.WeakReference
 import java.util.*
 
-const val DATABASE_LOADER = 0
-const val DATABASE_EDIT = 2
-const val DATABASE_REMOVE = 3
-const val DATABASE_ADD = 4
-const val DATABASE_PARCELABLE_TASK = "task"
-const val DATABASE_WRITER_ACTION = "action"
-const val DATABASE_WRITER_ADD = 1
-const val DATABASE_WRITER_REMOVE = 2
-const val DATABASE_WRITER_EDIT = 3
+const val DATABASE_READ_LOADER_ID = 0
+const val DATABASE_EDIT_LOADER_ID = 2
+const val DATABASE_REMOVE_LOADER_ID = 3
+const val DATABASE_ADD_LOADER_ID = 4
+const val DATABASE_KEY_TASK = "task"
+const val DATABASE_KEY_ACTION = "action"
+const val DATABASE_ACTION_ADD = 1
+const val DATABASE_ACTION_REMOVE = 2
+const val DATABASE_ACTION_EDIT = 3
 
 object DatabaseStorage: Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
     var taskMap = sortedMapOf<Int, Task>()
@@ -38,11 +38,11 @@ object DatabaseStorage: Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Ta
     override fun onCreateLoader(id: Int, bundle: Bundle?): Loader<SortedMap<Int, Task>> {
         context.get()?.let {
             return when (id) {
-                DATABASE_LOADER -> DatabaseLoader(it)
+                DATABASE_READ_LOADER_ID -> DatabaseLoader(it)
                 else -> DatabaseWriter(
                     it,
-                    bundle?.getParcelable(DATABASE_PARCELABLE_TASK),
-                    bundle?.getInt(DATABASE_WRITER_ACTION),
+                    bundle?.getParcelable(DATABASE_KEY_TASK),
+                    bundle?.getInt(DATABASE_KEY_ACTION),
                     taskMap
                 )
             }
@@ -61,29 +61,29 @@ object DatabaseStorage: Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Ta
 
     override fun addTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(DATABASE_PARCELABLE_TASK, task)
-        bundle.putInt(DATABASE_WRITER_ACTION, DATABASE_WRITER_ADD)
-        loaderManager.restartLoader(DATABASE_ADD, bundle, this).forceLoad()
+        bundle.putParcelable(DATABASE_KEY_TASK, task)
+        bundle.putInt(DATABASE_KEY_ACTION, DATABASE_ACTION_ADD)
+        loaderManager.restartLoader(DATABASE_ADD_LOADER_ID, bundle, this).forceLoad()
     }
 
     override fun removeTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(DATABASE_PARCELABLE_TASK, task)
-        bundle.putInt(EXTERNAL_WRITER_ACTION, DATABASE_WRITER_REMOVE)
-        loaderManager.restartLoader(DATABASE_REMOVE, bundle, this).forceLoad()
+        bundle.putParcelable(DATABASE_KEY_TASK, task)
+        bundle.putInt(DATABASE_KEY_ACTION, DATABASE_ACTION_REMOVE)
+        loaderManager.restartLoader(DATABASE_REMOVE_LOADER_ID, bundle, this).forceLoad()
 
     }
 
     override fun editTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(DATABASE_PARCELABLE_TASK, task)
-        bundle.putInt(DATABASE_WRITER_ACTION, DATABASE_WRITER_EDIT)
-        loaderManager.restartLoader(DATABASE_EDIT, bundle, this).forceLoad()
+        bundle.putParcelable(DATABASE_KEY_TASK, task)
+        bundle.putInt(DATABASE_KEY_ACTION, DATABASE_ACTION_EDIT)
+        loaderManager.restartLoader(DATABASE_EDIT_LOADER_ID, bundle, this).forceLoad()
     }
 
     override fun getList() {
         if (taskMap.isEmpty()) {
-            loaderManager.restartLoader(DATABASE_LOADER, null, this).forceLoad()
+            loaderManager.restartLoader(DATABASE_READ_LOADER_ID, null, this).forceLoad()
         } else {
             notifyObservers(taskMap)
         }
@@ -98,6 +98,6 @@ object DatabaseStorage: Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Ta
     }
 
     private fun notifyObservers(tasks: Map<Int, Task>) {
-        observers.forEach { it.onUpdateList(tasks) }
+        observers.forEach { it.onUpdateMap(tasks) }
     }
 }

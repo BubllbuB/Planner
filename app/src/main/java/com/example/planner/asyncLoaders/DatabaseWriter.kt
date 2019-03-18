@@ -4,9 +4,9 @@ import android.content.ContentValues
 import android.content.Context
 import android.support.v4.content.AsyncTaskLoader
 import com.example.planner.sqlhelper.*
-import com.example.planner.storages.DATABASE_WRITER_ADD
-import com.example.planner.storages.DATABASE_WRITER_EDIT
-import com.example.planner.storages.DATABASE_WRITER_REMOVE
+import com.example.planner.storages.DATABASE_ACTION_ADD
+import com.example.planner.storages.DATABASE_ACTION_EDIT
+import com.example.planner.storages.DATABASE_ACTION_REMOVE
 import com.example.planner.task.Task
 import java.util.*
 
@@ -34,17 +34,17 @@ class DatabaseWriter(
 
 
         when (action) {
-            DATABASE_WRITER_ADD -> {
+            DATABASE_ACTION_ADD -> {
                 task?.id = lastId + 1
                 tasks[task?.id] = task
                 db.insert(DB_TABLE_NAME, null, taskValues)
 
             }
-            DATABASE_WRITER_REMOVE -> {
+            DATABASE_ACTION_REMOVE -> {
                 db.delete(DB_TABLE_NAME, DB_TASK_ID + "=" + task?.id, null)
                 tasks.remove(task?.id)
             }
-            DATABASE_WRITER_EDIT -> {
+            DATABASE_ACTION_EDIT -> {
                 db.update(DB_TABLE_NAME, taskValues, DB_TASK_ID + "=" + task?.id, null)
                 tasks[task?.id] = task
             }

@@ -96,13 +96,13 @@ class AddTaskActivity : AppCompatActivity(), AddView {
                 when (action) {
                     TASK_ADD -> {
                         val task = Task(title, desc)
-                        presenter.updateTask(1, task)
+                        presenter.updateTask(TASK_ADD, task)
                     }
                     TASK_EDIT -> {
                         val task = intent.getParcelableExtra<Task>("Task")
                         task.title = title
                         task.description = desc
-                        presenter.updateTask(2, task)
+                        presenter.updateTask(TASK_EDIT, task)
                     }
                 }
                 setResult(RESULT_OK)

@@ -2,6 +2,7 @@ package com.example.planner.asyncLoaders
 
 import android.content.Context
 import android.support.v4.content.AsyncTaskLoader
+import com.example.planner.extensions.getTask
 import com.example.planner.storages.SHARED_PREFERENCES_FILE_TASKS
 import com.example.planner.task.Task
 import com.google.gson.GsonBuilder
@@ -15,9 +16,8 @@ class SharedLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(con
         val strings = sharedPreferences.all
         strings.remove("lastId")
 
-        val gson = GsonBuilder().setPrettyPrinting().create()
         for ((_, value) in strings) {
-            val taskJ = gson.fromJson<Task>(value.toString(), Task::class.java)
+            val taskJ = value.toString().getTask()
             tasksList[taskJ.id] = taskJ
         }
 

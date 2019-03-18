@@ -2,17 +2,17 @@ package com.example.planner
 
 import android.content.Intent
 import android.os.Bundle
+import android.preference.CheckBoxPreference
 import android.preference.PreferenceActivity
+import android.support.annotation.LayoutRes
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
-import android.preference.CheckBoxPreference
+import android.support.v7.app.AppCompatDelegate
 import android.support.v7.preference.PreferenceManager
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_settings.*
-import android.support.v7.app.AppCompatDelegate
-import android.support.annotation.LayoutRes
 
 
 @Suppress("DEPRECATION")
@@ -32,7 +32,7 @@ class SettingsActivity : PreferenceActivity(), NavigationView.OnNavigationItemSe
         setContentView(R.layout.activity_settings)
 
         addPreferencesFromResource(R.xml.preferences)
-        PreferenceManager.setDefaultValues(this,R.xml.preferences,false)
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
 
         drawerLayout = findViewById(R.id.drawer_layout_settings)
 
@@ -55,36 +55,36 @@ class SettingsActivity : PreferenceActivity(), NavigationView.OnNavigationItemSe
         sExternal = findPreference("storageTypeExternal") as CheckBoxPreference
         sDatabase = findPreference("storageTypeDatabase") as CheckBoxPreference
 
-        sCache.setOnPreferenceChangeListener{ _, _ ->
-            if(!sCache.isChecked) {
+        sCache.setOnPreferenceChangeListener { _, _ ->
+            if (!sCache.isChecked) {
                 setAllUnchecked()
                 sCache.isChecked = true
             }
             false
         }
-        sShared.setOnPreferenceChangeListener{ _, _ ->
-            if(!sShared.isChecked) {
+        sShared.setOnPreferenceChangeListener { _, _ ->
+            if (!sShared.isChecked) {
                 setAllUnchecked()
                 sShared.isChecked = true
             }
             false
         }
-        sInternal.setOnPreferenceChangeListener{ _, _ ->
-            if(!sInternal.isChecked) {
+        sInternal.setOnPreferenceChangeListener { _, _ ->
+            if (!sInternal.isChecked) {
                 setAllUnchecked()
                 sInternal.isChecked = true
             }
             false
         }
-        sExternal.setOnPreferenceChangeListener{ _, _ ->
-            if(!sExternal.isChecked) {
+        sExternal.setOnPreferenceChangeListener { _, _ ->
+            if (!sExternal.isChecked) {
                 setAllUnchecked()
                 sExternal.isChecked = true
             }
             false
         }
-        sDatabase.setOnPreferenceChangeListener{ _, _ ->
-            if(!sDatabase.isChecked) {
+        sDatabase.setOnPreferenceChangeListener { _, _ ->
+            if (!sDatabase.isChecked) {
                 setAllUnchecked()
                 sDatabase.isChecked = true
             }
@@ -125,21 +125,18 @@ class SettingsActivity : PreferenceActivity(), NavigationView.OnNavigationItemSe
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                drawerLayout.openDrawer(GravityCompat.START)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+        return if(item.itemId==android.R.id.home) {
+            drawerLayout.openDrawer(GravityCompat.START)
+            true
+        } else {
+            super.onOptionsItemSelected(item)
         }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_tasks -> {
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-            }
+        if (item.itemId == R.id.nav_tasks) {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true

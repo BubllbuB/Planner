@@ -123,8 +123,6 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.nav_tasks -> {
-            }
             R.id.nav_settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)

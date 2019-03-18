@@ -100,6 +100,6 @@ object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
     }
 
     private fun notifyObservers(tasks: Map<Int, Task>) {
-        observers.forEach { it.onUpdateList(tasks) }
+        observers.forEach { it.onUpdateMap(tasks) }
     }
 }

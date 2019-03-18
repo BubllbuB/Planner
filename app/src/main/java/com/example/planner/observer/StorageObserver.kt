@@ -3,5 +3,5 @@ package com.example.planner.observer
 import com.example.planner.task.Task
 
 interface StorageObserver {
-    fun onUpdateList(list: Map<Int,Task>)
+    fun onUpdateMap(map: Map<Int,Task>)
 }

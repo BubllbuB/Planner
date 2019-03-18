@@ -39,19 +39,19 @@ class TaskAdapter(
             vh = view.tag as ViewHolder
         }
 
-        vh.titleTextView.text = taskList?.get(position)?.title
-        vh.descriptionTextView.text = taskList?.get(position)?.description
+        vh.titleTextView?.text = taskList?.get(position)?.title
+        vh.descriptionTextView?.text = taskList?.get(position)?.description
 
         taskList?.get(position)?.let {
             if (it.done) {
-                vh.titleTextView.paintFlags = (vh.titleTextView.paintFlags
+                vh.titleTextView?.paintFlags = ((vh.titleTextView?.paintFlags ?: 0)
                         or (Paint.STRIKE_THRU_TEXT_FLAG))
-                vh.descriptionTextView.paintFlags = (vh.descriptionTextView.paintFlags
+                vh.descriptionTextView?.paintFlags = ((vh.descriptionTextView?.paintFlags ?: 0)
                         or (Paint.STRIKE_THRU_TEXT_FLAG))
             }
         }
 
-        vh.moreImageView.setOnClickListener {
+        vh.moreImageView?.setOnClickListener {
             showPopup(context, it, taskList?.get(position))
         }
 
@@ -107,8 +107,8 @@ class TaskAdapter(
     }
 
     private class ViewHolder(view: View?) {
-        var titleTextView: TextView = view?.findViewById(R.id.listTaskTitle) as TextView
-        var descriptionTextView: TextView = view?.findViewById(R.id.listTaskDescription) as TextView
-        var moreImageView: Button = view?.findViewById(R.id.listMoreButton) as Button
+        var titleTextView: TextView? = view?.findViewById(R.id.listTaskTitle)
+        var descriptionTextView: TextView? = view?.findViewById(R.id.listTaskDescription)
+        var moreImageView: Button? = view?.findViewById(R.id.listMoreButton)
     }
 }

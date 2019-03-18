@@ -15,7 +15,7 @@ class TaskPresenter(private val view: AddView, context: Context, loaderManager: 
     ITaskPresenter {
     private val storage: Storage = StorageFactory.getStorage(context, loaderManager)
 
-    override fun onUpdateList(list: Map<Int, Task>) {
+    override fun onUpdateMap(map: Map<Int, Task>) {
         view.onTaskSaveSuccess()
     }
 

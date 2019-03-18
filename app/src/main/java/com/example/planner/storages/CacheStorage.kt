@@ -38,6 +38,6 @@ object CacheStorage: Storage {
     }
 
     private fun notifyObservers(tasks: Map<Int,Task>) {
-        observers.forEach { it.onUpdateList(tasks) }
+        observers.forEach { it.onUpdateMap(tasks) }
     }
 }
