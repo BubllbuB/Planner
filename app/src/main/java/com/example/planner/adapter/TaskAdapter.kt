@@ -78,7 +78,6 @@ class TaskAdapter(
             })
         }
 
-
         popup.show()
     }
 
