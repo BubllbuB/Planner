@@ -4,8 +4,8 @@ import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import java.util.*
 
-object CacheStorage: Storage {
-    private var tasksList = sortedMapOf<Int,Task>()
+object CacheStorage : Storage {
+    private var tasksList = sortedMapOf<Int, Task>()
     private var taskId = 0
     private val observers: MutableList<StorageObserver> = ArrayList()
 
@@ -37,7 +37,7 @@ object CacheStorage: Storage {
         observers.remove(observer)
     }
 
-    private fun notifyObservers(tasks: Map<Int,Task>) {
+    private fun notifyObservers(tasks: Map<Int, Task>) {
         observers.forEach { it.onUpdateMap(tasks) }
     }
 }

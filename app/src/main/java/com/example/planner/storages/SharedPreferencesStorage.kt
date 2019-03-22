@@ -23,7 +23,7 @@ const val SHARED_REMOVE = 2
 const val SHARED_ADD = 3
 
 object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
-    var taskMap = sortedMapOf<Int, Task>()
+    private var taskMap = sortedMapOf<Int, Task>()
     private val observers: MutableList<StorageObserver> = ArrayList()
     private lateinit var context: WeakReference<Context>
     private lateinit var loaderManager: LoaderManager

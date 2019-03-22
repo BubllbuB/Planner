@@ -18,8 +18,8 @@ const val DATABASE_EDIT_LOADER_ID = 13
 const val DATABASE_REMOVE_LOADER_ID = 14
 const val DATABASE_ADD_LOADER_ID = 15
 
-object DatabaseStorage: Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
-    var taskMap = sortedMapOf<Int, Task>()
+object DatabaseStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
+    private var taskMap = sortedMapOf<Int, Task>()
     private val observers: MutableList<StorageObserver> = ArrayList()
 
     private lateinit var context: WeakReference<Context>

@@ -21,25 +21,27 @@ import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.TabHost
 import android.widget.Toast
-import com.example.planner.adapter.TaskAdapter
 import com.example.planner.adapter.TaskArrayAdapter
 import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskKey
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.presenters.MainPresenter
+import com.example.planner.storages.STORAGE_TYPE_EXTERNAL
+import com.example.planner.storages.STORAGE_TYPE_SHARED
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val CHECK_REQUEST = 3
-const val PREF_SHARED = "storageTypeShared"
-const val PREF_EXTERNAL = "storageTypeExternal"
+const val TAB_ALL = "tabAll"
+const val TAB_FAV = "tabFavorite"
 
 class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationItemSelectedListener {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var presenter: IMainPresenter
     private lateinit var listViewAll: ListView
     private lateinit var listViewFav: ListView
-    private lateinit var adapterListAll : TaskArrayAdapter
+    private lateinit var adapterListAll: TaskArrayAdapter
     private lateinit var adapterListFavorite: TaskArrayAdapter
     private val listTasksAll: MutableList<Task> = mutableListOf()
     private val listTasksFav: MutableList<Task> = mutableListOf()
@@ -74,18 +76,13 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
 
-        fab.setOnClickListener {
-            val intent = Intent(this, AddTaskActivity::class.java)
-            startActivityForResult(intent, TaskActionId.ACTION_ADD.getId())
-        }
-
         val tabHost = findViewById<TabHost>(R.id.tabHost)
         tabHost.setup()
 
         this.setNewTab(
             this@MainActivity,
             tabHost,
-            "tabAll",
+            TAB_ALL,
             R.string.textTabAllTasks,
             android.R.drawable.star_on,
             R.id.tab1
@@ -93,11 +90,17 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         this.setNewTab(
             this@MainActivity,
             tabHost,
-            "tabFavorite",
+            TAB_FAV,
             R.string.textTabFavoriteTasks,
             android.R.drawable.star_on,
             R.id.tab2
         )
+
+        fab.setOnClickListener {
+            val intent = Intent(this, AddTaskActivity::class.java)
+            intent.putExtra(TaskKey.KEY_TASK_FAV.getKey(), tabHost.currentTabTag == TAB_FAV)
+            startActivityForResult(intent, TaskActionId.ACTION_ADD.getId())
+        }
 
         nav_view.setNavigationItemSelectedListener(this)
     }
@@ -121,21 +124,17 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                drawerLayout.openDrawer(GravityCompat.START)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+        if (item.itemId == android.R.id.home) {
+            drawerLayout.openDrawer(GravityCompat.START)
+            return true
         }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_settings -> {
-                val intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
-            }
+        if (item.itemId == R.id.nav_settings) {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
@@ -153,28 +152,32 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     override fun onListUpdate(tasks: Map<Int, Task>) {
         hideProgressBars()
 
-        val listTasks = tasks.values.toTypedArray()
-        val listFavoriteTasks = listTasks.filter { it.favorite }
+        val groupMap = tasks.values.groupBy { it.favorite }
+
+        val listTasks = arrayListOf<Task>()
+        if (groupMap[true]?.isNotEmpty() == true) {
+            listTasks.add(Task(getString(R.string.listHeaderFavorites), "", -1))
+            listTasks.addAll(groupMap[true] ?: listOf())
+            listTasks.add(Task(getString(R.string.listHeaderOthers), "", -1))
+        }
+        listTasks.addAll(groupMap[false] ?: listOf())
 
         listTasksAll.clear()
         listTasksAll.addAll(listTasks)
         adapterListAll.notifyDataSetChanged()
-        //listViewAll.adapter = adapterListAll
 
         listTasksFav.clear()
-        listTasksFav.addAll(listFavoriteTasks)
+        listTasksFav.addAll(groupMap[true] ?: listOf())
         adapterListFavorite.notifyDataSetChanged()
     }
 
     override fun editSelectedTask(task: Task?) {
         val intent = Intent(this, AddTaskActivity::class.java)
-        intent.putExtra("Task", task)
+        intent.putExtra(TaskKey.KEY_TASK.getKey(), task)
         startActivityForResult(intent, TaskActionId.ACTION_EDIT.getId())
     }
 
     override fun showProgressBars() {
-        listViewAll.adapter = null
-        listViewFav.adapter = null
         progressBarAll.visibility = View.VISIBLE
         progressBarFav.visibility = View.VISIBLE
     }
@@ -186,7 +189,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
 
     private fun checkPermissions() {
         val pref = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
-        if (pref.getBoolean(PREF_EXTERNAL, false)) {
+        if (pref.getBoolean(STORAGE_TYPE_EXTERNAL, false)) {
             val permissionWrite = ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -214,21 +217,19 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         requestCode: Int,
         permissions: Array<String>, grantResults: IntArray
     ) {
-        when (requestCode) {
-            CHECK_REQUEST -> {
-                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    val pref = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
-                    val editor = pref.edit()
-                    editor.putBoolean(PREF_SHARED, true)
-                    editor.putBoolean(PREF_EXTERNAL, false)
-                    editor.apply()
-                    Toast.makeText(this@MainActivity, R.string.error_external_permission, Toast.LENGTH_SHORT).show()
-                    presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this))
-                    presenter.onStart()
-                    presenter.getTasksList()
-                } else {
-                    presenter.getTasksList()
-                }
+        if (requestCode == CHECK_REQUEST) {
+            if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                val pref = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
+                val editor = pref.edit()
+                editor.putBoolean(STORAGE_TYPE_SHARED, true)
+                editor.putBoolean(STORAGE_TYPE_EXTERNAL, false)
+                editor.apply()
+                Toast.makeText(this@MainActivity, R.string.error_external_permission, Toast.LENGTH_SHORT).show()
+                presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this))
+                presenter.onStart()
+                presenter.getTasksList()
+            } else {
+                presenter.getTasksList()
             }
         }
     }

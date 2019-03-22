@@ -23,14 +23,10 @@ class DatabaseLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(c
                     val task = cursor.parseTask()
                     tasksList[task.id] = task
                 }
-
-
             } while (cursor.moveToNext())
         }
         cursor.close()
         db.close()
         return tasksList
     }
-
-
 }

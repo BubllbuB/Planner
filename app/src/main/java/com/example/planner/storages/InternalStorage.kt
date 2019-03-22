@@ -20,7 +20,7 @@ const val INTERNAL_REMOVE = 6
 const val INTERNAL_ADD = 7
 
 object InternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
-    var taskMap = sortedMapOf<Int, Task>()
+    private var taskMap = sortedMapOf<Int, Task>()
     private val observers: MutableList<StorageObserver> = ArrayList()
 
     private lateinit var context: WeakReference<Context>

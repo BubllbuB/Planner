@@ -10,6 +10,7 @@ import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskKey
 import com.example.planner.presenters.ITaskPresenter
 import com.example.planner.presenters.TaskPresenter
 import com.example.planner.task.Task
@@ -35,7 +36,7 @@ class AddTaskActivity : AppCompatActivity(), AddView {
 
         presenter = TaskPresenter(this, this@AddTaskActivity, LoaderManager.getInstance(this))
 
-        val task = intent.getParcelableExtra<Task>("Task")
+        val task = intent.getParcelableExtra<Task>(TaskKey.KEY_TASK.getKey())
         if (task != null) action = TaskActionId.ACTION_EDIT.getId()
 
         val actionbar: ActionBar? = supportActionBar
@@ -84,34 +85,33 @@ class AddTaskActivity : AppCompatActivity(), AddView {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.saveTaskButton -> {
-                val title = editTaskTitle.editText?.text.toString()
-                val desc = editTaskDescription.editText?.text.toString()
+        if (item.itemId == R.id.saveTaskButton) {
+            val title = editTaskTitle.editText?.text.toString()
+            val desc = editTaskDescription.editText?.text.toString()
+            val fav = intent.getBooleanExtra(TaskKey.KEY_TASK_FAV.getKey(), false)
 
-                if (title.isBlank()) {
-                    editTaskTitle.error = "Title empty"
-                    return true
-                }
-
-                when (action) {
-                    TaskActionId.ACTION_ADD.getId() -> {
-                        val task = Task(title, desc)
-                        presenter.updateTask(TaskActionId.ACTION_ADD.getId(), task)
-                    }
-                    TaskActionId.ACTION_EDIT.getId() -> {
-                        val task = intent.getParcelableExtra<Task>("Task")
-                        task.title = title
-                        task.description = desc
-                        presenter.updateTask(TaskActionId.ACTION_EDIT.getId(), task)
-                    }
-                }
-                setResult(RESULT_OK)
-                finish()
-                true
+            if (title.isBlank()) {
+                editTaskTitle.error = getString(R.string.addTaskErrorEmpty)
+                return true
             }
-            else -> super.onOptionsItemSelected(item)
+
+            when (action) {
+                TaskActionId.ACTION_ADD.getId() -> {
+                    val task = Task(title, desc, favorite = fav)
+                    presenter.updateTask(TaskActionId.ACTION_ADD.getId(), task)
+                }
+                TaskActionId.ACTION_EDIT.getId() -> {
+                    val task = intent.getParcelableExtra<Task>(TaskKey.KEY_TASK.getKey())
+                    task.title = title
+                    task.description = desc
+                    presenter.updateTask(TaskActionId.ACTION_EDIT.getId(), task)
+                }
+            }
+            setResult(RESULT_OK)
+            finish()
+            return true
         }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onTaskSaveSuccess() {

@@ -9,7 +9,8 @@ import com.example.planner.storages.StorageFactory
 import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
 
-class TaskPresenter(private val view: AddView, private var context: Context, private var loaderManager: LoaderManager) : StorageObserver,
+class TaskPresenter(private val view: AddView, private var context: Context, private var loaderManager: LoaderManager) :
+    StorageObserver,
     ITaskPresenter {
     private var storage: Storage = StorageFactory.getStorage(context, loaderManager)
 

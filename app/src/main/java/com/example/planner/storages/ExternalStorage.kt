@@ -20,7 +20,7 @@ const val EXTERNAL_REMOVE = 10
 const val EXTERNAL_ADD = 11
 
 object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
-    var taskMap = sortedMapOf<Int, Task>()
+    private var taskMap = sortedMapOf<Int, Task>()
     private val observers: MutableList<StorageObserver> = ArrayList()
 
     private lateinit var context: WeakReference<Context>

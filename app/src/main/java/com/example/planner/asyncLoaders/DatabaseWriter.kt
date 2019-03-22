@@ -25,11 +25,10 @@ class DatabaseWriter(
             taskValues.put(DB_TASK_TITLE, it.title)
             taskValues.put(DB_TASK_DESCRIPTION, it.description)
             taskValues.put(DB_TASK_FAVORITE, if (it.favorite) 1 else 0)
-            taskValues.put(DB_TASK_DONE, if (it.favorite) 1 else 0)
+            taskValues.put(DB_TASK_DONE, if (it.done) 1 else 0)
         }
 
         val lastId = getLastId()
-
 
         when (action) {
             TaskActionId.ACTION_ADD.getId() -> {

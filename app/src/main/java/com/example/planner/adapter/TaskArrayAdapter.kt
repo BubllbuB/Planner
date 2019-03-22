@@ -15,6 +15,10 @@ import com.example.planner.enums.TaskActionId
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.task.Task
 
+
+const val ID_ELEMENT = 0
+const val ID_HEADER = 1
+
 class TaskArrayAdapter(
     context: Context,
     private val taskList: List<Task>,
@@ -22,37 +26,60 @@ class TaskArrayAdapter(
 ) : ArrayAdapter<Task>(context, 0, taskList) {
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-    override fun getCount(): Int {
-        return taskList.size
+    override fun getItemViewType(position: Int): Int {
+        return if (taskList[position].id > -1) ID_ELEMENT
+        else ID_HEADER
+    }
+
+    override fun getViewTypeCount(): Int {
+        return 2
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view: View
-        val vh: ViewHolder
 
-        if (convertView == null) {
-            view = inflater.inflate(R.layout.list_item_task, parent, false)
-            vh = ViewHolder(view)
-            view.tag = vh
+        if (getItemViewType(position) == ID_HEADER) {
+            val vh: ViewHolderHeader
+
+            if (convertView == null) {
+                view = inflater.inflate(R.layout.listview_header, parent, false)
+                vh = ViewHolderHeader(view)
+                view.tag = vh
+            } else {
+                view = convertView
+                vh = view.tag as ViewHolderHeader
+            }
+
+            vh.headerTextView?.text = taskList[position].title
         } else {
-            view = convertView
-            vh = view.tag as ViewHolder
+            val vh: ViewHolder
+
+            if (convertView == null) {
+                view = inflater.inflate(R.layout.list_item_task, parent, false)
+                vh = ViewHolder(view)
+                view.tag = vh
+            } else {
+                view = convertView
+                vh = view.tag as ViewHolder
+            }
+
+            vh.titleTextView?.text = taskList[position].title
+            vh.descriptionTextView?.text = taskList[position].description
+
+            if (taskList[position].done) {
+                vh.titleTextView?.paintFlags = ((vh.titleTextView?.paintFlags ?: 0)
+                        or (Paint.STRIKE_THRU_TEXT_FLAG))
+                vh.descriptionTextView?.paintFlags = ((vh.descriptionTextView?.paintFlags ?: 0)
+                        or (Paint.STRIKE_THRU_TEXT_FLAG))
+            } else {
+                vh.titleTextView?.paintFlags = 0
+                vh.descriptionTextView?.paintFlags = 0
+            }
+
+            vh.moreImageView?.setOnClickListener {
+                showPopup(context, it, taskList[position])
+            }
         }
-
-        vh.titleTextView?.text = taskList[position].title
-        vh.descriptionTextView?.text = taskList[position].description
-
-        if (taskList[position].done) {
-            vh.titleTextView?.paintFlags = ((vh.titleTextView?.paintFlags ?: 0)
-                    or (Paint.STRIKE_THRU_TEXT_FLAG))
-            vh.descriptionTextView?.paintFlags = ((vh.descriptionTextView?.paintFlags ?: 0)
-                    or (Paint.STRIKE_THRU_TEXT_FLAG))
-        }
-
-        vh.moreImageView?.setOnClickListener {
-            showPopup(context, it, taskList[position])
-        }
-
         return view
     }
 
@@ -95,5 +122,9 @@ class TaskArrayAdapter(
         var titleTextView: TextView? = view?.findViewById(R.id.listTaskTitle)
         var descriptionTextView: TextView? = view?.findViewById(R.id.listTaskDescription)
         var moreImageView: Button? = view?.findViewById(R.id.listMoreButton)
+    }
+
+    private class ViewHolderHeader(view: View?) {
+        var headerTextView: TextView? = view?.findViewById(R.id.listHeader)
     }
 }
