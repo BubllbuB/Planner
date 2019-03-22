@@ -7,14 +7,27 @@ import java.lang.ref.WeakReference
 
 class StorageFactory {
     companion object {
-        fun getStorage(context: Context, loaderManager: LoaderManager):Storage {
+        fun getStorage(context: Context, loaderManager: LoaderManager): Storage {
             val pref = PreferenceManager.getDefaultSharedPreferences(context)
             when {
-                pref.getBoolean("storageTypeCache",true) -> return CacheStorage
-                pref.getBoolean("storageTypeShared",false) -> return SharedPreferencesStorage.init(WeakReference(context), loaderManager)
-                pref.getBoolean("storageTypeInternal",false) -> return InternalStorage.init(WeakReference(context), loaderManager)
-                pref.getBoolean("storageTypeExternal",false) -> return ExternalStorage.init(WeakReference(context), loaderManager)
-                pref.getBoolean("storageTypeDatabase",false) -> return DatabaseStorage.init(WeakReference(context), loaderManager)
+                pref.getBoolean("storageTypeCache", true) -> return CacheStorage
+                pref.getBoolean("storageTypeShared", false) -> return SharedPreferencesStorage.init(
+                    WeakReference(
+                        context
+                    ), loaderManager
+                )
+                pref.getBoolean("storageTypeInternal", false) -> return InternalStorage.init(
+                    WeakReference(context),
+                    loaderManager
+                )
+                pref.getBoolean("storageTypeExternal", false) -> return ExternalStorage.init(
+                    WeakReference(context),
+                    loaderManager
+                )
+                pref.getBoolean("storageTypeDatabase", false) -> return DatabaseStorage.init(
+                    WeakReference(context),
+                    loaderManager
+                )
             }
             return CacheStorage
         }

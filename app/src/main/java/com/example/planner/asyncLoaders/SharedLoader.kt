@@ -5,7 +5,6 @@ import android.support.v4.content.AsyncTaskLoader
 import com.example.planner.extensions.getTask
 import com.example.planner.storages.SHARED_PREFERENCES_FILE_TASKS
 import com.example.planner.task.Task
-import com.google.gson.GsonBuilder
 import java.util.*
 
 class SharedLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {

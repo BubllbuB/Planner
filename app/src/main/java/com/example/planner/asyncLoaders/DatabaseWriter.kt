@@ -3,10 +3,8 @@ package com.example.planner.asyncLoaders
 import android.content.ContentValues
 import android.content.Context
 import android.support.v4.content.AsyncTaskLoader
+import com.example.planner.enums.TaskActionId
 import com.example.planner.sqlhelper.*
-import com.example.planner.storages.DATABASE_ACTION_ADD
-import com.example.planner.storages.DATABASE_ACTION_EDIT
-import com.example.planner.storages.DATABASE_ACTION_REMOVE
 import com.example.planner.task.Task
 import java.util.*
 
@@ -34,17 +32,17 @@ class DatabaseWriter(
 
 
         when (action) {
-            DATABASE_ACTION_ADD -> {
+            TaskActionId.ACTION_ADD.getId() -> {
                 task?.id = lastId + 1
                 tasks[task?.id] = task
                 db.insert(DB_TABLE_NAME, null, taskValues)
 
             }
-            DATABASE_ACTION_REMOVE -> {
+            TaskActionId.ACTION_REMOVE.getId() -> {
                 db.delete(DB_TABLE_NAME, DB_TASK_ID + "=" + task?.id, null)
                 tasks.remove(task?.id)
             }
-            DATABASE_ACTION_EDIT -> {
+            TaskActionId.ACTION_EDIT.getId() -> {
                 db.update(DB_TABLE_NAME, taskValues, DB_TASK_ID + "=" + task?.id, null)
                 tasks[task?.id] = task
             }

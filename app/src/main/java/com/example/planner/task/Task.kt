@@ -3,13 +3,20 @@ package com.example.planner.task
 import android.os.Parcel
 import android.os.Parcelable
 
-data class Task(var title: String?, var description: String?, var id: Int = 0, var favorite: Boolean = false, var done: Boolean = false) : Parcelable {
+data class Task(
+    var title: String?,
+    var description: String?,
+    var id: Int = 0,
+    var favorite: Boolean = false,
+    var done: Boolean = false
+) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),
         parcel.readString(),
         parcel.readInt(),
-        favorite = parcel.readInt() ==1,
-        done = parcel.readInt() ==1)
+        favorite = parcel.readInt() == 1,
+        done = parcel.readInt() == 1
+    )
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeString(title)

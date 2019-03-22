@@ -9,42 +9,43 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
+import com.example.planner.enums.TaskActionId
 import com.example.planner.presenters.ITaskPresenter
 import com.example.planner.presenters.TaskPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
 
-const val TASK_ADD = 1
-const val TASK_EDIT = 2
 
 class AddTaskActivity : AppCompatActivity(), AddView {
     private lateinit var presenter: ITaskPresenter
     private lateinit var editTaskTitle: TextInputLayout
     private lateinit var editTaskDescription: TextInputLayout
-    private var action = TASK_ADD
+    private var action = TaskActionId.ACTION_ADD.getId()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
+        init()
+    }
+
+    private fun init() {
         editTaskTitle = findViewById(R.id.taskTitleTextLayout)
         editTaskDescription = findViewById(R.id.taskDescriptionTextLayout)
 
         presenter = TaskPresenter(this, this@AddTaskActivity, LoaderManager.getInstance(this))
-        presenter.onStart()
 
         val task = intent.getParcelableExtra<Task>("Task")
-        if (task != null) action = TASK_EDIT
+        if (task != null) action = TaskActionId.ACTION_EDIT.getId()
 
         val actionbar: ActionBar? = supportActionBar
         actionbar?.apply {
             title =
-                if (action == TASK_ADD) getString(R.string.addTaskToolbarTitle)
+                if (action == TaskActionId.ACTION_ADD.getId()) getString(R.string.addTaskToolbarTitle)
                 else getString(R.string.editTaskToolbarTitle)
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
-
 
         editTaskTitle.editText?.setText(task?.title)
         editTaskDescription.editText?.setText(task?.description)
@@ -68,7 +69,7 @@ class AddTaskActivity : AppCompatActivity(), AddView {
 
     override fun onStart() {
         super.onStart()
-        presenter = TaskPresenter(this, this@AddTaskActivity, LoaderManager.getInstance(this))
+        presenter.updateFields(this@AddTaskActivity, LoaderManager.getInstance(this))
         presenter.onStart()
     }
 
@@ -94,15 +95,15 @@ class AddTaskActivity : AppCompatActivity(), AddView {
                 }
 
                 when (action) {
-                    TASK_ADD -> {
+                    TaskActionId.ACTION_ADD.getId() -> {
                         val task = Task(title, desc)
-                        presenter.updateTask(TASK_ADD, task)
+                        presenter.updateTask(TaskActionId.ACTION_ADD.getId(), task)
                     }
-                    TASK_EDIT -> {
+                    TaskActionId.ACTION_EDIT.getId() -> {
                         val task = intent.getParcelableExtra<Task>("Task")
                         task.title = title
                         task.description = desc
-                        presenter.updateTask(TASK_EDIT, task)
+                        presenter.updateTask(TaskActionId.ACTION_EDIT.getId(), task)
                     }
                 }
                 setResult(RESULT_OK)

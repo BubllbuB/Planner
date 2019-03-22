@@ -11,16 +11,13 @@ import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.TextView
 import com.example.planner.R
+import com.example.planner.enums.TaskActionId
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.task.Task
 
-const val TASK_REMOVE = 3
-const val TASK_FAVORITE = 4
-const val TASK_DONE = 5
-
 class TaskAdapter(
     private val context: Context,
-    private val taskList: ArrayList<Task>?,
+    private val taskList: List<Task>?,
     private val presenter: IMainPresenter
 ) : BaseAdapter() {
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -89,15 +86,15 @@ class TaskAdapter(
                         presenter.editTask(task)
                     }
                     R.id.removeTaskButton -> {
-                        presenter.updateTask(TASK_REMOVE, it)
+                        presenter.updateTask(TaskActionId.ACTION_REMOVE.getId(), it)
                     }
                     R.id.favoriteTaskButton -> {
                         task.favorite = !task.favorite
-                        presenter.updateTask(TASK_FAVORITE, task)
+                        presenter.updateTask(TaskActionId.ACTION_FAVORITE.getId(), task)
                     }
                     R.id.doneTaskButton -> {
                         task.done = !task.done
-                        presenter.updateTask(TASK_DONE, task)
+                        presenter.updateTask(TaskActionId.ACTION_DONE.getId(), task)
                     }
                 }
                 true

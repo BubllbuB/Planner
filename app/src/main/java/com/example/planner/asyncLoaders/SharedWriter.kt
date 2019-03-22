@@ -2,7 +2,10 @@ package com.example.planner.asyncLoaders
 
 import android.content.Context
 import android.support.v4.content.AsyncTaskLoader
-import com.example.planner.storages.*
+import com.example.planner.enums.TaskActionId
+import com.example.planner.storages.SHARED_PREFERENCES_FILE_TASKS
+import com.example.planner.storages.SHARED_PREFERENCES_KEY_LAST_ID
+import com.example.planner.storages.SHARED_PREFERENCES_KEY_TASK
 import com.example.planner.task.Task
 import com.google.gson.Gson
 import java.util.*
@@ -20,18 +23,18 @@ class SharedWriter(
         val lastId = sharedPreferences.getInt(SHARED_PREFERENCES_KEY_LAST_ID, 0)
 
         when (action) {
-            WRITER_ADD -> {
+            TaskActionId.ACTION_ADD.getId() -> {
                 task?.id = lastId + 1
                 tasks[task?.id] = task
                 val taskJson = Gson().toJson(task)
                 editor.putString(SHARED_PREFERENCES_KEY_TASK + task?.id, taskJson)
                 editor.putInt(SHARED_PREFERENCES_KEY_LAST_ID, lastId + 1)
             }
-            WRITER_REMOVE -> {
+            TaskActionId.ACTION_REMOVE.getId() -> {
                 tasks.remove(task?.id)
                 editor.remove(SHARED_PREFERENCES_KEY_TASK + task?.id)
             }
-            WRITER_EDIT -> {
+            TaskActionId.ACTION_EDIT.getId() -> {
                 tasks[task?.id] = task
                 val taskJson = Gson().toJson(task)
                 editor.putString(SHARED_PREFERENCES_KEY_TASK + task?.id, taskJson)

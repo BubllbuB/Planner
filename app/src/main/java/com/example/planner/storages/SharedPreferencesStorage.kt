@@ -6,6 +6,8 @@ import android.support.v4.app.LoaderManager
 import android.support.v4.content.Loader
 import com.example.planner.asyncLoaders.SharedLoader
 import com.example.planner.asyncLoaders.SharedWriter
+import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskKey
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import java.lang.ref.WeakReference
@@ -16,14 +18,9 @@ const val SHARED_PREFERENCES_FILE_TASKS = "tasksList"
 const val SHARED_PREFERENCES_KEY_TASK = "task_"
 const val SHARED_PREFERENCES_KEY_LAST_ID = "lastId"
 const val SHARED_LOADER = 0
-const val SHARED_EDIT = 2
-const val SHARED_REMOVE = 3
-const val SHARED_ADD = 4
-const val PARCELABLE_TASK = "task"
-const val WRITER_ACTION = "action"
-const val WRITER_ADD = 1
-const val WRITER_REMOVE = 2
-const val WRITER_EDIT = 3
+const val SHARED_EDIT = 1
+const val SHARED_REMOVE = 2
+const val SHARED_ADD = 3
 
 object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
     var taskMap = sortedMapOf<Int, Task>()
@@ -44,8 +41,8 @@ object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
                 SHARED_LOADER -> SharedLoader(it)
                 else -> SharedWriter(
                     it,
-                    bundle?.getParcelable(PARCELABLE_TASK),
-                    bundle?.getInt(WRITER_ACTION),
+                    bundle?.getParcelable(TaskKey.KEY_TASK.getKey()),
+                    bundle?.getInt(TaskKey.KEY_ACTION.getKey()),
                     taskMap
                 )
             }
@@ -64,22 +61,22 @@ object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
 
     override fun addTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(PARCELABLE_TASK, task)
-        bundle.putInt(WRITER_ACTION, WRITER_ADD)
+        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_ADD.getId())
         loaderManager.restartLoader(SHARED_ADD, bundle, this).forceLoad()
     }
 
     override fun removeTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(PARCELABLE_TASK, task)
-        bundle.putInt(WRITER_ACTION, WRITER_REMOVE)
+        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_REMOVE.getId())
         loaderManager.restartLoader(SHARED_REMOVE, bundle, this).forceLoad()
     }
 
     override fun editTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(PARCELABLE_TASK, task)
-        bundle.putInt(WRITER_ACTION, WRITER_EDIT)
+        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_EDIT.getId())
         loaderManager.restartLoader(SHARED_EDIT, bundle, this).forceLoad()
     }
 

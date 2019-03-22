@@ -3,10 +3,8 @@ package com.example.planner.asyncLoaders
 import android.content.Context
 import android.os.Environment
 import android.support.v4.content.AsyncTaskLoader
+import com.example.planner.enums.TaskActionId
 import com.example.planner.storages.EXTERNAL_FILE_TASKS
-import com.example.planner.storages.EXTERNAL_WRITER_ADD
-import com.example.planner.storages.EXTERNAL_WRITER_EDIT
-import com.example.planner.storages.EXTERNAL_WRITER_REMOVE
 import com.example.planner.task.Task
 import com.google.gson.Gson
 import java.io.File
@@ -27,17 +25,17 @@ class ExternalWriter(
         )
 
         val osw = OutputStreamWriter(FileOutputStream(file))
-        val lastId = if(tasks.isEmpty()) 0 else tasks.lastKey()
+        val lastId = if (tasks.isEmpty()) 0 else tasks.lastKey()
 
         when (action) {
-            EXTERNAL_WRITER_ADD -> {
+            TaskActionId.ACTION_ADD.getId() -> {
                 task?.id = lastId + 1
                 tasks[task?.id] = task
             }
-            EXTERNAL_WRITER_REMOVE -> {
+            TaskActionId.ACTION_REMOVE.getId() -> {
                 tasks.remove(task?.id)
             }
-            EXTERNAL_WRITER_EDIT -> {
+            TaskActionId.ACTION_EDIT.getId() -> {
                 tasks[task?.id] = task
             }
         }

@@ -6,21 +6,18 @@ import android.support.v4.app.LoaderManager
 import android.support.v4.content.Loader
 import com.example.planner.asyncLoaders.ExternalLoader
 import com.example.planner.asyncLoaders.ExternalWriter
+import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskKey
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import java.lang.ref.WeakReference
 import java.util.*
 
 const val EXTERNAL_FILE_TASKS = "tasksList.dat"
-const val EXTERNAL_LOADER = 0
-const val EXTERNAL_EDIT = 2
-const val EXTERNAL_REMOVE = 3
-const val EXTERNAL_ADD = 4
-const val EXTERNAL_PARCELABLE_TASK = "task"
-const val EXTERNAL_WRITER_ACTION = "action"
-const val EXTERNAL_WRITER_ADD = 1
-const val EXTERNAL_WRITER_REMOVE = 2
-const val EXTERNAL_WRITER_EDIT = 3
+const val EXTERNAL_LOADER = 8
+const val EXTERNAL_EDIT = 9
+const val EXTERNAL_REMOVE = 10
+const val EXTERNAL_ADD = 11
 
 object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
     var taskMap = sortedMapOf<Int, Task>()
@@ -42,8 +39,8 @@ object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, T
                 EXTERNAL_LOADER -> ExternalLoader(it)
                 else -> ExternalWriter(
                     it,
-                    bundle?.getParcelable(EXTERNAL_PARCELABLE_TASK),
-                    bundle?.getInt(EXTERNAL_WRITER_ACTION),
+                    bundle?.getParcelable(TaskKey.KEY_TASK.getKey()),
+                    bundle?.getInt(TaskKey.KEY_ACTION.getKey()),
                     taskMap
                 )
             }
@@ -62,23 +59,23 @@ object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, T
 
     override fun addTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(EXTERNAL_PARCELABLE_TASK, task)
-        bundle.putInt(EXTERNAL_WRITER_ACTION, EXTERNAL_WRITER_ADD)
+        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_ADD.getId())
         loaderManager.restartLoader(EXTERNAL_ADD, bundle, this).forceLoad()
     }
 
     override fun removeTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(PARCELABLE_TASK, task)
-        bundle.putInt(EXTERNAL_WRITER_ACTION, EXTERNAL_WRITER_REMOVE)
+        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_REMOVE.getId())
         loaderManager.restartLoader(EXTERNAL_REMOVE, bundle, this).forceLoad()
 
     }
 
     override fun editTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(PARCELABLE_TASK, task)
-        bundle.putInt(EXTERNAL_WRITER_ACTION, EXTERNAL_WRITER_EDIT)
+        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_EDIT.getId())
         loaderManager.restartLoader(EXTERNAL_EDIT, bundle, this).forceLoad()
     }
 

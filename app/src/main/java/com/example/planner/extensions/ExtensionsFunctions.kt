@@ -16,11 +16,8 @@ fun Cursor.parseTask(): Task {
     return Task(title, description, id, fav, done)
 }
 
-fun String.getTaskMap(): SortedMap<Int, Task> {
-    val itemType = object : TypeToken<SortedMap<Int, Task>>() {}.type
-    return Gson().fromJson<SortedMap<Int, Task>>(this, itemType)
-}
+fun String.getTaskMap(): SortedMap<Int, Task> =
+    Gson().fromJson<SortedMap<Int, Task>>(this, object : TypeToken<SortedMap<Int, Task>>() {}.type)
 
-fun String.getTask(): Task {
-    return Gson().fromJson<Task>(this, Task::class.java)
-}
+
+fun String.getTask(): Task = Gson().fromJson<Task>(this, Task::class.java)

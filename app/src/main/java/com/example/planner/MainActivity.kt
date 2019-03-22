@@ -22,14 +22,14 @@ import android.widget.ProgressBar
 import android.widget.TabHost
 import android.widget.Toast
 import com.example.planner.adapter.TaskAdapter
+import com.example.planner.adapter.TaskArrayAdapter
+import com.example.planner.enums.TaskActionId
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
 import kotlinx.android.synthetic.main.activity_main.*
 
-const val ADD_TASK = 1
-const val EDIT_TASK = 2
 const val CHECK_REQUEST = 3
 const val PREF_SHARED = "storageTypeShared"
 const val PREF_EXTERNAL = "storageTypeExternal"
@@ -39,6 +39,10 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     private lateinit var presenter: IMainPresenter
     private lateinit var listViewAll: ListView
     private lateinit var listViewFav: ListView
+    private lateinit var adapterListAll : TaskArrayAdapter
+    private lateinit var adapterListFavorite: TaskArrayAdapter
+    private val listTasksAll: MutableList<Task> = mutableListOf()
+    private val listTasksFav: MutableList<Task> = mutableListOf()
     private lateinit var progressBarAll: ProgressBar
     private lateinit var progressBarFav: ProgressBar
 
@@ -48,16 +52,21 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         setSupportActionBar(toolbar)
 
         init()
-
-        drawerLayout = findViewById(R.id.drawer_layout)
     }
 
     private fun init() {
+        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this))
         drawerLayout = findViewById(R.id.drawer_layout)
         listViewAll = findViewById(R.id.taskListView)
         listViewFav = findViewById(R.id.taskFavListView)
         progressBarAll = findViewById(R.id.progressBarAll)
         progressBarFav = findViewById(R.id.progressBarFav)
+
+        adapterListAll = TaskArrayAdapter(this, listTasksAll, presenter)
+        adapterListFavorite = TaskArrayAdapter(this, listTasksFav, presenter)
+
+        listViewAll.adapter = adapterListAll
+        listViewFav.adapter = adapterListFavorite
 
         val actionbar: ActionBar? = supportActionBar
         actionbar?.apply {
@@ -67,7 +76,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
 
         fab.setOnClickListener {
             val intent = Intent(this, AddTaskActivity::class.java)
-            startActivityForResult(intent, ADD_TASK)
+            startActivityForResult(intent, TaskActionId.ACTION_ADD.getId())
         }
 
         val tabHost = findViewById<TabHost>(R.id.tabHost)
@@ -95,7 +104,7 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
 
     override fun onStart() {
         super.onStart()
-        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this))
+        presenter.updateFields(this@MainActivity, LoaderManager.getInstance(this))
         presenter.onStart()
         checkPermissions()
     }
@@ -144,19 +153,23 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     override fun onListUpdate(tasks: Map<Int, Task>) {
         hideProgressBars()
 
-        val listTasks = arrayListOf<Task>()
-        listTasks.addAll(tasks.values.toTypedArray())
-        listViewAll.adapter = TaskAdapter(this, listTasks, presenter)
+        val listTasks = tasks.values.toTypedArray()
+        val listFavoriteTasks = listTasks.filter { it.favorite }
 
-        val listFavoriteTasks = arrayListOf<Task>()
-        listFavoriteTasks.addAll(listTasks.filter{ it.favorite })
-        listViewFav.adapter = TaskAdapter(this, listFavoriteTasks, presenter)
+        listTasksAll.clear()
+        listTasksAll.addAll(listTasks)
+        adapterListAll.notifyDataSetChanged()
+        //listViewAll.adapter = adapterListAll
+
+        listTasksFav.clear()
+        listTasksFav.addAll(listFavoriteTasks)
+        adapterListFavorite.notifyDataSetChanged()
     }
 
     override fun editSelectedTask(task: Task?) {
         val intent = Intent(this, AddTaskActivity::class.java)
         intent.putExtra("Task", task)
-        startActivityForResult(intent, EDIT_TASK)
+        startActivityForResult(intent, TaskActionId.ACTION_EDIT.getId())
     }
 
     override fun showProgressBars() {

@@ -6,20 +6,17 @@ import android.support.v4.app.LoaderManager
 import android.support.v4.content.Loader
 import com.example.planner.asyncLoaders.DatabaseLoader
 import com.example.planner.asyncLoaders.DatabaseWriter
+import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskKey
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import java.lang.ref.WeakReference
 import java.util.*
 
-const val DATABASE_READ_LOADER_ID = 0
-const val DATABASE_EDIT_LOADER_ID = 2
-const val DATABASE_REMOVE_LOADER_ID = 3
-const val DATABASE_ADD_LOADER_ID = 4
-const val DATABASE_KEY_TASK = "task"
-const val DATABASE_KEY_ACTION = "action"
-const val DATABASE_ACTION_ADD = 1
-const val DATABASE_ACTION_REMOVE = 2
-const val DATABASE_ACTION_EDIT = 3
+const val DATABASE_READ_LOADER_ID = 12
+const val DATABASE_EDIT_LOADER_ID = 13
+const val DATABASE_REMOVE_LOADER_ID = 14
+const val DATABASE_ADD_LOADER_ID = 15
 
 object DatabaseStorage: Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
     var taskMap = sortedMapOf<Int, Task>()
@@ -41,8 +38,8 @@ object DatabaseStorage: Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Ta
                 DATABASE_READ_LOADER_ID -> DatabaseLoader(it)
                 else -> DatabaseWriter(
                     it,
-                    bundle?.getParcelable(DATABASE_KEY_TASK),
-                    bundle?.getInt(DATABASE_KEY_ACTION),
+                    bundle?.getParcelable(TaskKey.KEY_TASK.getKey()),
+                    bundle?.getInt(TaskKey.KEY_ACTION.getKey()),
                     taskMap
                 )
             }
@@ -61,23 +58,23 @@ object DatabaseStorage: Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Ta
 
     override fun addTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(DATABASE_KEY_TASK, task)
-        bundle.putInt(DATABASE_KEY_ACTION, DATABASE_ACTION_ADD)
+        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_ADD.getId())
         loaderManager.restartLoader(DATABASE_ADD_LOADER_ID, bundle, this).forceLoad()
     }
 
     override fun removeTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(DATABASE_KEY_TASK, task)
-        bundle.putInt(DATABASE_KEY_ACTION, DATABASE_ACTION_REMOVE)
+        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_REMOVE.getId())
         loaderManager.restartLoader(DATABASE_REMOVE_LOADER_ID, bundle, this).forceLoad()
 
     }
 
     override fun editTask(task: Task) {
         val bundle = Bundle()
-        bundle.putParcelable(DATABASE_KEY_TASK, task)
-        bundle.putInt(DATABASE_KEY_ACTION, DATABASE_ACTION_EDIT)
+        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_EDIT.getId())
         loaderManager.restartLoader(DATABASE_EDIT_LOADER_ID, bundle, this).forceLoad()
     }
 

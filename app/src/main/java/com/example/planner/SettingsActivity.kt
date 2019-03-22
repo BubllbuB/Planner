@@ -125,7 +125,7 @@ class SettingsActivity : PreferenceActivity(), NavigationView.OnNavigationItemSe
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return if(item.itemId==android.R.id.home) {
+        return if (item.itemId == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START)
             true
         } else {

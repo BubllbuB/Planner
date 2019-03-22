@@ -1,7 +1,6 @@
 package com.example.planner.asyncLoaders
 
 import android.content.Context
-import android.database.Cursor
 import android.support.v4.content.AsyncTaskLoader
 import com.example.planner.extensions.parseTask
 import com.example.planner.sqlhelper.DB_TABLE_NAME
