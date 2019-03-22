@@ -14,7 +14,6 @@ import android.support.v7.preference.PreferenceManager
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_settings.*
 
-
 @Suppress("DEPRECATION")
 class SettingsActivity : PreferenceActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var sCache: CheckBoxPreference

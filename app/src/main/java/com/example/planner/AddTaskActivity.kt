@@ -16,7 +16,6 @@ import com.example.planner.presenters.TaskPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
 
-
 class AddTaskActivity : AppCompatActivity(), AddView {
     private lateinit var presenter: ITaskPresenter
     private lateinit var editTaskTitle: TextInputLayout

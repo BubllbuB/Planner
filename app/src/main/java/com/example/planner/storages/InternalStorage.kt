@@ -19,7 +19,7 @@ const val INTERNAL_EDIT = 5
 const val INTERNAL_REMOVE = 6
 const val INTERNAL_ADD = 7
 
-object InternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
+internal object InternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
     private var taskMap = sortedMapOf<Int, Task>()
     private val observers: MutableList<StorageObserver> = ArrayList()
 

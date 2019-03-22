@@ -4,7 +4,7 @@ import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import java.util.*
 
-object CacheStorage : Storage {
+internal object CacheStorage : Storage {
     private var tasksList = sortedMapOf<Int, Task>()
     private var taskId = 0
     private val observers: MutableList<StorageObserver> = ArrayList()
