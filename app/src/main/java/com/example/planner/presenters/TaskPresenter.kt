@@ -1,7 +1,6 @@
 package com.example.planner.presenters
 
 import com.example.planner.observer.StorageObserver
-import com.example.planner.storages.CacheStorage
 import com.example.planner.storages.Storage
 import com.example.planner.storages.StorageFactory
 import com.example.planner.task.Task
