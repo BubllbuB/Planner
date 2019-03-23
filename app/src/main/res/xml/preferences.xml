@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+            android:title="@string/prefStorageTitle"
+            android:key="storageType">
+        <CheckBoxPreference
+                android:key="storageTypeCache"
+                android:summary="@string/prefCacheSummary"
+                android:title="@string/prefStorageCache"
+                android:defaultValue="true"/>
+        <CheckBoxPreference
+                android:key="storageTypeShared"
+                android:summary="@string/prefSharedSummary"
+                android:title="@string/prefStorageShared"
+                android:defaultValue="false"/>
+        <CheckBoxPreference
+                android:key="storageTypeInternal"
+                android:summary="@string/prefInternalSummary"
+                android:title="@string/prefStorageInternal"
+                android:defaultValue="false"/>
+        <CheckBoxPreference
+                android:key="storageTypeExternal"
+                android:summary="@string/prefExternalSummary"
+                android:title="@string/prefStorageExternal"
+                android:defaultValue="false"/>
+        <CheckBoxPreference
+                android:key="storageTypeDatabase"
+                android:summary="@string/prefDatabaseSummary"
+                android:title="@string/prefStorageDatabase"
+                android:defaultValue="false"/>
+    </PreferenceCategory>
+</PreferenceScreen>

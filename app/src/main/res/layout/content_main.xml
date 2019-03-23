@@ -30,7 +30,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                <LinearLayout
+                <RelativeLayout
                         android:id="@+id/tab1"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -41,7 +41,32 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
 
-                </LinearLayout>
+                    <ProgressBar
+                            android:id="@+id/progressBarAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:indeterminate="true"
+                            android:layout_centerInParent="true"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                        android:id="@+id/tab2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:ignore="UselessParent">
+
+                    <ListView
+                            android:id="@+id/taskFavListView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+
+                    <ProgressBar
+                            android:id="@+id/progressBarFav"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:indeterminate="true"
+                            android:layout_centerInParent="true"/>
+                </RelativeLayout>
             </FrameLayout>
         </LinearLayout>
     </TabHost>
