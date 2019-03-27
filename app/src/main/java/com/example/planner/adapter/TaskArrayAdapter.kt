@@ -3,11 +3,11 @@ package com.example.planner.adapter
 import android.content.Context
 import android.graphics.Paint
 import android.support.v7.widget.PopupMenu
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.TextView
 import com.example.planner.R
@@ -18,55 +18,59 @@ import com.example.planner.task.Task
 
 const val ID_ELEMENT = 0
 const val ID_HEADER = 1
+const val TITLE_FAVORITE = "Favorites:"
+const val TITLE_OTHERS = "Others:"
 
 class TaskArrayAdapter(
-    context: Context,
+    private val context: Context,
     private val taskList: List<Task>,
     private val presenter: IMainPresenter
-) : ArrayAdapter<Task>(context, 0, taskList) {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    private var posHeadOther = taskList.indexOfFirst { !it.favorite } + 1
+
+    override fun getItemCount(): Int {
+        return if (taskList.isNotEmpty()) {
+            if (taskList[0].favorite && posHeadOther > 0) {
+                taskList.size + 2
+            } else {
+                taskList.size
+            }
+        } else {
+            taskList.size
+        }
+    }
 
     override fun getItemViewType(position: Int): Int {
-        return if (taskList[position].id > -1) ID_ELEMENT
-        else ID_HEADER
-    }
+        posHeadOther = taskList.indexOfFirst { !it.favorite } + 1
 
-    override fun getViewTypeCount(): Int {
-        return 2
-    }
-
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view: View
-
-        if (getItemViewType(position) == ID_HEADER) {
-            val vh: ViewHolderHeader
-
-            if (convertView == null) {
-                view = inflater.inflate(R.layout.listview_header, parent, false)
-                vh = ViewHolderHeader(view)
-                view.tag = vh
-            } else {
-                view = convertView
-                vh = view.tag as ViewHolderHeader
-            }
-
-            vh.headerTextView?.text = taskList[position].title
+        return if (posHeadOther > 0 && (position == 0 || position == posHeadOther)) {
+            ID_HEADER
         } else {
-            val vh: ViewHolder
+            ID_ELEMENT
+        }
+    }
 
-            if (convertView == null) {
-                view = inflater.inflate(R.layout.list_item_task, parent, false)
-                vh = ViewHolder(view)
-                view.tag = vh
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder.itemViewType == ID_HEADER) {
+            val vh = holder as ViewHolderHeader
+
+            if (position == 0) {
+                vh.headerTextView?.text = TITLE_FAVORITE
             } else {
-                view = convertView
-                vh = view.tag as ViewHolder
+                vh.headerTextView?.text = TITLE_OTHERS
             }
+        } else {
+            val vh = holder as ViewHolder
+            var offset = if (posHeadOther > 0) 1 else 0
 
-            vh.titleTextView?.text = taskList[position].title
-            vh.descriptionTextView?.text = taskList[position].description
+            if (posHeadOther in 1..position) offset = 2
 
-            if (taskList[position].done) {
+            vh.titleTextView?.text = taskList[position - offset].title
+            vh.descriptionTextView?.text = taskList[position - offset].description
+
+            if (taskList[position - offset].done) {
                 vh.titleTextView?.paintFlags = ((vh.titleTextView?.paintFlags ?: 0)
                         or (Paint.STRIKE_THRU_TEXT_FLAG))
                 vh.descriptionTextView?.paintFlags = ((vh.descriptionTextView?.paintFlags ?: 0)
@@ -77,10 +81,17 @@ class TaskArrayAdapter(
             }
 
             vh.moreImageView?.setOnClickListener {
-                showPopup(context, it, taskList[position])
+                showPopup(context, it, taskList[position - offset])
             }
         }
-        return view
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == ID_HEADER) {
+            ViewHolderHeader(inflater.inflate(R.layout.listview_header, parent, false))
+        } else {
+            ViewHolder(inflater.inflate(R.layout.list_item_task, parent, false))
+        }
     }
 
     private fun showPopup(context: Context, view: View, task: Task) {
@@ -118,13 +129,13 @@ class TaskArrayAdapter(
         popup.show()
     }
 
-    private class ViewHolder(view: View?) {
-        var titleTextView: TextView? = view?.findViewById(R.id.listTaskTitle)
-        var descriptionTextView: TextView? = view?.findViewById(R.id.listTaskDescription)
-        var moreImageView: Button? = view?.findViewById(R.id.listMoreButton)
+    private class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        var titleTextView: TextView? = view.findViewById(R.id.listTaskTitle)
+        var descriptionTextView: TextView? = view.findViewById(R.id.listTaskDescription)
+        var moreImageView: Button? = view.findViewById(R.id.listMoreButton)
     }
 
-    private class ViewHolderHeader(view: View?) {
-        var headerTextView: TextView? = view?.findViewById(R.id.listHeader)
+    private class ViewHolderHeader(view: View) : RecyclerView.ViewHolder(view) {
+        var headerTextView: TextView? = view.findViewById(R.id.listHeader)
     }
 }

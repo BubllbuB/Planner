@@ -15,9 +15,10 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.PreferenceManager
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.MenuItem
 import android.view.View
-import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.TabHost
 import android.widget.Toast
@@ -39,8 +40,8 @@ const val TAB_FAV = "tabFavorite"
 class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationItemSelectedListener {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var presenter: IMainPresenter
-    private lateinit var listViewAll: ListView
-    private lateinit var listViewFav: ListView
+    private lateinit var listViewAll: RecyclerView
+    private lateinit var listViewFav: RecyclerView
     private lateinit var adapterListAll: TaskArrayAdapter
     private lateinit var adapterListFavorite: TaskArrayAdapter
     private val listTasksAll: MutableList<Task> = mutableListOf()
@@ -66,6 +67,9 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
 
         adapterListAll = TaskArrayAdapter(this, listTasksAll, presenter)
         adapterListFavorite = TaskArrayAdapter(this, listTasksFav, presenter)
+
+        listViewAll.layoutManager = LinearLayoutManager(this)
+        listViewFav.layoutManager = LinearLayoutManager(this)
 
         listViewAll.adapter = adapterListAll
         listViewFav.adapter = adapterListFavorite
@@ -152,18 +156,12 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     override fun onListUpdate(tasks: Map<Int, Task>) {
         hideProgressBars()
 
+        val tasksS = tasks.values.toList().sortedBy { !it.favorite }
+
         val groupMap = tasks.values.groupBy { it.favorite }
 
-        val listTasks = arrayListOf<Task>()
-        if (groupMap[true]?.isNotEmpty() == true) {
-            listTasks.add(Task(getString(R.string.listHeaderFavorites), "", -1))
-            listTasks.addAll(groupMap[true] ?: listOf())
-            listTasks.add(Task(getString(R.string.listHeaderOthers), "", -1))
-        }
-        listTasks.addAll(groupMap[false] ?: listOf())
-
         listTasksAll.clear()
-        listTasksAll.addAll(listTasks)
+        listTasksAll.addAll(tasksS)
         adapterListAll.notifyDataSetChanged()
 
         listTasksFav.clear()
