@@ -101,9 +101,8 @@ class AddTaskActivity : AppCompatActivity(), AddView {
                 }
                 TaskActionId.ACTION_EDIT.getId() -> {
                     val task = intent.getParcelableExtra<Task>(TaskKey.KEY_TASK.getKey())
-                    task.title = title
-                    task.description = desc
-                    presenter.updateTask(TaskActionId.ACTION_EDIT.getId(), task)
+                    val newTask = Task(title, desc, task.id, task.favorite, task.done)
+                    presenter.updateTask(TaskActionId.ACTION_EDIT.getId(), newTask)
                 }
             }
             setResult(RESULT_OK)

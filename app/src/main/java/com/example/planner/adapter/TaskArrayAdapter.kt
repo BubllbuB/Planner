@@ -27,13 +27,13 @@ class TaskArrayAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var taskList: MutableList<Task> = mutableListOf()
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    private var posHeadOther = 0
+    private var posHeadOther = -1
 
 
     override fun getItemCount(): Int {
-        posHeadOther = taskList.indexOfFirst { !it.favorite } + 1
-
         return if (taskList.isNotEmpty()) {
+            posHeadOther = if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
+
             if (taskList[0].favorite && posHeadOther > 0) {
                 taskList.size + 2
             } else {
@@ -45,7 +45,7 @@ class TaskArrayAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        posHeadOther = taskList.indexOfFirst { !it.favorite } + 1
+        posHeadOther = if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
 
         return if ((posHeadOther > 0 && taskList[0].favorite) && (position == 0 || position == posHeadOther)) {
             ID_HEADER
@@ -66,7 +66,7 @@ class TaskArrayAdapter(
             }
         } else {
             val vh = holder as ViewHolder
-            posHeadOther = taskList.indexOfFirst { !it.favorite } + 1
+            posHeadOther = if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
 
             var offset = if (posHeadOther > 0 && taskList[0].favorite) 1 else 0
 
@@ -100,7 +100,8 @@ class TaskArrayAdapter(
     }
 
     fun setList(newList: List<Task>) {
-        val diffResult = DiffUtil.calculateDiff(TaskUpdateListDiffUtilCallback(taskList, newList), true)
+        val oldList = taskList
+        val diffResult = DiffUtil.calculateDiff(TaskUpdateListDiffUtilCallback(oldList, newList), true)
         taskList.clear()
         taskList.addAll(newList)
         diffResult.dispatchUpdatesTo(this)
@@ -127,12 +128,12 @@ class TaskArrayAdapter(
                     presenter.updateTask(TaskActionId.ACTION_REMOVE.getId(), task)
                 }
                 R.id.favoriteTaskButton -> {
-                    task.favorite = !task.favorite
-                    presenter.updateTask(TaskActionId.ACTION_FAVORITE.getId(), task)
+                    val newTask = Task(task.title, task.description, task.id, !task.favorite, task.done)
+                    presenter.updateTask(TaskActionId.ACTION_FAVORITE.getId(), newTask)
                 }
                 R.id.doneTaskButton -> {
-                    task.done = !task.done
-                    presenter.updateTask(TaskActionId.ACTION_DONE.getId(), task)
+                    val newTask = Task(task.title, task.description, task.id, task.favorite, !task.done)
+                    presenter.updateTask(TaskActionId.ACTION_DONE.getId(), newTask)
                 }
             }
             true
