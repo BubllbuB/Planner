@@ -86,7 +86,7 @@ class TaskArrayAdapter(
             }
 
             vh.moreImageView?.setOnClickListener {
-                showPopup(context, it, taskList[vh.adapterPosition - offset])
+                showPopup(context, it, vh.adapterPosition)
             }
         }
     }
@@ -107,12 +107,21 @@ class TaskArrayAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
-    private fun showPopup(context: Context, view: View, task: Task) {
+    private fun showPopup(context: Context, view: View, position: Int) {
         val popup: PopupMenu?
         popup = PopupMenu(context, view)
         popup.inflate(R.menu.task)
         val favItem = popup.menu.findItem(R.id.favoriteTaskButton)
         val doneItem = popup.menu.findItem(R.id.doneTaskButton)
+
+        posHeadOther = if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
+
+        var offset = if (posHeadOther > 0 && taskList[0].favorite) 1 else 0
+
+        if (posHeadOther in 1..position && taskList[0].favorite) offset = 2
+
+        val task = taskList[position-offset]
+
         favItem.title = if (task.favorite) context.resources.getString(R.string.taskMenuRemoveFavorite)
         else context.resources.getString(R.string.taskMenuAddFavorite)
 

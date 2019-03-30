@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         card_view:cardCornerRadius="3dp"
         android:layout_margin="3dp"
+        android:foreground="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true">
 

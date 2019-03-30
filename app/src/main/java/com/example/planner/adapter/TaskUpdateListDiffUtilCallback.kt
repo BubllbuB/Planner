@@ -6,8 +6,6 @@ import com.example.planner.task.Task
 class TaskUpdateListDiffUtilCallback(private val oldList: List<Task>, private val newList: List<Task>) :
     DiffUtil.Callback() {
 
-    private var posHeadOther = 0
-
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val oldPosHeadFav = if (oldList[0].favorite) 0 else -1
         val oldPosHeadOther = if (oldList[0].favorite) oldList.indexOfFirst { !it.favorite } + 1 else -1
@@ -25,54 +23,18 @@ class TaskUpdateListDiffUtilCallback(private val oldList: List<Task>, private va
             return if (oldPosHeadFav == 0 && newPosHeadFav == 0) {
                 true
             } else if (oldPosHeadFav == -1 && newPosHeadFav == -1) {
-                val compareTitle = oldList[oldItemPosition - offsetOld].title == newList[newItemPosition - offsetNew].title
-                val compareDescription =
-                    oldList[oldItemPosition - offsetOld].description == newList[newItemPosition - offsetNew].description
-                val compareDone = oldList[oldItemPosition - offsetOld].done == newList[newItemPosition - offsetNew].done
-                val compareFavorite =
-                    oldList[oldItemPosition - offsetOld].favorite == newList[newItemPosition - offsetNew].favorite
-
-                val returnedV = compareTitle && compareDescription && compareDone && compareFavorite
-
-                return compareTitle && compareDescription && compareDone && compareFavorite
+                return oldList[oldItemPosition - offsetOld] == newList[newItemPosition - offsetNew]
             } else if (oldPosHeadFav == 0 && newPosHeadFav == -1 && newItemPosition==0 && oldItemPosition!=0 && oldItemPosition!=oldPosHeadOther){
-                val compareTitle = oldList[oldItemPosition - offsetOld].title == newList[newItemPosition - offsetNew].title
-                val compareDescription =
-                    oldList[oldItemPosition - offsetOld].description == newList[newItemPosition - offsetNew].description
-                val compareDone = oldList[oldItemPosition - offsetOld].done == newList[newItemPosition - offsetNew].done
-                val compareFavorite =
-                    oldList[oldItemPosition - offsetOld].favorite == newList[newItemPosition - offsetNew].favorite
-
-                val returnedV = compareTitle && compareDescription && compareDone && compareFavorite
-
-                return compareTitle && compareDescription && compareDone && compareFavorite
+                return oldList[oldItemPosition - offsetOld] == newList[newItemPosition - offsetNew]
             } else if (oldPosHeadFav == -1 && newPosHeadFav == 0 && oldItemPosition==0 && newItemPosition!=0 && newItemPosition!=newPosHeadOther){
-                val compareTitle = oldList[oldItemPosition - offsetOld].title == newList[newItemPosition - offsetNew].title
-                val compareDescription =
-                    oldList[oldItemPosition - offsetOld].description == newList[newItemPosition - offsetNew].description
-                val compareDone = oldList[oldItemPosition - offsetOld].done == newList[newItemPosition - offsetNew].done
-                val compareFavorite =
-                    oldList[oldItemPosition - offsetOld].favorite == newList[newItemPosition - offsetNew].favorite
-
-                val returnedV = compareTitle && compareDescription && compareDone && compareFavorite
-
-                return compareTitle && compareDescription && compareDone && compareFavorite
+                return oldList[oldItemPosition - offsetOld] == newList[newItemPosition - offsetNew]
             } else {
                 false
             }
         }
 
         return if (oldPosHeadOther != oldItemPosition && newPosHeadOther != newItemPosition) {
-            val compareTitle = oldList[oldItemPosition - offsetOld].title == newList[newItemPosition - offsetNew].title
-            val compareDescription =
-                oldList[oldItemPosition - offsetOld].description == newList[newItemPosition - offsetNew].description
-            val compareDone = oldList[oldItemPosition - offsetOld].done == newList[newItemPosition - offsetNew].done
-            val compareFavorite =
-                oldList[oldItemPosition - offsetOld].favorite == newList[newItemPosition - offsetNew].favorite
-
-            val returnedV = compareTitle && compareDescription && compareDone && compareFavorite
-
-            return compareTitle && compareDescription && compareDone && compareFavorite
+            return oldList[oldItemPosition - offsetOld] == newList[newItemPosition - offsetNew]
         } else oldPosHeadOther == oldItemPosition && newPosHeadOther == newItemPosition
 
 
@@ -111,9 +73,9 @@ class TaskUpdateListDiffUtilCallback(private val oldList: List<Task>, private va
     }
 
     override fun getNewListSize(): Int {
-        posHeadOther = newList.indexOfFirst { !it.favorite } + 1
-
         return if (newList.isNotEmpty()) {
+            val posHeadOther = newList.indexOfFirst { !it.favorite } + 1
+
             if (newList[0].favorite && posHeadOther > 0) {
                 newList.size + 2
             } else {
@@ -125,9 +87,9 @@ class TaskUpdateListDiffUtilCallback(private val oldList: List<Task>, private va
     }
 
     override fun getOldListSize(): Int {
-        posHeadOther = oldList.indexOfFirst { !it.favorite } + 1
-
         return if (oldList.isNotEmpty()) {
+            val posHeadOther = if (oldList[0].favorite) oldList.indexOfFirst { !it.favorite } + 1 else -1
+
             if (oldList[0].favorite && posHeadOther > 0) {
                 oldList.size + 2
             } else {
