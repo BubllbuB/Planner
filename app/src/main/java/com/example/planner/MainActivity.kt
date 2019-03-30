@@ -71,17 +71,6 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         listViewAll.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         listViewFav.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-        val animator = DefaultItemAnimator()
-        animator.removeDuration = 10000
-        animator.addDuration = 10000
-
-        val taskAnimator = TaskAnimator()
-        taskAnimator.removeDuration = 10000
-        taskAnimator.addDuration = 10000
-
-        listViewAll.itemAnimator = animator
-
-        listViewFav.itemAnimator = taskAnimator
 
         listViewAll.adapter = adapterListAll
         listViewFav.adapter = adapterListFavorite
