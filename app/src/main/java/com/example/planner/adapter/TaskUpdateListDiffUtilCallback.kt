@@ -21,11 +21,32 @@ class TaskUpdateListDiffUtilCallback(private val oldList: List<Task>, private va
         if (newPosHeadOther in 1..newItemPosition && newList[0].favorite) offsetNew = 2
 
 
-
         if (oldItemPosition == 0 || newItemPosition == 0) {
             return if (oldPosHeadFav == 0 && newPosHeadFav == 0) {
                 true
             } else if (oldPosHeadFav == -1 && newPosHeadFav == -1) {
+                val compareTitle = oldList[oldItemPosition - offsetOld].title == newList[newItemPosition - offsetNew].title
+                val compareDescription =
+                    oldList[oldItemPosition - offsetOld].description == newList[newItemPosition - offsetNew].description
+                val compareDone = oldList[oldItemPosition - offsetOld].done == newList[newItemPosition - offsetNew].done
+                val compareFavorite =
+                    oldList[oldItemPosition - offsetOld].favorite == newList[newItemPosition - offsetNew].favorite
+
+                val returnedV = compareTitle && compareDescription && compareDone && compareFavorite
+
+                return compareTitle && compareDescription && compareDone && compareFavorite
+            } else if (oldPosHeadFav == 0 && newPosHeadFav == -1 && newItemPosition==0 && oldItemPosition!=0 && oldItemPosition!=oldPosHeadOther){
+                val compareTitle = oldList[oldItemPosition - offsetOld].title == newList[newItemPosition - offsetNew].title
+                val compareDescription =
+                    oldList[oldItemPosition - offsetOld].description == newList[newItemPosition - offsetNew].description
+                val compareDone = oldList[oldItemPosition - offsetOld].done == newList[newItemPosition - offsetNew].done
+                val compareFavorite =
+                    oldList[oldItemPosition - offsetOld].favorite == newList[newItemPosition - offsetNew].favorite
+
+                val returnedV = compareTitle && compareDescription && compareDone && compareFavorite
+
+                return compareTitle && compareDescription && compareDone && compareFavorite
+            } else if (oldPosHeadFav == -1 && newPosHeadFav == 0 && oldItemPosition==0 && newItemPosition!=0 && newItemPosition!=newPosHeadOther){
                 val compareTitle = oldList[oldItemPosition - offsetOld].title == newList[newItemPosition - offsetNew].title
                 val compareDescription =
                     oldList[oldItemPosition - offsetOld].description == newList[newItemPosition - offsetNew].description
@@ -74,6 +95,10 @@ class TaskUpdateListDiffUtilCallback(private val oldList: List<Task>, private va
             return if (oldPosHeadFav == 0 && newPosHeadFav == 0) {
                 true
             } else if (oldPosHeadFav == -1 && newPosHeadFav == -1) {
+                oldList[oldItemPosition - offsetOld].id == newList[newItemPosition - offsetNew].id
+            } else if (oldPosHeadFav == 0 && newPosHeadFav == -1 && newItemPosition==0 && oldItemPosition!=0 && oldItemPosition!=oldPosHeadOther){
+                oldList[oldItemPosition - offsetOld].id == newList[newItemPosition - offsetNew].id
+            } else if (oldPosHeadFav == -1 && newPosHeadFav == 0 && oldItemPosition==0 && newItemPosition!=0 && newItemPosition!=newPosHeadOther){
                 oldList[oldItemPosition - offsetOld].id == newList[newItemPosition - offsetNew].id
             } else {
                 false
