@@ -2,6 +2,8 @@ package com.example.planner.adapter
 
 import android.content.Context
 import android.graphics.Paint
+import android.os.Handler
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -15,7 +17,6 @@ import com.example.planner.enums.TaskActionId
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.task.Task
 
-
 const val ID_ELEMENT = 0
 const val ID_HEADER = 1
 const val TITLE_FAVORITE = "Favorites:"
@@ -23,11 +24,12 @@ const val TITLE_OTHERS = "Others:"
 
 class TaskArrayAdapter(
     private val context: Context,
-    private val taskList: List<Task>,
     private val presenter: IMainPresenter
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private var taskList: MutableList<Task> = mutableListOf()
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private var posHeadOther = taskList.indexOfFirst { !it.favorite } + 1
+
 
     override fun getItemCount(): Int {
         return if (taskList.isNotEmpty()) {
@@ -92,6 +94,14 @@ class TaskArrayAdapter(
         } else {
             ViewHolder(inflater.inflate(R.layout.list_item_task, parent, false))
         }
+    }
+
+    fun setList(newList: List<Task>) {
+        val diffResult = DiffUtil.calculateDiff(TaskUpdateListDiffUtilCallback(taskList, newList), true)
+
+        taskList.clear()
+        taskList.addAll(newList)
+        diffResult.dispatchUpdatesTo(this)
     }
 
     private fun showPopup(context: Context, view: View, task: Task) {

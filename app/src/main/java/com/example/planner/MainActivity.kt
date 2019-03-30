@@ -44,8 +44,6 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     private lateinit var listViewFav: RecyclerView
     private lateinit var adapterListAll: TaskArrayAdapter
     private lateinit var adapterListFavorite: TaskArrayAdapter
-    private val listTasksAll: MutableList<Task> = mutableListOf()
-    private val listTasksFav: MutableList<Task> = mutableListOf()
     private lateinit var progressBarAll: ProgressBar
     private lateinit var progressBarFav: ProgressBar
 
@@ -65,11 +63,11 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         progressBarAll = findViewById(R.id.progressBarAll)
         progressBarFav = findViewById(R.id.progressBarFav)
 
-        adapterListAll = TaskArrayAdapter(this, listTasksAll, presenter)
-        adapterListFavorite = TaskArrayAdapter(this, listTasksFav, presenter)
+        adapterListAll = TaskArrayAdapter(this, presenter)
+        adapterListFavorite = TaskArrayAdapter(this, presenter)
 
-        listViewAll.layoutManager = LinearLayoutManager(this)
-        listViewFav.layoutManager = LinearLayoutManager(this)
+        listViewAll.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        listViewFav.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
         listViewAll.adapter = adapterListAll
         listViewFav.adapter = adapterListFavorite
@@ -157,16 +155,10 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         hideProgressBars()
 
         val tasksS = tasks.values.toList().sortedBy { !it.favorite }
-
         val groupMap = tasks.values.groupBy { it.favorite }
 
-        listTasksAll.clear()
-        listTasksAll.addAll(tasksS)
-        adapterListAll.notifyDataSetChanged()
-
-        listTasksFav.clear()
-        listTasksFav.addAll(groupMap[true] ?: listOf())
-        adapterListFavorite.notifyDataSetChanged()
+        adapterListAll.setList(tasksS)
+        adapterListFavorite.setList(groupMap[true] ?: listOf())
     }
 
     override fun editSelectedTask(task: Task?) {
