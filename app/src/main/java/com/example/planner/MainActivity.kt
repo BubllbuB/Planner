@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.PreferenceManager
+import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.MenuItem
@@ -22,6 +23,7 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.TabHost
 import android.widget.Toast
+import com.example.planner.adapter.TaskAnimator
 import com.example.planner.adapter.TaskArrayAdapter
 import com.example.planner.enums.TaskActionId
 import com.example.planner.enums.TaskKey
@@ -68,6 +70,18 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
 
         listViewAll.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         listViewFav.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+        val animator = DefaultItemAnimator()
+        animator.removeDuration = 10000
+        animator.addDuration = 10000
+
+        val taskAnimator = TaskAnimator()
+        taskAnimator.removeDuration = 10000
+        taskAnimator.addDuration = 10000
+
+        listViewAll.itemAnimator = animator
+
+        listViewFav.itemAnimator = taskAnimator
 
         listViewAll.adapter = adapterListAll
         listViewFav.adapter = adapterListFavorite
