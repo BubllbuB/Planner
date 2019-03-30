@@ -2,7 +2,6 @@ package com.example.planner.adapter
 
 import android.content.Context
 import android.graphics.Paint
-import android.os.Handler
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.RecyclerView
@@ -10,8 +9,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.TextView
 import com.example.planner.R
@@ -30,10 +27,12 @@ class TaskArrayAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var taskList: MutableList<Task> = mutableListOf()
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    private var posHeadOther = taskList.indexOfFirst { !it.favorite } + 1
+    private var posHeadOther = 0
 
 
     override fun getItemCount(): Int {
+        posHeadOther = taskList.indexOfFirst { !it.favorite } + 1
+
         return if (taskList.isNotEmpty()) {
             if (taskList[0].favorite && posHeadOther > 0) {
                 taskList.size + 2
@@ -48,7 +47,7 @@ class TaskArrayAdapter(
     override fun getItemViewType(position: Int): Int {
         posHeadOther = taskList.indexOfFirst { !it.favorite } + 1
 
-        return if (posHeadOther > 0 && (position == 0 || position == posHeadOther)) {
+        return if ((posHeadOther > 0 && taskList[0].favorite) && (position == 0 || position == posHeadOther)) {
             ID_HEADER
         } else {
             ID_ELEMENT
@@ -67,14 +66,16 @@ class TaskArrayAdapter(
             }
         } else {
             val vh = holder as ViewHolder
-            var offset = if (posHeadOther > 0) 1 else 0
+            posHeadOther = taskList.indexOfFirst { !it.favorite } + 1
 
-            if (posHeadOther in 1..position) offset = 2
+            var offset = if (posHeadOther > 0 && taskList[0].favorite) 1 else 0
 
-            vh.titleTextView?.text = taskList[position - offset].title
-            vh.descriptionTextView?.text = taskList[position - offset].description
+            if (posHeadOther in 1..vh.adapterPosition && taskList[0].favorite) offset = 2
 
-            if (taskList[position - offset].done) {
+            vh.titleTextView?.text = taskList[vh.adapterPosition - offset].title
+            vh.descriptionTextView?.text = taskList[vh.adapterPosition - offset].description
+
+            if (taskList[vh.adapterPosition - offset].done) {
                 vh.titleTextView?.paintFlags = ((vh.titleTextView?.paintFlags ?: 0)
                         or (Paint.STRIKE_THRU_TEXT_FLAG))
                 vh.descriptionTextView?.paintFlags = ((vh.descriptionTextView?.paintFlags ?: 0)
@@ -85,7 +86,7 @@ class TaskArrayAdapter(
             }
 
             vh.moreImageView?.setOnClickListener {
-                showPopup(context, it, taskList[position - offset])
+                showPopup(context, it, taskList[vh.adapterPosition - offset])
             }
         }
     }
@@ -100,7 +101,6 @@ class TaskArrayAdapter(
 
     fun setList(newList: List<Task>) {
         val diffResult = DiffUtil.calculateDiff(TaskUpdateListDiffUtilCallback(taskList, newList), true)
-
         taskList.clear()
         taskList.addAll(newList)
         diffResult.dispatchUpdatesTo(this)
