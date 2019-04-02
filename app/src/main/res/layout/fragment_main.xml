@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<android.support.constraint.ConstraintLayout
+        android:id="@+id/layout_main_content"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -34,39 +35,12 @@
                         android:id="@+id/tab1"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        tools:ignore="UselessParent">
-
-                    <android.support.v7.widget.RecyclerView
-                            android:id="@+id/taskListView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
-
-                    <ProgressBar
-                            android:id="@+id/progressBarAll"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:indeterminate="true"
-                            android:layout_centerInParent="true"/>
-                </RelativeLayout>
-
+                        tools:ignore="UselessParent"/>
                 <RelativeLayout
                         android:id="@+id/tab2"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        tools:ignore="UselessParent">
-
-                    <android.support.v7.widget.RecyclerView
-                            android:id="@+id/taskFavListView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
-
-                    <ProgressBar
-                            android:id="@+id/progressBarFav"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:indeterminate="true"
-                            android:layout_centerInParent="true"/>
-                </RelativeLayout>
+                        tools:ignore="UselessParent"/>
             </FrameLayout>
         </LinearLayout>
     </TabHost>
@@ -74,8 +48,12 @@
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
             app:srcCompat="@drawable/ic_add"
-            app:layout_behavior=".behaviors.ScrollFABBehavior"/>
-</android.support.design.widget.CoordinatorLayout>
+            app:layout_behavior=".behaviors.ScrollFABBehavior"
+            app:layout_constraintStart_toStartOf="@+id/layout_main_content"
+            app:layout_constraintTop_toTopOf="@+id/layout_main_content"
+            app:layout_constraintEnd_toEndOf="@+id/layout_main_content"
+            app:layout_constraintBottom_toBottomOf="@+id/layout_main_content"
+            android:layout_gravity="bottom|end"/>
+</android.support.constraint.ConstraintLayout>

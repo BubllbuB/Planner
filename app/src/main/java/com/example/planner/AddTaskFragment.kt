@@ -1,14 +1,14 @@
 package com.example.planner
 
+import android.app.Activity.RESULT_OK
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
+import android.support.v4.app.Fragment
 import android.support.v4.app.LoaderManager
 import android.support.v7.app.ActionBar
-import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.Menu
-import android.view.MenuItem
+import android.view.*
 import com.example.planner.enums.TaskActionId
 import com.example.planner.enums.TaskKey
 import com.example.planner.presenters.ITaskPresenter
@@ -16,39 +16,40 @@ import com.example.planner.presenters.TaskPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
 
-class AddTaskActivity : AppCompatActivity(), AddView {
+class AddTaskFragment : Fragment(), AddView {
     private lateinit var presenter: ITaskPresenter
     private lateinit var editTaskTitle: TextInputLayout
     private lateinit var editTaskDescription: TextInputLayout
     private var action = TaskActionId.ACTION_ADD.getId()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_task)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view =  inflater.inflate(R.layout.fragment_add_task, container, false)
 
-        init()
+        init(view)
+
+        return view
     }
 
-    private fun init() {
-        editTaskTitle = findViewById(R.id.taskTitleTextLayout)
-        editTaskDescription = findViewById(R.id.taskDescriptionTextLayout)
+    private fun init(view: View) {
+        editTaskTitle = view.findViewById(R.id.taskTitleTextLayout)
+        editTaskDescription = view.findViewById(R.id.taskDescriptionTextLayout)
 
-        presenter = TaskPresenter(this, this@AddTaskActivity, LoaderManager.getInstance(this))
+        presenter = TaskPresenter(this, activity!!.applicationContext, LoaderManager.getInstance(this))
 
-        val task = intent.getParcelableExtra<Task>(TaskKey.KEY_TASK.getKey())
-        if (task != null) action = TaskActionId.ACTION_EDIT.getId()
+        /*val task = intent.getParcelableExtra<Task>(TaskKey.KEY_TASK.getKey())
+        if (task != null) action = TaskActionId.ACTION_EDIT.getId()*/
 
-        val actionbar: ActionBar? = supportActionBar
+        /*val actionbar: ActionBar? = supportActionBar
         actionbar?.apply {
             title =
                 if (action == TaskActionId.ACTION_ADD.getId()) getString(R.string.addTaskToolbarTitle)
                 else getString(R.string.editTaskToolbarTitle)
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-        }
+        }*/
 
-        editTaskTitle.editText?.setText(task?.title)
-        editTaskDescription.editText?.setText(task?.description)
+        /*editTaskTitle.editText?.setText(task?.title)
+        editTaskDescription.editText?.setText(task?.description)*/
 
         editTaskTitle.editText?.setOnClickListener {
             editTaskTitle.error = null
@@ -69,7 +70,7 @@ class AddTaskActivity : AppCompatActivity(), AddView {
 
     override fun onStart() {
         super.onStart()
-        presenter.updateFields(this@AddTaskActivity, LoaderManager.getInstance(this))
+        presenter.updateFields(activity!!.applicationContext, LoaderManager.getInstance(this))
         presenter.onStart()
     }
 
@@ -78,7 +79,7 @@ class AddTaskActivity : AppCompatActivity(), AddView {
         presenter.onStop()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    /*override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.toolbar, menu)
         return true
     }
@@ -110,10 +111,11 @@ class AddTaskActivity : AppCompatActivity(), AddView {
             return true
         }
         return super.onOptionsItemSelected(item)
-    }
+    }*/
 
     override fun onTaskSaveSuccess() {
-        setResult(RESULT_OK)
-        finish()
+        activity!!.setResult(RESULT_OK)
+
+        //finish()
     }
 }

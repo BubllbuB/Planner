@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
@@ -52,7 +53,13 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        init()
+
+        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this))
+        supportFragmentManager.beginTransaction()
+            .add(R.id.content_fragments, MainContentFragment.newInstance(presenter))
+            .commit()
+
+        //init()
     }
 
     private fun init() {
@@ -79,31 +86,14 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
 
-        val tabHost = findViewById<TabHost>(R.id.tabHost)
-        tabHost.setup()
-
-        this.setNewTab(
-            this@MainActivity,
-            tabHost,
-            TAB_ALL,
-            R.string.textTabAllTasks,
-            android.R.drawable.star_on,
-            R.id.tab1
-        )
-        this.setNewTab(
-            this@MainActivity,
-            tabHost,
-            TAB_FAV,
-            R.string.textTabFavoriteTasks,
-            android.R.drawable.star_on,
-            R.id.tab2
-        )
-
-        fab.setOnClickListener {
-            val intent = Intent(this, AddTaskActivity::class.java)
+        /*fab.setOnClickListener {
+            *//*val intent = Intent(this, AddTaskFragment::class.java)
             intent.putExtra(TaskKey.KEY_TASK_FAV.getKey(), tabHost.currentTabTag == TAB_FAV)
-            startActivityForResult(intent, TaskActionId.ACTION_ADD.getId())
-        }
+            startActivityForResult(intent, TaskActionId.ACTION_ADD.getId())*//*
+            supportFragmentManager.beginTransaction()
+                .add(R.id.content_fragments, AddTaskFragment())
+                .commit()
+        }*/
 
         nav_view.setNavigationItemSelectedListener(this)
     }
@@ -143,39 +133,33 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
         return true
     }
 
-    private fun setNewTab(context: Context, tabHost: TabHost, tag: String, title: Int, icon: Int, contentID: Int) {
-        val tabSpec = tabHost.newTabSpec(tag)
-        tabSpec.apply {
-            setContent(contentID)
-            setIndicator(getString(title), context.resources.getDrawable(icon, null))
-        }
-        tabHost.addTab(tabSpec)
-    }
-
     override fun onListUpdate(tasks: Map<Int, Task>) {
         hideProgressBars()
 
         val tasksS = tasks.values.toList().sortedBy { !it.favorite }
         val groupMap = tasks.values.groupBy { it.favorite }
 
-        adapterListAll.setList(tasksS)
-        adapterListFavorite.setList(groupMap[true] ?: listOf())
+        /*adapterListAll.setList(tasksS)
+        adapterListFavorite.setList(groupMap[true] ?: listOf())*/
     }
 
     override fun editSelectedTask(task: Task?) {
-        val intent = Intent(this, AddTaskActivity::class.java)
+        /*val intent = Intent(this, AddTaskFragment::class.java)
         intent.putExtra(TaskKey.KEY_TASK.getKey(), task)
-        startActivityForResult(intent, TaskActionId.ACTION_EDIT.getId())
+        startActivityForResult(intent, TaskActionId.ACTION_EDIT.getId())*/
+        supportFragmentManager.beginTransaction()
+            .add(R.id.content_fragments, AddTaskFragment())
+            .commit()
     }
 
     override fun showProgressBars() {
-        progressBarAll.visibility = View.VISIBLE
-        progressBarFav.visibility = View.VISIBLE
+        /*progressBarAll.visibility = View.VISIBLE
+        progressBarFav.visibility = View.VISIBLE*/
     }
 
     private fun hideProgressBars() {
-        progressBarAll.visibility = View.GONE
-        progressBarFav.visibility = View.GONE
+        /*progressBarAll.visibility = View.GONE
+        progressBarFav.visibility = View.GONE*/
     }
 
     private fun checkPermissions() {
