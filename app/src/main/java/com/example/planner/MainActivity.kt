@@ -1,84 +1,43 @@
 package com.example.planner
 
 import android.Manifest
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
-import android.support.v4.app.LoaderManager
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.PreferenceManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.MenuItem
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.TabHost
 import android.widget.Toast
-import com.example.planner.adapter.TaskArrayAdapter
-import com.example.planner.enums.TaskActionId
-import com.example.planner.enums.TaskKey
-import com.example.planner.presenters.IMainPresenter
-import com.example.planner.presenters.MainPresenter
+import com.example.planner.fragments.MainContentFragment
+import com.example.planner.fragments.SettingsFragment
 import com.example.planner.storages.STORAGE_TYPE_EXTERNAL
 import com.example.planner.storages.STORAGE_TYPE_SHARED
-import com.example.planner.task.Task
-import com.example.planner.viewer.MainView
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val CHECK_REQUEST = 3
-const val TAB_ALL = "tabAll"
-const val TAB_FAV = "tabFavorite"
 
-class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var drawerLayout: DrawerLayout
-    private lateinit var presenter: IMainPresenter
-    private lateinit var listViewAll: RecyclerView
-    private lateinit var listViewFav: RecyclerView
-    private lateinit var adapterListAll: TaskArrayAdapter
-    private lateinit var adapterListFavorite: TaskArrayAdapter
-    private lateinit var progressBarAll: ProgressBar
-    private lateinit var progressBarFav: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-
-        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this))
         supportFragmentManager.beginTransaction()
-            .add(R.id.content_fragments, MainContentFragment.newInstance(presenter))
+            .add(R.id.content_fragments, MainContentFragment())
             .commit()
 
-        //init()
+        init()
     }
 
     private fun init() {
-        presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this))
         drawerLayout = findViewById(R.id.drawer_layout)
-        listViewAll = findViewById(R.id.taskListView)
-        listViewFav = findViewById(R.id.taskFavListView)
-        progressBarAll = findViewById(R.id.progressBarAll)
-        progressBarFav = findViewById(R.id.progressBarFav)
-
-        adapterListAll = TaskArrayAdapter(this, presenter)
-        adapterListFavorite = TaskArrayAdapter(this, presenter)
-
-        listViewAll.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        listViewFav.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-
-
-        listViewAll.adapter = adapterListAll
-        listViewFav.adapter = adapterListFavorite
 
         val actionbar: ActionBar? = supportActionBar
         actionbar?.apply {
@@ -86,34 +45,12 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
 
-        /*fab.setOnClickListener {
-            *//*val intent = Intent(this, AddTaskFragment::class.java)
-            intent.putExtra(TaskKey.KEY_TASK_FAV.getKey(), tabHost.currentTabTag == TAB_FAV)
-            startActivityForResult(intent, TaskActionId.ACTION_ADD.getId())*//*
-            supportFragmentManager.beginTransaction()
-                .add(R.id.content_fragments, AddTaskFragment())
-                .commit()
-        }*/
-
         nav_view.setNavigationItemSelectedListener(this)
     }
 
     override fun onStart() {
         super.onStart()
-        presenter.updateFields(this@MainActivity, LoaderManager.getInstance(this))
-        presenter.onStart()
         checkPermissions()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter.onStop()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
-            presenter.getTasksList()
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -125,41 +62,16 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.nav_settings) {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+        when(item.itemId) {
+            R.id.nav_settings -> supportFragmentManager.beginTransaction()
+                .replace(R.id.content_fragments, SettingsFragment())
+                .commit()
+            R.id.nav_tasks -> supportFragmentManager.beginTransaction()
+                .replace(R.id.content_fragments, MainContentFragment())
+                .commit()
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
-    }
-
-    override fun onListUpdate(tasks: Map<Int, Task>) {
-        hideProgressBars()
-
-        val tasksS = tasks.values.toList().sortedBy { !it.favorite }
-        val groupMap = tasks.values.groupBy { it.favorite }
-
-        /*adapterListAll.setList(tasksS)
-        adapterListFavorite.setList(groupMap[true] ?: listOf())*/
-    }
-
-    override fun editSelectedTask(task: Task?) {
-        /*val intent = Intent(this, AddTaskFragment::class.java)
-        intent.putExtra(TaskKey.KEY_TASK.getKey(), task)
-        startActivityForResult(intent, TaskActionId.ACTION_EDIT.getId())*/
-        supportFragmentManager.beginTransaction()
-            .add(R.id.content_fragments, AddTaskFragment())
-            .commit()
-    }
-
-    override fun showProgressBars() {
-        /*progressBarAll.visibility = View.VISIBLE
-        progressBarFav.visibility = View.VISIBLE*/
-    }
-
-    private fun hideProgressBars() {
-        /*progressBarAll.visibility = View.GONE
-        progressBarFav.visibility = View.GONE*/
     }
 
     private fun checkPermissions() {
@@ -173,10 +85,10 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
             if (permissionWrite != PackageManager.PERMISSION_GRANTED) {
                 makeRequest()
             } else {
-                presenter.getTasksList()
+                //presenter.getTasksList()
             }
         } else {
-            presenter.getTasksList()
+            //presenter.getTasksList()
         }
     }
 
@@ -200,11 +112,9 @@ class MainActivity : AppCompatActivity(), MainView, NavigationView.OnNavigationI
                 editor.putBoolean(STORAGE_TYPE_EXTERNAL, false)
                 editor.apply()
                 Toast.makeText(this@MainActivity, R.string.error_external_permission, Toast.LENGTH_SHORT).show()
-                presenter = MainPresenter(this, this@MainActivity, LoaderManager.getInstance(this))
-                presenter.onStart()
-                presenter.getTasksList()
+                //presenter.getTasksList()
             } else {
-                presenter.getTasksList()
+                //presenter.getTasksList()
             }
         }
     }

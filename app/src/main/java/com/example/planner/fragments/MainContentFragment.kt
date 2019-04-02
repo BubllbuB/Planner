@@ -1,4 +1,4 @@
-package com.example.planner
+package com.example.planner.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -7,33 +7,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TabHost
-import com.example.planner.presenters.IMainPresenter
-import kotlinx.android.synthetic.main.content_main.view.*
+import com.example.planner.R
+import kotlinx.android.synthetic.main.fragment_main.view.*
+
+const val TAB_ALL = "tabAll"
+const val TAB_FAV = "tabFavorite"
 
 class MainContentFragment : Fragment() {
-    private lateinit var presenter: IMainPresenter
-
-    companion object{
-        fun newInstance(presenter: IMainPresenter):MainContentFragment{
-            val args = Bundle()
-            args.putSerializable("presenter", presenter)
-            val fragment = MainContentFragment()
-            fragment.arguments = args
-            return fragment
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_main, container, false)
 
         init(view)
 
-        presenter = arguments?.get("presenter") as IMainPresenter
-
-        val allTasksFragment = AllTasksFragment.newInstance(presenter)
+        requireActivity().supportFragmentManager.beginTransaction()
+            .add(R.id.tab1, AllTasksFragment())
+            .commit()
 
         requireActivity().supportFragmentManager.beginTransaction()
-            .add(R.id.tab1, allTasksFragment)
+            .add(R.id.tab2, FavoritesTasksFragment())
             .commit()
 
         return view
@@ -61,8 +53,10 @@ class MainContentFragment : Fragment() {
         )
 
 
-
         view.fab.setOnClickListener {
+            /*val intent = Intent(this, AddTaskFragment::class.java)
+              intent.putExtra(TaskKey.KEY_TASK_FAV.getKey(), tabHost.currentTabTag == TAB_FAV)
+              startActivityForResult(intent, TaskActionId.ACTION_ADD.getId())*/
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.content_fragments, AddTaskFragment())
                 .commit()

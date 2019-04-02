@@ -1,19 +1,17 @@
-package com.example.planner
+package com.example.planner.fragments
 
 import android.app.Activity.RESULT_OK
 import android.os.Bundle
 import android.support.design.widget.TextInputLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.LoaderManager
-import android.support.v7.app.ActionBar
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
+import com.example.planner.R
 import com.example.planner.enums.TaskActionId
-import com.example.planner.enums.TaskKey
 import com.example.planner.presenters.ITaskPresenter
 import com.example.planner.presenters.TaskPresenter
-import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
 
 class AddTaskFragment : Fragment(), AddView {
