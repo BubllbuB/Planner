@@ -2,7 +2,6 @@ package com.example.planner.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.TextInputLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.LoaderManager
 import android.text.Editable
@@ -17,13 +16,12 @@ import com.example.planner.presenters.ITaskPresenter
 import com.example.planner.presenters.TaskPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
+import kotlinx.android.synthetic.main.fragment_add_task.*
 
 
 class AddTaskFragment : Fragment(), AddView {
     private lateinit var mListener: FragmentListener
     private lateinit var presenter: ITaskPresenter
-    private lateinit var editTaskTitle: TextInputLayout
-    private lateinit var editTaskDescription: TextInputLayout
     private var action = TaskActionId.ACTION_ADD.getId()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,21 +30,19 @@ class AddTaskFragment : Fragment(), AddView {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_add_task, container, false)
+        return inflater.inflate(R.layout.fragment_add_task, container, false)
+    }
 
-        init(view)
-
-        return view
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        init()
     }
 
     fun setFragmentListener(callback: FragmentListener) {
         mListener = callback
     }
 
-    private fun init(view: View) {
-        editTaskTitle = view.findViewById(R.id.taskTitleTextLayout)
-        editTaskDescription = view.findViewById(R.id.taskDescriptionTextLayout)
-
+    private fun init() {
         presenter = TaskPresenter(this, requireContext(), LoaderManager.getInstance(this))
 
         val bundle = this.arguments
@@ -59,20 +55,20 @@ class AddTaskFragment : Fragment(), AddView {
 
         mListener.setupActionBar(title, R.drawable.ic_arrow_back)
 
-        editTaskTitle.editText?.setText(task?.title)
-        editTaskTitle.requestFocus()
-        editTaskDescription.editText?.setText(task?.description)
+        taskTitleTextLayout.editText?.setText(task?.title)
+        taskTitleTextLayout.requestFocus()
+        taskDescriptionTextLayout.editText?.setText(task?.description)
 
-        editTaskTitle.editText?.setOnClickListener {
-            editTaskTitle.error = null
+        taskTitleTextLayout.editText?.setOnClickListener {
+            taskTitleTextLayout.error = null
         }
 
-        editTaskTitle.editText?.addTextChangedListener(object : TextWatcher {
+        taskTitleTextLayout.editText?.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                editTaskTitle.error = null
+                taskTitleTextLayout.error = null
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -99,14 +95,14 @@ class AddTaskFragment : Fragment(), AddView {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.saveTaskButton) {
-            val title = editTaskTitle.editText?.text.toString()
-            val desc = editTaskDescription.editText?.text.toString()
+            val title = taskTitleTextLayout.editText?.text.toString()
+            val desc = taskDescriptionTextLayout.editText?.text.toString()
 
             val bundle = this.arguments
             val fav = bundle?.getBoolean(TaskKey.KEY_TASK_FAV.getKey()) ?: false
 
             if (title.isBlank()) {
-                editTaskTitle.error = getString(R.string.addTaskErrorEmpty)
+                taskTitleTextLayout.error = getString(R.string.addTaskErrorEmpty)
                 return true
             }
 

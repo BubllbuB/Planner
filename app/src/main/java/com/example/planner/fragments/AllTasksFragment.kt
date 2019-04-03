@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.LoaderManager
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import com.example.planner.R
 import com.example.planner.adapter.TaskArrayAdapter
 import com.example.planner.enums.TaskKey
@@ -16,31 +14,28 @@ import com.example.planner.presenters.IMainPresenter
 import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
+import kotlinx.android.synthetic.main.fragment_all_tasks.*
 
 class AllTasksFragment : Fragment(), MainView {
-    private lateinit var listViewAll: RecyclerView
     private lateinit var adapterListAll: TaskArrayAdapter
-    private lateinit var progressBarAll: ProgressBar
     private lateinit var presenter: IMainPresenter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_all_tasks, container, false)
-
-        init(view)
-
-        return view
+        return inflater.inflate(R.layout.fragment_all_tasks, container, false)
     }
 
-    private fun init(view: View) {
-        presenter = MainPresenter(this, requireContext(), LoaderManager.getInstance(this))
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        init()
+    }
 
-        listViewAll = view.findViewById(R.id.taskListView)
-        progressBarAll = view.findViewById(R.id.progressBarAll)
+    private fun init() {
+        presenter = MainPresenter(this, requireContext(), LoaderManager.getInstance(this))
 
         adapterListAll = TaskArrayAdapter(requireContext(), presenter)
 
-        listViewAll.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        listViewAll.adapter = adapterListAll
+        taskListView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        taskListView.adapter = adapterListAll
     }
 
     override fun onStart() {

@@ -8,7 +8,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.PreferenceManager
@@ -26,7 +25,6 @@ const val CHECK_REQUEST = 3
 const val FRAGMENT_TAG_ADD_TASK = "FragmentAdd"
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, FragmentListener {
-    private lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,8 +39,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun init() {
-        drawerLayout = findViewById(R.id.drawer_layout)
-
         val actionbar: ActionBar? = supportActionBar
         actionbar?.apply {
             setDisplayHomeAsUpEnabled(true)
@@ -59,7 +55,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onAttachFragment(fragment: Fragment?) {
         super.onAttachFragment(fragment)
-        if(fragment is SettingsFragment) {
+        if (fragment is SettingsFragment) {
             fragment.setFragmentListener(this)
         } else if (fragment is AddTaskFragment) {
             fragment.setFragmentListener(this)
@@ -74,7 +70,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 return true
             }
 
-            drawerLayout.openDrawer(GravityCompat.START)
+            drawer_layout.openDrawer(GravityCompat.START)
             return true
         }
         return super.onOptionsItemSelected(item)

@@ -16,19 +16,19 @@ import com.example.planner.presenters.IMainPresenter
 import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
+import kotlinx.android.synthetic.main.content_main.*
 
 class FavoritesTasksFragment : Fragment(), MainView {
-    private lateinit var listViewFav: RecyclerView
     private lateinit var adapterListFav: TaskArrayAdapter
-    private lateinit var progressBarFav: ProgressBar
     private lateinit var presenter: IMainPresenter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_fav_tasks, container, false)
+        return inflater.inflate(R.layout.fragment_fav_tasks, container, false)
+    }
 
-        init(view)
-
-        return view
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        init()
     }
 
     override fun onStart() {
@@ -43,16 +43,13 @@ class FavoritesTasksFragment : Fragment(), MainView {
         presenter.onStop()
     }
 
-    private fun init(view: View) {
+    private fun init() {
         presenter = MainPresenter(this, requireContext(), LoaderManager.getInstance(this))
-
-        listViewFav = view.findViewById(R.id.taskFavListView)
-        progressBarFav = view.findViewById(R.id.progressBarFav)
 
         adapterListFav = TaskArrayAdapter(requireContext(), presenter)
 
-        listViewFav.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        listViewFav.adapter = adapterListFav
+        taskFavListView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        taskFavListView.adapter = adapterListFav
     }
 
     override fun onListUpdate(tasks: Map<Int, Task>) {
