@@ -3,7 +3,7 @@ package com.example.planner.asyncLoaders
 import android.content.ContentValues
 import android.content.Context
 import android.support.v4.content.AsyncTaskLoader
-import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskAction
 import com.example.planner.sqlhelper.*
 import com.example.planner.task.Task
 import java.util.*
@@ -12,7 +12,7 @@ import java.util.*
 class DatabaseWriter(
     context: Context,
     private var task: Task?,
-    private val action: Int?,
+    private val action: TaskAction,
     private val tasks: SortedMap<Int, Task>
 ) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {
     private val database = StorageSQLiteOpenHelper(context, DB_TABLE_NAME, null, 1)
@@ -31,17 +31,17 @@ class DatabaseWriter(
         val lastId = getLastId()
 
         when (action) {
-            TaskActionId.ACTION_ADD.getId() -> {
+            TaskAction.ACTION_ADD -> {
                 task?.id = lastId + 1
                 tasks[task?.id] = task
                 db.insert(DB_TABLE_NAME, null, taskValues)
 
             }
-            TaskActionId.ACTION_REMOVE.getId() -> {
+            TaskAction.ACTION_REMOVE -> {
                 db.delete(DB_TABLE_NAME, DB_TASK_ID + "=" + task?.id, null)
                 tasks.remove(task?.id)
             }
-            TaskActionId.ACTION_EDIT.getId() -> {
+            else -> {
                 db.update(DB_TABLE_NAME, taskValues, DB_TASK_ID + "=" + task?.id, null)
                 tasks[task?.id] = task
             }

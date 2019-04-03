@@ -2,7 +2,7 @@ package com.example.planner.asyncLoaders
 
 import android.content.Context
 import android.support.v4.content.AsyncTaskLoader
-import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskAction
 import com.example.planner.storages.INTERNAL_FILE_TASKS
 import com.example.planner.task.Task
 import com.google.gson.Gson
@@ -12,7 +12,7 @@ import java.util.*
 class InternalWriter(
     context: Context,
     private var task: Task?,
-    private val action: Int?,
+    private val action: TaskAction,
     private val tasks: SortedMap<Int, Task>
 ) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {
 
@@ -22,14 +22,14 @@ class InternalWriter(
         val lastId = if (tasks.isEmpty()) 0 else tasks.lastKey()
 
         when (action) {
-            TaskActionId.ACTION_ADD.getId() -> {
+            TaskAction.ACTION_ADD -> {
                 task?.id = lastId + 1
                 tasks[task?.id] = task
             }
-            TaskActionId.ACTION_REMOVE.getId() -> {
+            TaskAction.ACTION_REMOVE -> {
                 tasks.remove(task?.id)
             }
-            TaskActionId.ACTION_EDIT.getId() -> {
+            else -> {
                 tasks[task?.id] = task
             }
         }

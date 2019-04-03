@@ -2,7 +2,7 @@ package com.example.planner.presenters
 
 import android.content.Context
 import android.support.v4.app.LoaderManager
-import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskAction
 import com.example.planner.observer.StorageObserver
 import com.example.planner.storages.Storage
 import com.example.planner.storages.StorageFactory
@@ -31,15 +31,15 @@ class MainPresenter(
         storage.getList()
     }
 
-    override fun updateTask(actionId: Int, task: Task) {
+    override fun updateTask(action: TaskAction, task: Task) {
         view.showProgressBars()
 
-        when (actionId) {
-            TaskActionId.ACTION_ADD.getId() -> storage.addTask(task)
-            TaskActionId.ACTION_EDIT.getId() -> storage.editTask(task)
-            TaskActionId.ACTION_REMOVE.getId() -> storage.removeTask(task)
-            TaskActionId.ACTION_FAVORITE.getId() -> storage.editTask(task)
-            TaskActionId.ACTION_DONE.getId() -> storage.editTask(task)
+        when (action) {
+            TaskAction.ACTION_ADD -> storage.addTask(task)
+            TaskAction.ACTION_EDIT -> storage.editTask(task)
+            TaskAction.ACTION_REMOVE -> storage.removeTask(task)
+            TaskAction.ACTION_FAVORITE -> storage.editTask(task)
+            TaskAction.ACTION_DONE -> storage.editTask(task)
         }
     }
 

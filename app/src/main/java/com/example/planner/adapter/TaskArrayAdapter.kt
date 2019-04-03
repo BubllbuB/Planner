@@ -12,7 +12,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import com.example.planner.R
-import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskAction
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.task.Task
 
@@ -134,15 +134,15 @@ class TaskArrayAdapter(
                     presenter.editTask(task)
                 }
                 R.id.removeTaskButton -> {
-                    presenter.updateTask(TaskActionId.ACTION_REMOVE.getId(), task)
+                    presenter.updateTask(TaskAction.ACTION_REMOVE, task)
                 }
                 R.id.favoriteTaskButton -> {
                     val newTask = Task(task.title, task.description, task.id, !task.favorite, task.done)
-                    presenter.updateTask(TaskActionId.ACTION_FAVORITE.getId(), newTask)
+                    presenter.updateTask(TaskAction.ACTION_FAVORITE, newTask)
                 }
                 R.id.doneTaskButton -> {
                     val newTask = Task(task.title, task.description, task.id, task.favorite, !task.done)
-                    presenter.updateTask(TaskActionId.ACTION_DONE.getId(), newTask)
+                    presenter.updateTask(TaskAction.ACTION_DONE, newTask)
                 }
             }
             true

@@ -2,7 +2,7 @@ package com.example.planner.presenters
 
 import android.content.Context
 import android.support.v4.app.LoaderManager
-import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskAction
 import com.example.planner.observer.StorageObserver
 import com.example.planner.storages.Storage
 import com.example.planner.storages.StorageFactory
@@ -24,10 +24,10 @@ class TaskPresenter(private val view: AddView, private var context: Context, pri
         view.onTaskSaveSuccess()
     }
 
-    override fun updateTask(actionId: Int, task: Task) {
-        when (actionId) {
-            TaskActionId.ACTION_ADD.getId() -> storage.addTask(task)
-            TaskActionId.ACTION_EDIT.getId() -> storage.editTask(task)
+    override fun updateTask(action: TaskAction, task: Task) {
+        when (action) {
+            TaskAction.ACTION_ADD -> storage.addTask(task)
+            else -> storage.editTask(task)
         }
     }
 

@@ -6,7 +6,7 @@ import android.support.v4.app.LoaderManager
 import android.support.v4.content.Loader
 import com.example.planner.asyncLoaders.DatabaseLoader
 import com.example.planner.asyncLoaders.DatabaseWriter
-import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskAction
 import com.example.planner.enums.TaskKey
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
@@ -39,7 +39,7 @@ internal object DatabaseStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
                 else -> DatabaseWriter(
                     it,
                     bundle?.getParcelable(TaskKey.KEY_TASK.getKey()),
-                    bundle?.getInt(TaskKey.KEY_ACTION.getKey()),
+                    bundle?.getSerializable(TaskKey.KEY_ACTION.getKey()) as TaskAction,
                     taskMap
                 )
             }
@@ -59,14 +59,14 @@ internal object DatabaseStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
     override fun addTask(task: Task) {
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
-        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_ADD.getId())
+        bundle.putSerializable(TaskKey.KEY_ACTION.getKey(), TaskAction.ACTION_ADD)
         loaderManager.restartLoader(DATABASE_ADD_LOADER_ID, bundle, this).forceLoad()
     }
 
     override fun removeTask(task: Task) {
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
-        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_REMOVE.getId())
+        bundle.putSerializable(TaskKey.KEY_ACTION.getKey(), TaskAction.ACTION_REMOVE)
         loaderManager.restartLoader(DATABASE_REMOVE_LOADER_ID, bundle, this).forceLoad()
 
     }
@@ -74,7 +74,7 @@ internal object DatabaseStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
     override fun editTask(task: Task) {
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
-        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_EDIT.getId())
+        bundle.putSerializable(TaskKey.KEY_ACTION.getKey(), TaskAction.ACTION_EDIT)
         loaderManager.restartLoader(DATABASE_EDIT_LOADER_ID, bundle, this).forceLoad()
     }
 

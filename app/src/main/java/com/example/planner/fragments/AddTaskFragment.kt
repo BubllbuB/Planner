@@ -9,7 +9,7 @@ import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import com.example.planner.R
-import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskAction
 import com.example.planner.enums.TaskKey
 import com.example.planner.observer.FragmentListener
 import com.example.planner.presenters.ITaskPresenter
@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.fragment_add_task.*
 class AddTaskFragment : Fragment(), AddView {
     private lateinit var mListener: FragmentListener
     private lateinit var presenter: ITaskPresenter
-    private var action = TaskActionId.ACTION_ADD.getId()
+    private var action = TaskAction.ACTION_ADD
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
@@ -47,10 +47,10 @@ class AddTaskFragment : Fragment(), AddView {
 
         val bundle = this.arguments
         val task = bundle?.getParcelable<Task>(TaskKey.KEY_TASK.getKey())
-        if (task != null) action = TaskActionId.ACTION_EDIT.getId()
+        if (task != null) action = TaskAction.ACTION_EDIT
 
         val title =
-            if (action == TaskActionId.ACTION_ADD.getId()) getString(R.string.addTaskToolbarTitle)
+            if (action == TaskAction.ACTION_ADD) getString(R.string.addTaskToolbarTitle)
             else getString(R.string.editTaskToolbarTitle)
 
         mListener.setupActionBar(title, R.drawable.ic_arrow_back)
@@ -107,14 +107,14 @@ class AddTaskFragment : Fragment(), AddView {
             }
 
             when (action) {
-                TaskActionId.ACTION_ADD.getId() -> {
+                TaskAction.ACTION_ADD -> {
                     val task = Task(title, desc, favorite = fav)
-                    presenter.updateTask(TaskActionId.ACTION_ADD.getId(), task)
+                    presenter.updateTask(TaskAction.ACTION_ADD, task)
                 }
-                TaskActionId.ACTION_EDIT.getId() -> {
+                else -> {
                     val task = bundle?.getParcelable<Task>(TaskKey.KEY_TASK.getKey())
                     val newTask = Task(title, desc, task!!.id, task.favorite, task.done)
-                    presenter.updateTask(TaskActionId.ACTION_EDIT.getId(), newTask)
+                    presenter.updateTask(TaskAction.ACTION_EDIT, newTask)
                 }
             }
             return true

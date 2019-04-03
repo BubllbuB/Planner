@@ -6,7 +6,7 @@ import android.support.v4.app.LoaderManager
 import android.support.v4.content.Loader
 import com.example.planner.asyncLoaders.ExternalLoader
 import com.example.planner.asyncLoaders.ExternalWriter
-import com.example.planner.enums.TaskActionId
+import com.example.planner.enums.TaskAction
 import com.example.planner.enums.TaskKey
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
@@ -40,7 +40,7 @@ internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
                 else -> ExternalWriter(
                     it,
                     bundle?.getParcelable(TaskKey.KEY_TASK.getKey()),
-                    bundle?.getInt(TaskKey.KEY_ACTION.getKey()),
+                    bundle?.getSerializable(TaskKey.KEY_ACTION.getKey()) as TaskAction,
                     taskMap
                 )
             }
@@ -60,14 +60,14 @@ internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
     override fun addTask(task: Task) {
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
-        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_ADD.getId())
+        bundle.putSerializable(TaskKey.KEY_ACTION.getKey(), TaskAction.ACTION_ADD)
         loaderManager.restartLoader(EXTERNAL_ADD, bundle, this).forceLoad()
     }
 
     override fun removeTask(task: Task) {
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
-        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_REMOVE.getId())
+        bundle.putSerializable(TaskKey.KEY_ACTION.getKey(), TaskAction.ACTION_REMOVE)
         loaderManager.restartLoader(EXTERNAL_REMOVE, bundle, this).forceLoad()
 
     }
@@ -75,7 +75,7 @@ internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
     override fun editTask(task: Task) {
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
-        bundle.putInt(TaskKey.KEY_ACTION.getKey(), TaskActionId.ACTION_EDIT.getId())
+        bundle.putSerializable(TaskKey.KEY_ACTION.getKey(), TaskAction.ACTION_EDIT)
         loaderManager.restartLoader(EXTERNAL_EDIT, bundle, this).forceLoad()
     }
 
