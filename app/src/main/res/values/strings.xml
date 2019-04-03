@@ -7,7 +7,7 @@
     <string name="tasksNavMenuTitle">Tasks</string>
     <string name="menuNavMenuTitle">Menu</string>
     <string name="textTabAllTasks">All</string>
-    <string name="textTabFavoriteTasks">Favorite</string>
+    <string name="textTabFavoriteTasks">Favorites</string>
     <string name="addTaskToolbarTitle">Add Task</string>
     <string name="editTaskToolbarTitle">Edit Task</string>
     <string name="taskAddTitle">Title</string>
