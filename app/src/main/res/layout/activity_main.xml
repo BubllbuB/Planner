@@ -26,7 +26,9 @@
                     android:layout_height="?attr/actionBarSize"
                     android:background="?attr/colorPrimary"
                     app:popupTheme="@style/AppTheme.PopupOverlay"
-                    app:title="@string/mainToolbarTitle"/>
+                    app:title="@string/mainToolbarTitle"
+                    app:layout_collapseMode="pin"
+                    app:layout_scrollFlags="scroll|exitUntilCollapsed"/>
 
         </android.support.design.widget.AppBarLayout>
 
