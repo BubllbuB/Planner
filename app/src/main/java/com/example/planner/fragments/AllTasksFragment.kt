@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import com.example.planner.R
 import com.example.planner.adapter.TaskArrayAdapter
+import com.example.planner.enums.TaskKey
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
@@ -30,18 +31,6 @@ class AllTasksFragment : Fragment(), MainView {
         return view
     }
 
-    override fun onStart() {
-        super.onStart()
-        presenter.updateFields(requireContext(), LoaderManager.getInstance(this))
-        presenter.onStart()
-        presenter.getTasksList()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter.onStop()
-    }
-
     private fun init(view: View) {
         presenter = MainPresenter(this, requireContext(), LoaderManager.getInstance(this))
 
@@ -54,6 +43,18 @@ class AllTasksFragment : Fragment(), MainView {
         listViewAll.adapter = adapterListAll
     }
 
+    override fun onStart() {
+        super.onStart()
+        presenter.updateFields(requireContext(), LoaderManager.getInstance(this))
+        presenter.onStart()
+        presenter.getTasksList()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        presenter.onStop()
+    }
+
     override fun onListUpdate(tasks: Map<Int, Task>) {
         hideProgressBars()
 
@@ -63,11 +64,13 @@ class AllTasksFragment : Fragment(), MainView {
     }
 
     override fun editSelectedTask(task: Task?) {
-        /*val intent = Intent(this, AddTaskFragment::class.java)
-        intent.putExtra(TaskKey.KEY_TASK.getKey(), task)
-        startActivityForResult(intent, TaskActionId.ACTION_EDIT.getId())*/
+        val fragment = AddTaskFragment()
+        val bundle = Bundle()
+        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        fragment.arguments = bundle
         requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.content_fragments, AddTaskFragment())
+            .replace(R.id.content_fragments, fragment)
+            .addToBackStack(null)
             .commit()
     }
 

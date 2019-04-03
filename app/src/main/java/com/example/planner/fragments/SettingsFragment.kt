@@ -5,6 +5,8 @@ import android.support.v7.preference.CheckBoxPreference
 import android.support.v7.preference.PreferenceFragmentCompat
 import android.support.v7.preference.PreferenceManager
 import com.example.planner.R
+import com.example.planner.observer.FragmentListener
+
 
 class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var sCache: CheckBoxPreference
@@ -12,13 +14,24 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var sInternal: CheckBoxPreference
     private lateinit var sExternal: CheckBoxPreference
     private lateinit var sDatabase: CheckBoxPreference
+    private lateinit var mListener: FragmentListener
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, p1: String?) {
         addPreferencesFromResource(R.xml.preferences)
         PreferenceManager.setDefaultValues(requireContext(), R.xml.preferences, false)
-
+        mListener.setupActionBar(getString(R.string.settingsToolbarTitle))
         initCheckboxes()
     }
+
+    fun setFragmentListener(callback: FragmentListener) {
+        mListener = callback
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mListener.setupActionBar(getString(R.string.mainToolbarTitle))
+    }
+
 
     private fun initCheckboxes() {
         sCache = findPreference("storageTypeCache") as CheckBoxPreference

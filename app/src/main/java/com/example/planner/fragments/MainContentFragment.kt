@@ -7,7 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TabHost
+import com.example.planner.FRAGMENT_TAG_ADD_TASK
 import com.example.planner.R
+import com.example.planner.enums.TaskKey
 import kotlinx.android.synthetic.main.fragment_main.view.*
 
 const val TAB_ALL = "tabAll"
@@ -54,11 +56,13 @@ class MainContentFragment : Fragment() {
 
 
         view.fab.setOnClickListener {
-            /*val intent = Intent(this, AddTaskFragment::class.java)
-              intent.putExtra(TaskKey.KEY_TASK_FAV.getKey(), tabHost.currentTabTag == TAB_FAV)
-              startActivityForResult(intent, TaskActionId.ACTION_ADD.getId())*/
+            val fragment = AddTaskFragment()
+            val bundle = Bundle()
+            bundle.putBoolean(TaskKey.KEY_TASK_FAV.getKey(), tabHost.currentTabTag == TAB_FAV)
+            fragment.arguments = bundle
             requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.content_fragments, AddTaskFragment())
+                .replace(R.id.content_fragments, fragment, FRAGMENT_TAG_ADD_TASK)
+                .addToBackStack(null)
                 .commit()
         }
     }

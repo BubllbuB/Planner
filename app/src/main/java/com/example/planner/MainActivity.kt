@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
@@ -13,15 +14,18 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.PreferenceManager
 import android.view.MenuItem
 import android.widget.Toast
+import com.example.planner.fragments.AddTaskFragment
 import com.example.planner.fragments.MainContentFragment
 import com.example.planner.fragments.SettingsFragment
+import com.example.planner.observer.FragmentListener
 import com.example.planner.storages.STORAGE_TYPE_EXTERNAL
 import com.example.planner.storages.STORAGE_TYPE_SHARED
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val CHECK_REQUEST = 3
+const val FRAGMENT_TAG_ADD_TASK = "FragmentAdd"
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, FragmentListener {
     private lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,8 +57,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         checkPermissions()
     }
 
+    override fun onAttachFragment(fragment: Fragment?) {
+        super.onAttachFragment(fragment)
+        if(fragment is SettingsFragment) {
+            fragment.setFragmentListener(this)
+        } else if (fragment is AddTaskFragment) {
+            fragment.setFragmentListener(this)
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
+            val addFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_ADD_TASK)
+            if (addFragment != null && addFragment.isVisible) {
+                supportFragmentManager.popBackStack()
+                return true
+            }
+
             drawerLayout.openDrawer(GravityCompat.START)
             return true
         }
@@ -62,12 +81,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.nav_settings -> supportFragmentManager.beginTransaction()
                 .replace(R.id.content_fragments, SettingsFragment())
+                .addToBackStack(null)
                 .commit()
             R.id.nav_tasks -> supportFragmentManager.beginTransaction()
                 .replace(R.id.content_fragments, MainContentFragment())
+                .addToBackStack(null)
                 .commit()
         }
         drawer_layout.closeDrawer(GravityCompat.START)
@@ -89,6 +110,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         } else {
             //presenter.getTasksList()
+        }
+    }
+
+    override fun setupActionBar(title: String, iconId: Int) {
+        supportActionBar?.apply {
+            this.title = title
+            setHomeAsUpIndicator(iconId)
         }
     }
 
