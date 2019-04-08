@@ -1,0 +1,10 @@
+<vector android:height="128dp" android:viewportHeight="512"
+    android:viewportWidth="512" android:width="128dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#fff" android:name="Фигура 2" android:pathData="m396 403c-4.5 32 -36 34 -36 34c0 0 -205 -1 -210 0c-32.5 -5.5 -34 -33 -34 -33l-3 -262c0 0 1 -30 35 -34c6.5 0 15 -1 15 -1c0 0 1 -26.5 32 -32c7 0 123 0 123 0c0 0 28.5 4.5 31 32c3 0.5 13 0 13 0c0 0 34.5 3 37 35c0 4 -2.5 254.5 -3 261z"/>
+    <path android:fillColor="#1e427e" android:name="Фигура 1" android:pathData="m145 167.5 2.1 223.8c0 0 -3.9 16.2 20.8 14.6c2.2 -0.3 189.6 -2.8 189.6 -2.8c0 0 13.6 2.1 12.5 -13.2c0.3 2.2 -2.5 -228.4 -2.8 -234.2c2.5 -16.4 -7.6 -18.7 -7.6 -18.7h-9.7c0 0 -5.4 35.9 -49.1 32.6c8.3 -0.3 -95.2 0.4 -101 0.7c-31.8 -4.2 -32.8 -30.6 -33.9 -31.2c-19.1 -1.7 -20.2 4.2 -20.8 8.3c0.3 3.3 0 20.1 0 20.1z"/>
+    <path android:fillColor="#fff" android:name="Прямоугольник 1" android:pathData="m184 200h144v28h-144v-28z"/>
+    <path android:fillColor="#fff" android:name="Прямоугольник 2" android:pathData="m183 272h144v28h-144v-28z"/>
+    <path android:fillColor="#fff" android:name="Прямоугольник 3" android:pathData="m183 344h146v29h-146v-29z"/>
+    <path android:fillColor="#1e427e"
+        android:name="Прямоугольник, скругл. углы 1" android:pathData="m204 105h103c8.3 0 15 6.7 15 15v5c0 8.3 -6.7 15 -15 15h-103c-8.3 0 -15 -6.7 -15 -15v-5c0 -8.3 6.7 -15 15 -15z"/>
+</vector>

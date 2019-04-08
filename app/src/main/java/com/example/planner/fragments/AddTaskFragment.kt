@@ -124,9 +124,7 @@ class AddTaskFragment : Fragment(), AddView {
 
     override fun onTaskSaveSuccess() {
         hideKeyboard()
-        activity.let {
-            requireActivity().supportFragmentManager.popBackStack()
-        }
+        activity?.supportFragmentManager?.popBackStack()
     }
 
     private fun hideKeyboard() {
