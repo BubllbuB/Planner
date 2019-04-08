@@ -78,7 +78,7 @@ class AddTaskFragment : Fragment(), AddView {
 
     override fun onStart() {
         super.onStart()
-        presenter.updateFields(activity!!.applicationContext, LoaderManager.getInstance(this))
+        presenter.updateFields(requireContext(), LoaderManager.getInstance(this))
         presenter.onStart()
     }
 
@@ -124,7 +124,9 @@ class AddTaskFragment : Fragment(), AddView {
 
     override fun onTaskSaveSuccess() {
         hideKeyboard()
-        requireActivity().supportFragmentManager.popBackStack()
+        activity.let {
+            requireActivity().supportFragmentManager.popBackStack()
+        }
     }
 
     private fun hideKeyboard() {

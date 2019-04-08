@@ -1,6 +1,7 @@
 package com.example.planner.fragments
 
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -25,13 +26,21 @@ class MainContentFragment : Fragment() {
     }
 
     private fun init() {
-
         val tabAdapter = TabAdapter(childFragmentManager)
         tabAdapter.addFragment(AllTasksFragment(), getString(R.string.textTabAllTasks))
         tabAdapter.addFragment(FavoritesTasksFragment(), getString(R.string.textTabFavoriteTasks))
 
         viewPager.adapter = tabAdapter
         tabLayout.setupWithViewPager(viewPager)
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(p0: TabLayout.Tab?) {
+                fab.show()
+            }
+
+            override fun onTabReselected(p0: TabLayout.Tab?) {}
+            override fun onTabUnselected(p0: TabLayout.Tab?) {}
+        })
 
         fab.setOnClickListener {
             val fragment = AddTaskFragment()

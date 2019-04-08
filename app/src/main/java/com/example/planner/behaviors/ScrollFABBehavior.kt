@@ -3,11 +3,9 @@ package com.example.planner.behaviors
 import android.content.Context
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
 import android.view.View
-import android.widget.RelativeLayout
 
 
 class ScrollFABBehavior(context: Context?, attrs: AttributeSet?) : FloatingActionButton.Behavior(context, attrs) {
@@ -34,14 +32,15 @@ class ScrollFABBehavior(context: Context?, attrs: AttributeSet?) : FloatingActio
         type: Int
     ) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type)
-        if (dyConsumed > 0 && child.visibility == View.VISIBLE) {
+
+        if (dyConsumed > 0 && child.isOrWillBeShown) {
             child.hide(object : FloatingActionButton.OnVisibilityChangedListener() {
                 override fun onHidden(fab: FloatingActionButton?) {
                     super.onHidden(fab)
-                    (fab as View).visibility = View.INVISIBLE
+                    (child as View).visibility = View.INVISIBLE
                 }
             })
-        } else if (dyConsumed < 0 && child.visibility != View.VISIBLE) {
+        } else if (dyConsumed <= 0 && dyUnconsumed <= 0 && child.isOrWillBeHidden) {
             child.show()
         }
     }

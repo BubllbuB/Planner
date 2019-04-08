@@ -21,3 +21,13 @@ fun String.getTaskMap(): SortedMap<Int, Task> =
 
 
 fun String.getTask(): Task = Gson().fromJson<Task>(this, Task::class.java)
+
+fun getOffset(posHeadOther: Int, position: Int, firstFav: Boolean): Int {
+    return if (posHeadOther in 1..position && firstFav) {
+        2
+    } else if (posHeadOther > 0 && firstFav) {
+        1
+    } else {
+        0
+    }
+}

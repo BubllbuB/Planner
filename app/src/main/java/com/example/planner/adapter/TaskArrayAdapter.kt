@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.TextView
 import com.example.planner.R
 import com.example.planner.enums.TaskAction
+import com.example.planner.extensions.getOffset
 import com.example.planner.presenters.IMainPresenter
 import com.example.planner.task.Task
 
@@ -32,8 +33,6 @@ class TaskArrayAdapter(
 
     override fun getItemCount(): Int {
         return if (taskList.isNotEmpty()) {
-            posHeadOther = if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
-
             if (taskList[0].favorite && posHeadOther > 0) {
                 taskList.size + 2
             } else {
@@ -45,8 +44,6 @@ class TaskArrayAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        posHeadOther = if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
-
         return if ((posHeadOther > 0 && taskList[0].favorite) && (position == 0 || position == posHeadOther)) {
             ID_HEADER
         } else {
@@ -66,11 +63,7 @@ class TaskArrayAdapter(
             }
         } else {
             val vh = holder as ViewHolder
-            posHeadOther = if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
-
-            var offset = if (posHeadOther > 0 && taskList[0].favorite) 1 else 0
-
-            if (posHeadOther in 1..vh.adapterPosition && taskList[0].favorite) offset = 2
+            val offset = getOffset(posHeadOther, position, taskList[0].favorite)
 
             vh.titleTextView?.text = taskList[vh.adapterPosition - offset].title
             vh.descriptionTextView?.text = taskList[vh.adapterPosition - offset].description
@@ -104,6 +97,7 @@ class TaskArrayAdapter(
         val diffResult = DiffUtil.calculateDiff(TaskUpdateListDiffUtilCallback(oldList, newList), true)
         taskList.clear()
         taskList.addAll(newList)
+        if (taskList.isNotEmpty()) posHeadOther = if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
         diffResult.dispatchUpdatesTo(this)
     }
 
@@ -113,14 +107,9 @@ class TaskArrayAdapter(
         popup.inflate(R.menu.task)
         val favItem = popup.menu.findItem(R.id.favoriteTaskButton)
         val doneItem = popup.menu.findItem(R.id.doneTaskButton)
+        val offset = getOffset(posHeadOther, position, taskList[0].favorite)
 
-        posHeadOther = if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
-
-        var offset = if (posHeadOther > 0 && taskList[0].favorite) 1 else 0
-
-        if (posHeadOther in 1..position && taskList[0].favorite) offset = 2
-
-        val task = taskList[position-offset]
+        val task = taskList[position - offset]
 
         favItem.title = if (task.favorite) context.resources.getString(R.string.taskMenuRemoveFavorite)
         else context.resources.getString(R.string.taskMenuAddFavorite)
