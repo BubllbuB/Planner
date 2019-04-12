@@ -8,11 +8,16 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ProgressBar
+import com.arellomobile.mvp.MvpDelegate
+import com.arellomobile.mvp.presenter.InjectPresenter
+import com.arellomobile.mvp.presenter.PresenterType
+import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.example.planner.R
 import com.example.planner.adapter.TaskArrayAdapter
 import com.example.planner.enums.TaskKey
 import com.example.planner.fragments.AddTaskFragment
 import com.example.planner.presenters.MainPresenter
+import com.example.planner.presenters.TaskPresenter
 import com.example.planner.viewer.MainView
 
 class TaskFragmentSetter(
@@ -23,8 +28,11 @@ class TaskFragmentSetter(
     tasksRecyclerView: RecyclerView,
     private val favorites: Boolean = false
 ) : MainView {
-    private val presenter = MainPresenter(this, context, loaderManager)
+    private var presenter = MainPresenter( context, loaderManager)
     private val adapterList = TaskArrayAdapter(context, presenter)
+
+    @ProvidePresenter
+    fun provideMainPresenter() = MainPresenter(context, loaderManager)
 
     init {
         tasksRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

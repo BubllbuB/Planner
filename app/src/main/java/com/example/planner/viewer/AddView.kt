@@ -1,5 +1,10 @@
 package com.example.planner.viewer
 
-interface AddView {
+import com.arellomobile.mvp.MvpView
+import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
+
+@StateStrategyType(AddToEndSingleStrategy::class)
+interface AddView: MvpView {
     fun onTaskSaveSuccess()
 }

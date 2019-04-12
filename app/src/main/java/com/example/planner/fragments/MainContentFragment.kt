@@ -2,10 +2,10 @@ package com.example.planner.fragments
 
 import android.os.Bundle
 import android.support.design.widget.TabLayout
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.arellomobile.mvp.MvpAppCompatFragment
 import com.example.planner.FRAGMENT_TAG_ADD_TASK
 import com.example.planner.R
 import com.example.planner.adapter.TabAdapter
@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.fragment_main.*
 
 const val ID_FAV_TAB = 1
 
-class MainContentFragment : Fragment() {
+class MainContentFragment : MvpAppCompatFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main, container, false)

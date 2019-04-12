@@ -2,27 +2,32 @@ package com.example.planner.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v4.app.LoaderManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import com.arellomobile.mvp.MvpAppCompatFragment
+import com.arellomobile.mvp.presenter.InjectPresenter
+import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.example.planner.R
 import com.example.planner.enums.TaskAction
 import com.example.planner.enums.TaskKey
 import com.example.planner.observer.FragmentListener
-import com.example.planner.presenters.ITaskPresenter
 import com.example.planner.presenters.TaskPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
 import kotlinx.android.synthetic.main.fragment_add_task.*
 
 
-class AddTaskFragment : Fragment(), AddView {
+class AddTaskFragment : MvpAppCompatFragment(), AddView {
     private lateinit var mListener: FragmentListener
-    private lateinit var presenter: ITaskPresenter
+    @InjectPresenter
+    lateinit var presenter: TaskPresenter
     private var action = TaskAction.ACTION_ADD
+
+    @ProvidePresenter
+    fun provideTaskPresenter() = TaskPresenter(requireContext(), LoaderManager.getInstance(this))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
@@ -43,8 +48,6 @@ class AddTaskFragment : Fragment(), AddView {
     }
 
     private fun init() {
-        presenter = TaskPresenter(this, requireContext(), LoaderManager.getInstance(this))
-
         val bundle = this.arguments
         val task = bundle?.getParcelable<Task>(TaskKey.KEY_TASK.getKey())
         if (task != null) action = TaskAction.ACTION_EDIT

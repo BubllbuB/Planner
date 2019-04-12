@@ -14,7 +14,7 @@ import android.widget.TextView
 import com.example.planner.R
 import com.example.planner.enums.TaskAction
 import com.example.planner.extensions.getOffset
-import com.example.planner.presenters.IMainPresenter
+import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 
 const val ID_ELEMENT = 0
@@ -24,7 +24,7 @@ const val TITLE_OTHERS = "Others:"
 
 class TaskArrayAdapter(
     private val context: Context,
-    private val presenter: IMainPresenter
+    private val presenter: MainPresenter
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var taskList: MutableList<Task> = mutableListOf()
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -97,7 +97,8 @@ class TaskArrayAdapter(
         val diffResult = DiffUtil.calculateDiff(TaskUpdateListDiffUtilCallback(oldList, newList), true)
         taskList.clear()
         taskList.addAll(newList)
-        if (taskList.isNotEmpty()) posHeadOther = if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
+        if (taskList.isNotEmpty()) posHeadOther =
+            if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
         diffResult.dispatchUpdatesTo(this)
     }
 
