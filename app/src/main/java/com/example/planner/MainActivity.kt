@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
-import android.support.v4.app.LoaderManager
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBar
@@ -15,13 +14,11 @@ import android.view.MenuItem
 import android.widget.Toast
 import com.arellomobile.mvp.MvpAppCompatActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
-import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.example.planner.fragments.AddTaskFragment
 import com.example.planner.fragments.MainContentFragment
 import com.example.planner.fragments.SettingsFragment
 import com.example.planner.observer.FragmentListener
 import com.example.planner.presenters.ActivityPresenter
-import com.example.planner.presenters.TaskPresenter
 import com.example.planner.storages.STORAGE_TYPE_EXTERNAL
 import com.example.planner.storages.STORAGE_TYPE_SHARED
 import com.example.planner.viewer.ActivityView
@@ -29,8 +26,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 const val CHECK_REQUEST = 3
 const val FRAGMENT_TAG_ADD_TASK = "FragmentAdd"
+const val FRAGMENT_TAG_CONTENT = "FragmentContent"
 
-class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, FragmentListener, ActivityView {
+class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, FragmentListener,
+    ActivityView {
     @InjectPresenter
     lateinit var presenter: ActivityPresenter
 
@@ -39,14 +38,15 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        presenter.onSetContent()
-
+        if (savedInstanceState == null) {
+            presenter.onSetContent()
+        }
         init()
     }
 
     override fun setContentFragment() {
         supportFragmentManager.beginTransaction()
-            .add(R.id.content_fragments, MainContentFragment())
+            .replace(R.id.content_fragments, MainContentFragment(), FRAGMENT_TAG_CONTENT)
             .commit()
     }
 

@@ -1,8 +1,11 @@
 package com.example.planner.adapter
 
 import android.content.Context
+import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.Paint
 import android.support.v7.util.DiffUtil
+import android.support.v7.widget.CardView
 import android.support.v7.widget.PopupMenu
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -29,6 +32,7 @@ class TaskArrayAdapter(
     private var taskList: MutableList<Task> = mutableListOf()
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private var posHeadOther = -1
+    private var selectedPosition = 1
 
 
     override fun getItemCount(): Int {
@@ -81,6 +85,13 @@ class TaskArrayAdapter(
             vh.moreImageView?.setOnClickListener {
                 showPopup(context, it, vh.adapterPosition)
             }
+            //selectable item
+            if (selectedPosition == position) {
+                vh.cardView?.setBackgroundColor(Color.rgb(235,233,240))
+            } else {
+                vh.cardView?.setBackgroundColor(Color.WHITE)
+            }
+
         }
     }
 
@@ -100,6 +111,18 @@ class TaskArrayAdapter(
         if (taskList.isNotEmpty()) posHeadOther =
             if (taskList[0].favorite) taskList.indexOfFirst { !it.favorite } + 1 else -1
         diffResult.dispatchUpdatesTo(this)
+    }
+
+    fun setSelectedPosition(position: Int) {
+        selectedPosition = position
+        notifyDataSetChanged()
+
+        if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if(taskList.isNotEmpty()) {
+                val offset = getOffset(posHeadOther, position, taskList[0].favorite)
+                presenter.editTask(taskList[position - offset])
+            }
+        }
     }
 
     private fun showPopup(context: Context, view: View, position: Int) {
@@ -141,10 +164,17 @@ class TaskArrayAdapter(
         popup.show()
     }
 
-    private class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    private inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var titleTextView: TextView? = view.findViewById(R.id.listTaskTitle)
         var descriptionTextView: TextView? = view.findViewById(R.id.listTaskDescription)
         var moreImageView: Button? = view.findViewById(R.id.listMoreButton)
+        var cardView: CardView? = view.findViewById(R.id.card_view)
+
+        init {
+            cardView?.setOnClickListener {
+                presenter.updateAdapterPosition(adapterPosition)
+            }
+        }
     }
 
     private class ViewHolderHeader(view: View) : RecyclerView.ViewHolder(view) {

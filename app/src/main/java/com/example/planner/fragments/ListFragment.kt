@@ -1,5 +1,6 @@
 package com.example.planner.fragments
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.LoaderManager
 import android.view.View
@@ -38,10 +39,17 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
         fragment.arguments = bundle
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.content_fragments, fragment)
-            .addToBackStack(null)
-            .commit()
+
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.edit_fragment, fragment)
+                .commit()
+        } else {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.content_fragments, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     override fun onStart() {
@@ -59,6 +67,10 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
     private fun initAdapter() {
         adapterList = TaskArrayAdapter(requireContext(), presenter)
         init(adapterList)
+    }
+
+    override fun setAdapterSelectedPosition(position: Int) {
+        adapterList.setSelectedPosition(position)
     }
 
     abstract fun init(adapter: TaskArrayAdapter)

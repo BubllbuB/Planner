@@ -13,4 +13,5 @@ interface MainView: MvpView {
     @StateStrategyType(SkipStrategy::class)
     fun editSelectedTask(task: Task?)
     fun showProgressBars()
+    fun setAdapterSelectedPosition(position: Int)
 }

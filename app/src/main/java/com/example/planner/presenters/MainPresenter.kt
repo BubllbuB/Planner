@@ -4,9 +4,6 @@ import android.content.Context
 import android.support.v4.app.LoaderManager
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
-import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy
-import com.arellomobile.mvp.viewstate.strategy.SkipStrategy
-import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
 import com.example.planner.enums.TaskAction
 import com.example.planner.observer.StorageObserver
 import com.example.planner.storages.Storage
@@ -46,6 +43,10 @@ class MainPresenter(
             TaskAction.ACTION_FAVORITE -> storage.editTask(task)
             TaskAction.ACTION_DONE -> storage.editTask(task)
         }
+    }
+
+    fun updateAdapterPosition(position: Int) {
+        viewState.setAdapterSelectedPosition(position)
     }
 
     fun onStart() {

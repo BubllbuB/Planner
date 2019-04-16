@@ -3,7 +3,7 @@ package com.example.planner.task
 import android.os.Parcel
 import android.os.Parcelable
 
-data class Task(
+open class Task(
     var title: String?,
     var description: String?,
     var id: Int = 0,

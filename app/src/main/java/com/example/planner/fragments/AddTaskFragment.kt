@@ -1,6 +1,7 @@
 package com.example.planner.fragments
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.LoaderManager
 import android.text.Editable
@@ -20,11 +21,33 @@ import com.example.planner.viewer.AddView
 import kotlinx.android.synthetic.main.fragment_add_task.*
 
 
+const val TEXT_LAYOUT_TITLE_TEXT = "titleTextLayoutText"
+const val TEXT_LAYOUT_TITLE_FOCUS = "titleTextLayoutFocus"
+const val TEXT_LAYOUT_TITLE_START_POS = "titleTextLayoutStartPos"
+const val TEXT_LAYOUT_TITLE_FINAL_POS = "titleTextLayoutFinalPos"
+const val TEXT_LAYOUT_DESCRIPTION_TEXT = "descriptionTextLayoutText"
+const val TEXT_LAYOUT_DESCRIPTION_FOCUS = "descriptionTextLayoutFocus"
+const val TEXT_LAYOUT_DESCRIPTION_START_POS = "descriptionTextLayoutStartPos"
+const val TEXT_LAYOUT_DESCRIPTION_FINAL_POS = "descriptionTextLayoutFinalPos"
+const val FRAME_RECREATE = "frameRecreate"
+
 class AddTaskFragment : MvpAppCompatFragment(), AddView {
     private lateinit var mListener: FragmentListener
     @InjectPresenter
     lateinit var presenter: TaskPresenter
     private var action = TaskAction.ACTION_ADD
+
+    private val titleTextWatcher = object : TextWatcher {
+        override fun afterTextChanged(p0: Editable?) {
+        }
+
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            taskTitleTextLayout.error = null
+        }
+
+        override fun onTextChanged(title: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
+    }
 
     @ProvidePresenter
     fun provideTaskPresenter() = TaskPresenter(requireContext(), LoaderManager.getInstance(this))
@@ -40,14 +63,14 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        init()
+        init(savedInstanceState)
     }
 
     fun setFragmentListener(callback: FragmentListener) {
         mListener = callback
     }
 
-    private fun init() {
+    private fun init(savedInstanceState: Bundle?) {
         val bundle = this.arguments
         val task = bundle?.getParcelable<Task>(TaskKey.KEY_TASK.getKey())
         if (task != null) action = TaskAction.ACTION_EDIT
@@ -56,27 +79,77 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
             if (action == TaskAction.ACTION_ADD) getString(R.string.addTaskToolbarTitle)
             else getString(R.string.editTaskToolbarTitle)
 
-        mListener.setupActionBar(title, R.drawable.ic_arrow_back)
-
         taskTitleTextLayout.editText?.setText(task?.title)
-        taskTitleTextLayout.requestFocus()
+
         taskDescriptionTextLayout.editText?.setText(task?.description)
 
         taskTitleTextLayout.editText?.setOnClickListener {
             taskTitleTextLayout.error = null
         }
 
-        taskTitleTextLayout.editText?.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
+        taskTitleTextLayout.editText?.addTextChangedListener(titleTextWatcher)
+
+        if (savedInstanceState != null) {
+
+            taskTitleTextLayout.editText?.setText(savedInstanceState.getString(TEXT_LAYOUT_TITLE_TEXT, ""))
+            taskDescriptionTextLayout.editText?.setText(savedInstanceState.getString(TEXT_LAYOUT_DESCRIPTION_TEXT, ""))
+            taskTitleTextLayout.editText?.setSelection(
+                savedInstanceState.getInt(TEXT_LAYOUT_TITLE_START_POS),
+                savedInstanceState.getInt(TEXT_LAYOUT_TITLE_FINAL_POS)
+            )
+            taskDescriptionTextLayout.editText?.setSelection(
+                savedInstanceState.getInt(TEXT_LAYOUT_DESCRIPTION_START_POS),
+                savedInstanceState.getInt(TEXT_LAYOUT_DESCRIPTION_FINAL_POS)
+            )
+
+            if (savedInstanceState.getBoolean(TEXT_LAYOUT_TITLE_FOCUS)) {
+                taskTitleTextLayout.requestFocus()
+            } else if (savedInstanceState.getBoolean(TEXT_LAYOUT_DESCRIPTION_FOCUS)) {
+                taskDescriptionTextLayout.requestFocus()
             }
 
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                taskTitleTextLayout.error = null
-            }
+            val isRecreated = bundle?.getBoolean(FRAME_RECREATE) ?: false
 
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            if (requireContext().resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+                if (savedInstanceState.getBoolean(TEXT_LAYOUT_TITLE_FOCUS)
+                    || savedInstanceState.getBoolean(TEXT_LAYOUT_DESCRIPTION_FOCUS)
+                    && !isRecreated
+                ) {
+
+                    val dupFragment = AddTaskFragment()
+                    val oldState = requireActivity().supportFragmentManager.saveFragmentInstanceState(this)
+                    dupFragment.setInitialSavedState(oldState)
+                    val newBundle = Bundle()
+                    newBundle.putParcelable(TaskKey.KEY_TASK.getKey(),task)
+                    newBundle.putBoolean(FRAME_RECREATE, true)
+                    dupFragment.arguments = newBundle
+
+                    requireActivity().supportFragmentManager.beginTransaction().remove(this).commit()
+
+                    requireActivity().supportFragmentManager.beginTransaction()
+                        .replace(R.id.content_fragments, dupFragment)
+                        .addToBackStack(null)
+                        .commit()
+                }
+
             }
-        })
+            mListener.setupActionBar(title, R.drawable.ic_arrow_back)
+        } else {
+            taskTitleTextLayout.requestFocus()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(TEXT_LAYOUT_TITLE_TEXT, taskTitleTextLayout.editText?.text.toString())
+        outState.putBoolean(TEXT_LAYOUT_TITLE_FOCUS, taskTitleTextLayout.editText!!.hasFocus())
+        outState.putInt(TEXT_LAYOUT_TITLE_START_POS, taskTitleTextLayout.editText!!.selectionStart)
+        outState.putInt(TEXT_LAYOUT_TITLE_FINAL_POS, taskTitleTextLayout.editText!!.selectionEnd)
+
+        outState.putString(TEXT_LAYOUT_DESCRIPTION_TEXT, taskDescriptionTextLayout.editText?.text.toString())
+        outState.putBoolean(TEXT_LAYOUT_DESCRIPTION_FOCUS, taskDescriptionTextLayout.editText!!.hasFocus())
+        outState.putInt(TEXT_LAYOUT_DESCRIPTION_START_POS, taskDescriptionTextLayout.editText!!.selectionStart)
+        outState.putInt(TEXT_LAYOUT_DESCRIPTION_FINAL_POS, taskDescriptionTextLayout.editText!!.selectionEnd)
     }
 
     override fun onStart() {
@@ -127,7 +200,9 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
 
     override fun onTaskSaveSuccess() {
         hideKeyboard()
-        activity?.supportFragmentManager?.popBackStack()
+        if (requireContext().resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            activity?.supportFragmentManager?.popBackStack()
+        }
     }
 
     private fun hideKeyboard() {
