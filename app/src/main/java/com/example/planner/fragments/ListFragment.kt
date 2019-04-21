@@ -14,6 +14,8 @@ import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
 
+const val ADAPTER_POSITION = "adapterPosition"
+
 abstract class ListFragment : MvpAppCompatFragment(), MainView {
     @InjectPresenter
     lateinit var presenter: MainPresenter
@@ -38,6 +40,7 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
         val fragment = AddTaskFragment()
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        bundle.putInt(ADAPTER_POSITION, adapterList.getSelectedPosition())
         fragment.arguments = bundle
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -66,6 +69,10 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
 
     private fun initAdapter() {
         adapterList = TaskArrayAdapter(requireContext(), presenter)
+        this.arguments?.getInt(ADAPTER_POSITION)?.let {
+            presenter.updateAdapterPosition(it)
+        }
+
         init(adapterList)
     }
 

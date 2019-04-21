@@ -22,12 +22,21 @@ class MainContentFragment : MvpAppCompatFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        init()
+        init(savedInstanceState)
     }
 
-    private fun init() {
+    private fun init(savedInstanceState: Bundle?) {
         val tabAdapter = TabAdapter(childFragmentManager)
-        tabAdapter.addFragment(AllTasksFragment(), getString(R.string.textTabAllTasks))
+
+        val allTaskFragment = AllTasksFragment()
+
+        this.arguments?.getInt(ADAPTER_POSITION)?.let {
+            val bundle = Bundle()
+            bundle.putInt(ADAPTER_POSITION, it)
+            allTaskFragment.arguments = bundle
+        }
+
+        tabAdapter.addFragment(allTaskFragment, getString(R.string.textTabAllTasks))
         tabAdapter.addFragment(FavoritesTasksFragment(), getString(R.string.textTabFavoriteTasks))
 
         viewPager.adapter = tabAdapter

@@ -32,7 +32,7 @@ class TaskArrayAdapter(
     private var taskList: MutableList<Task> = mutableListOf()
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private var posHeadOther = -1
-    private var selectedPosition = 1
+    private var selectedPosition = -1
 
 
     override fun getItemCount(): Int {
@@ -86,8 +86,12 @@ class TaskArrayAdapter(
                 showPopup(context, it, vh.adapterPosition)
             }
             //selectable item
+            if (selectedPosition < 0) {
+                selectedPosition = vh.adapterPosition
+            }
+
             if (selectedPosition == position) {
-                vh.cardView?.setBackgroundColor(Color.rgb(235,233,240))
+                vh.cardView?.setBackgroundColor(Color.rgb(235, 233, 240))
             } else {
                 vh.cardView?.setBackgroundColor(Color.WHITE)
             }
@@ -118,12 +122,14 @@ class TaskArrayAdapter(
         notifyDataSetChanged()
 
         if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if(taskList.isNotEmpty()) {
+            if (taskList.isNotEmpty()) {
                 val offset = getOffset(posHeadOther, position, taskList[0].favorite)
                 presenter.editTask(taskList[position - offset])
             }
         }
     }
+
+    fun getSelectedPosition(): Int = selectedPosition
 
     private fun showPopup(context: Context, view: View, position: Int) {
         val popup: PopupMenu?

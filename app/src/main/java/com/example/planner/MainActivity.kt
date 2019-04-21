@@ -2,6 +2,7 @@ package com.example.planner
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.ActivityCompat
@@ -27,6 +28,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 const val CHECK_REQUEST = 3
 const val FRAGMENT_TAG_ADD_TASK = "FragmentAdd"
 const val FRAGMENT_TAG_CONTENT = "FragmentContent"
+const val FRAGMENT_TAG_ADDTASK = "FragmentAddTask"
 
 class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, FragmentListener,
     ActivityView {
@@ -38,13 +40,28 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        if (savedInstanceState == null) {
-            presenter.onSetContent()
-        }
+        presenter.onSetContent(savedInstanceState)
+
         init()
     }
 
-    override fun setContentFragment() {
+    override fun setContentFragment(savedInstanceState: Bundle?) {
+        if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            val contentFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_CONTENT)
+            if (contentFragment == null) {
+                setContentFragment()
+            } else {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.content_fragments, contentFragment, FRAGMENT_TAG_CONTENT)
+                    .commit()
+            }
+        } else if (savedInstanceState == null) {
+            setContentFragment()
+        }
+
+    }
+
+    private fun setContentFragment() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.content_fragments, MainContentFragment(), FRAGMENT_TAG_CONTENT)
             .commit()

@@ -7,4 +7,7 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
 @StateStrategyType(AddToEndSingleStrategy::class)
 interface AddView: MvpView {
     fun onTaskSaveSuccess()
+    fun setTitle(title: String, startPos: Int, endPos: Int)
+    fun setDescription(title: String, startPos: Int, endPos: Int)
+    fun setFocus(focusId: Int = 0)
 }
