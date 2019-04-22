@@ -22,10 +22,10 @@ class MainContentFragment : MvpAppCompatFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        init(savedInstanceState)
+        init()
     }
 
-    private fun init(savedInstanceState: Bundle?) {
+    private fun init() {
         val tabAdapter = TabAdapter(childFragmentManager)
 
         val allTaskFragment = AllTasksFragment()

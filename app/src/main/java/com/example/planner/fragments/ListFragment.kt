@@ -34,6 +34,7 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
     override fun onListUpdate(tasks: Map<Int, Task>) {
         hideProgressBars()
         adapterList.setList(getList(tasks))
+        presenter.setAdapterStartPosition()
     }
 
     override fun editSelectedTask(task: Task?) {
@@ -78,6 +79,10 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
 
     override fun setAdapterSelectedPosition(position: Int) {
         adapterList.setSelectedPosition(position)
+    }
+
+    override fun setAdapterStartPosition() {
+        adapterList.setSelectedStartedPosition()
     }
 
     abstract fun init(adapter: TaskArrayAdapter)

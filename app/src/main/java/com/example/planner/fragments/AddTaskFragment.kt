@@ -119,22 +119,14 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
         taskTitleTextLayout.editText?.setOnFocusChangeListener { _, hasFocus ->
             if(hasFocus) {
                 presenter.onSetFocus(1)
-            } else {
-                presenter.onSetFocus(0)
             }
         }
 
         taskDescriptionTextLayout.editText?.setOnFocusChangeListener { _, hasFocus ->
             if(hasFocus) {
                 presenter.onSetFocus(2)
-            } else {
-                presenter.onSetFocus(0)
             }
         }
-
-        val currFocus = presenter.setFocusable()
-        val titleFocus = taskTitleTextLayout.editText?.hasFocus()
-        val descriptionFocus = taskDescriptionTextLayout.editText?.hasFocus()
 
         val isRecreated = bundle?.getBoolean(FRAME_RECREATE) ?: false
 
@@ -211,9 +203,6 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
         }
         return super.onOptionsItemSelected(item)
     }
-
-
-
 
     override fun onTaskSaveSuccess() {
         hideKeyboard()

@@ -129,6 +129,24 @@ class TaskArrayAdapter(
         }
     }
 
+    fun setSelectedStartedPosition() {
+        if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (taskList.isNotEmpty()) {
+                val position = if (taskList[0].favorite) {
+                    if (posHeadOther > 0) {
+                        1
+                    } else {
+                        0
+                    }
+                } else {
+                    0
+                }
+                val offset = getOffset(posHeadOther, position, taskList[0].favorite)
+                presenter.editTask(taskList[position - offset])
+            }
+        }
+    }
+
     fun getSelectedPosition(): Int = selectedPosition
 
     private fun showPopup(context: Context, view: View, position: Int) {

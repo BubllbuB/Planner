@@ -16,7 +16,6 @@ class TaskPresenter(private var context: Context, private var loaderManager: Loa
     StorageObserver,
     MvpPresenter<AddView>() {
     private var storage: Storage = StorageFactory.getStorage(context, loaderManager)
-    private var focus = false
 
     fun updateFields(context: Context, loaderManager: LoaderManager) {
         this.context = context
@@ -52,9 +51,6 @@ class TaskPresenter(private var context: Context, private var loaderManager: Loa
     }
 
     fun onSetFocus(focusId: Int) {
-        focus = focusId > 0
         viewState.setFocus(focusId)
     }
-
-    fun setFocusable(): Boolean = focus
 }
