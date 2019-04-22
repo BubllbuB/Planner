@@ -212,6 +212,9 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
         return super.onOptionsItemSelected(item)
     }
 
+
+
+
     override fun onTaskSaveSuccess() {
         hideKeyboard()
         if (requireContext().resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
