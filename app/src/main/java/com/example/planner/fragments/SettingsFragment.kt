@@ -1,9 +1,11 @@
 package com.example.planner.fragments
 
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.v7.preference.CheckBoxPreference
 import android.support.v7.preference.PreferenceFragmentCompat
 import android.support.v7.preference.PreferenceManager
+import android.widget.FrameLayout
 import com.example.planner.R
 import com.example.planner.observer.FragmentListener
 
@@ -27,9 +29,32 @@ class SettingsFragment : PreferenceFragmentCompat() {
         mListener = callback
     }
 
+    override fun onStart() {
+        super.onStart()
+        val v  = requireActivity().findViewById<FrameLayout>(R.id.content_fragments)
+        val t = v.layoutParams as ConstraintLayout.LayoutParams
+        t.matchConstraintPercentWidth = 1.0f
+        v.layoutParams = t
+
+        val v1  = requireActivity().findViewById<FrameLayout>(R.id.edit_fragment)
+        val t1 = v1.layoutParams as ConstraintLayout.LayoutParams
+        t1.matchConstraintPercentWidth = 0.0f
+        v1.layoutParams = t1
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         mListener.setupActionBar(getString(R.string.mainToolbarTitle))
+
+        val v  = requireActivity().findViewById<FrameLayout>(R.id.content_fragments)
+        val t = v.layoutParams as ConstraintLayout.LayoutParams
+        t.matchConstraintPercentWidth = 0.5f
+        v.layoutParams = t
+
+        val v1  = requireActivity().findViewById<FrameLayout>(R.id.edit_fragment)
+        val t1 = v1.layoutParams as ConstraintLayout.LayoutParams
+        t1.matchConstraintPercentWidth = 0.5f
+        v1.layoutParams = t1
     }
 
 

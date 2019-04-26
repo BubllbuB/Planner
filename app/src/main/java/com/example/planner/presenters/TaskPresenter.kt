@@ -1,6 +1,7 @@
 package com.example.planner.presenters
 
 import android.content.Context
+import android.content.res.Configuration
 import android.support.v4.app.LoaderManager
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
@@ -16,6 +17,7 @@ class TaskPresenter(private var context: Context, private var loaderManager: Loa
     StorageObserver,
     MvpPresenter<AddView>() {
     private var storage: Storage = StorageFactory.getStorage(context, loaderManager)
+    private var userSelected = false
 
     fun updateFields(context: Context, loaderManager: LoaderManager) {
         this.context = context
@@ -51,6 +53,15 @@ class TaskPresenter(private var context: Context, private var loaderManager: Loa
     }
 
     fun onSetFocus(focusId: Int) {
+        if (focusId > 0) userSelected = true
         viewState.setFocus(focusId)
+    }
+
+    fun onRestore() {
+        if (context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT && userSelected) {
+            viewState.replaceFragment()
+        } else if(context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            viewState.addFragment()
+        }
     }
 }

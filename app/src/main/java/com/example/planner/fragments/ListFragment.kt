@@ -9,12 +9,12 @@ import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.example.planner.R
 import com.example.planner.adapter.TaskArrayAdapter
-import com.example.planner.enums.TaskKey
 import com.example.planner.presenters.MainPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
 
-const val ADAPTER_POSITION = "adapterPosition"
+const val ADAPTER_POSITION_ALL = "adapterPositionAll"
+const val ADAPTER_POSITION_FAV = "adapterPositionFav"
 
 abstract class ListFragment : MvpAppCompatFragment(), MainView {
     @InjectPresenter
@@ -34,15 +34,12 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
     override fun onListUpdate(tasks: Map<Int, Task>) {
         hideProgressBars()
         adapterList.setList(getList(tasks))
-        presenter.setAdapterStartPosition()
     }
 
     override fun editSelectedTask(task: Task?) {
         val fragment = AddTaskFragment()
-        val bundle = Bundle()
-        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
-        bundle.putInt(ADAPTER_POSITION, adapterList.getSelectedPosition())
-        fragment.arguments = bundle
+
+        fragment.arguments = bundlePutPosition(task, adapterList.getSelectedPosition())
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             requireActivity().supportFragmentManager.beginTransaction()
@@ -70,7 +67,9 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
 
     private fun initAdapter() {
         adapterList = TaskArrayAdapter(requireContext(), presenter)
-        this.arguments?.getInt(ADAPTER_POSITION)?.let {
+        checkSavedPosition(this.arguments)
+
+        this.arguments?.getInt(ADAPTER_POSITION_ALL)?.let {
             presenter.updateAdapterPosition(it)
         }
 
@@ -85,6 +84,8 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
         adapterList.setSelectedStartedPosition()
     }
 
+    abstract fun checkSavedPosition(bundle: Bundle?)
+    abstract fun bundlePutPosition(task: Task?, position: Int): Bundle
     abstract fun init(adapter: TaskArrayAdapter)
     abstract fun hideProgressBars()
     abstract fun getList(tasks: Map<Int, Task>): List<Task>

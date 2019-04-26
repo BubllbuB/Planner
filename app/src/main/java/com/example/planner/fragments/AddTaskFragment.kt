@@ -21,6 +21,7 @@ import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
 import kotlinx.android.synthetic.main.fragment_add_task.*
 
+
 const val FRAME_RECREATE = "frameRecreate"
 
 class AddTaskFragment : MvpAppCompatFragment(), AddView {
@@ -86,7 +87,7 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
     }
 
     override fun setFocus(focusId: Int) {
-        when(focusId) {
+        when (focusId) {
             1 -> taskTitleTextLayout.requestFocus()
             2 -> taskDescriptionTextLayout.requestFocus()
         }
@@ -117,13 +118,13 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
         taskDescriptionTextLayout.editText?.addTextChangedListener(descriptionTextWatcher)
 
         taskTitleTextLayout.editText?.setOnFocusChangeListener { _, hasFocus ->
-            if(hasFocus) {
+            if (hasFocus) {
                 presenter.onSetFocus(1)
             }
         }
 
         taskDescriptionTextLayout.editText?.setOnFocusChangeListener { _, hasFocus ->
-            if(hasFocus) {
+            if (hasFocus) {
                 presenter.onSetFocus(2)
             }
         }
@@ -131,31 +132,48 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
         val isRecreated = bundle?.getBoolean(FRAME_RECREATE) ?: false
 
         if (!isRecreated && savedInstanceState != null) {
-            val oldState = requireActivity().supportFragmentManager.saveFragmentInstanceState(this)
-            val dupFragment = AddTaskFragment()
-            dupFragment.setInitialSavedState(oldState)
-            val newBundle = Bundle()
-            newBundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
-            newBundle.putBoolean(FRAME_RECREATE, true)
-            dupFragment.arguments = newBundle
-
-            requireActivity().supportFragmentManager.beginTransaction().remove(this).commit()
-
-            if (requireContext().resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
-                requireActivity().supportFragmentManager.beginTransaction()
-                    .replace(R.id.content_fragments, dupFragment, FRAGMENT_TAG_ADDTASK)
-                    .addToBackStack(null)
-                    .commit()
-            } else {
-                requireActivity().supportFragmentManager.beginTransaction()
-                    .replace(R.id.edit_fragment, dupFragment)
-                    .commit()
-            }
-        } else if(isRecreated) {
+            presenter.onRestore()
+        } else if (isRecreated) {
             bundle?.putBoolean(FRAME_RECREATE, false)
         }
 
-        mListener.setupActionBar(title, R.drawable.ic_arrow_back)
+        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+            mListener.setupActionBar(title, R.drawable.ic_arrow_back)
+    }
+
+    override fun addFragment() {
+        removeFragment()
+
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.edit_fragment, duplicateFragment())
+            .commit()
+    }
+
+    override fun replaceFragment() {
+        removeFragment()
+
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.content_fragments, duplicateFragment(), FRAGMENT_TAG_ADDTASK)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun duplicateFragment(): AddTaskFragment {
+        val task = this.arguments?.getParcelable<Task>(TaskKey.KEY_TASK.getKey())
+
+        val oldState = requireActivity().supportFragmentManager.saveFragmentInstanceState(this)
+        val dupFragment = AddTaskFragment()
+        dupFragment.setInitialSavedState(oldState)
+        val newBundle = Bundle()
+        newBundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
+        newBundle.putBoolean(FRAME_RECREATE, true)
+        dupFragment.arguments = newBundle
+
+        return dupFragment
+    }
+
+    private fun removeFragment() {
+        requireActivity().supportFragmentManager.beginTransaction().remove(this).commit()
     }
 
     override fun onStart() {

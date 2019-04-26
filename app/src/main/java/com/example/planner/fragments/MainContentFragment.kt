@@ -1,5 +1,6 @@
 package com.example.planner.fragments
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.view.LayoutInflater
@@ -29,15 +30,22 @@ class MainContentFragment : MvpAppCompatFragment() {
         val tabAdapter = TabAdapter(childFragmentManager)
 
         val allTaskFragment = AllTasksFragment()
+        val favTaskFragment = FavoritesTasksFragment()
 
-        this.arguments?.getInt(ADAPTER_POSITION)?.let {
+        this.arguments?.getInt(ADAPTER_POSITION_ALL)?.let {
             val bundle = Bundle()
-            bundle.putInt(ADAPTER_POSITION, it)
+            bundle.putInt(ADAPTER_POSITION_ALL, it)
             allTaskFragment.arguments = bundle
         }
 
+        this.arguments?.getInt(ADAPTER_POSITION_FAV)?.let {
+            val bundle = Bundle()
+            bundle.putInt(ADAPTER_POSITION_FAV, it)
+            favTaskFragment.arguments = bundle
+        }
+
         tabAdapter.addFragment(allTaskFragment, getString(R.string.textTabAllTasks))
-        tabAdapter.addFragment(FavoritesTasksFragment(), getString(R.string.textTabFavoriteTasks))
+        tabAdapter.addFragment(favTaskFragment, getString(R.string.textTabFavoriteTasks))
 
         viewPager.adapter = tabAdapter
         tabLayout.setupWithViewPager(viewPager)
@@ -56,10 +64,17 @@ class MainContentFragment : MvpAppCompatFragment() {
             val bundle = Bundle()
             bundle.putBoolean(TaskKey.KEY_TASK_FAV.getKey(), tabLayout.selectedTabPosition == ID_FAV_TAB)
             fragment.arguments = bundle
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.content_fragments, fragment, FRAGMENT_TAG_ADD_TASK)
-                .addToBackStack(null)
-                .commit()
+
+            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.edit_fragment, fragment)
+                    .commit()
+            } else {
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.content_fragments, fragment, FRAGMENT_TAG_ADD_TASK)
+                    .addToBackStack(null)
+                    .commit()
+            }
         }
     }
 }

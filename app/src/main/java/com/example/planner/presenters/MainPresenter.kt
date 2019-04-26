@@ -6,6 +6,7 @@ import android.support.v4.app.LoaderManager
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.example.planner.enums.TaskAction
+import com.example.planner.fragments.StartingPositionChecker
 import com.example.planner.observer.StorageObserver
 import com.example.planner.storages.Storage
 import com.example.planner.storages.StorageFactory
@@ -18,7 +19,7 @@ class MainPresenter(
     private var loaderManager: LoaderManager
 ) : StorageObserver, MvpPresenter<MainView>() {
     private var storage: Storage = StorageFactory.getStorage(context, loaderManager)
-    private var isNotSetStartPosition = true
+
 
     fun updateFields(context: Context, loaderManager: LoaderManager) {
         this.context = context
@@ -28,11 +29,18 @@ class MainPresenter(
 
     override fun onUpdateMap(map: Map<Int, Task>) {
         viewState.onListUpdate(map)
+
+        if (StartingPositionChecker.isNotSetStartPosition && context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            StartingPositionChecker.isNotSetStartPosition = false
+            viewState.setAdapterStartPosition()
+        }
     }
 
     fun getTasksList() {
-        viewState.showProgressBars()
-        storage.getList()
+        if (StartingPositionChecker.isNotSetStartPosition) {
+            viewState.showProgressBars()
+            storage.getList()
+        }
     }
 
     fun updateTask(action: TaskAction, task: Task) {
@@ -48,14 +56,8 @@ class MainPresenter(
     }
 
     fun updateAdapterPosition(position: Int) {
+        StartingPositionChecker.isNotSetStartPosition = false
         viewState.setAdapterSelectedPosition(position)
-    }
-
-    fun setAdapterStartPosition() {
-        if (isNotSetStartPosition && context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            isNotSetStartPosition = false
-            viewState.setAdapterStartPosition()
-        }
     }
 
     fun onStart() {

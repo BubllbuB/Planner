@@ -29,6 +29,7 @@ const val CHECK_REQUEST = 3
 const val FRAGMENT_TAG_ADD_TASK = "FragmentAdd"
 const val FRAGMENT_TAG_CONTENT = "FragmentContent"
 const val FRAGMENT_TAG_ADDTASK = "FragmentAddTask"
+const val FRAGMENT_TAG_SETTINGS = "FragmentSettings"
 
 class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, FragmentListener,
     ActivityView {
@@ -48,9 +49,10 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
     override fun setContentFragment(savedInstanceState: Bundle?) {
         if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             val contentFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_CONTENT)
+            val settingsFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_SETTINGS)
             if (contentFragment == null) {
                 setContentFragment()
-            } else {
+            } else if (settingsFragment == null || settingsFragment.isHidden) {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.content_fragments, contentFragment, FRAGMENT_TAG_CONTENT)
                     .commit()
@@ -108,7 +110,7 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_settings -> supportFragmentManager.beginTransaction()
-                .replace(R.id.content_fragments, SettingsFragment())
+                .replace(R.id.content_fragments, SettingsFragment(), FRAGMENT_TAG_SETTINGS)
                 .addToBackStack(null)
                 .commit()
             R.id.nav_tasks -> supportFragmentManager.beginTransaction()
