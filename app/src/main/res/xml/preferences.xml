@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
             android:title="@string/prefStorageTitle"
             android:key="storageType">
@@ -7,12 +8,14 @@
                 android:key="storageTypeCache"
                 android:summary="@string/prefCacheSummary"
                 android:title="@string/prefStorageCache"
-                android:defaultValue="true"/>
+                android:defaultValue="true"
+                android:layout="@layout/preference_checkbox"/>
         <CheckBoxPreference
                 android:key="storageTypeShared"
                 android:summary="@string/prefSharedSummary"
                 android:title="@string/prefStorageShared"
-                android:defaultValue="false"/>
+                android:defaultValue="false"
+                android:layout="@layout/preference_checkbox"/>
         <CheckBoxPreference
                 android:key="storageTypeInternal"
                 android:summary="@string/prefInternalSummary"

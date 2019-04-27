@@ -2,10 +2,12 @@ package com.example.planner.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.design.widget.TabLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.example.planner.FRAGMENT_TAG_ADD_TASK
 import com.example.planner.R
@@ -19,6 +21,22 @@ class MainContentFragment : MvpAppCompatFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main, container, false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        if(requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            val v  = requireActivity().findViewById<FrameLayout>(R.id.content_fragments)
+            val t = v.layoutParams as ConstraintLayout.LayoutParams
+            t.matchConstraintPercentWidth = 0.5f
+            v.layoutParams = t
+
+            val v1  = requireActivity().findViewById<FrameLayout>(R.id.edit_fragment)
+            val t1 = v1.layoutParams as ConstraintLayout.LayoutParams
+            t1.matchConstraintPercentWidth = 0.5f
+            v1.layoutParams = t1
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
