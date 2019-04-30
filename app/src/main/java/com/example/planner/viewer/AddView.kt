@@ -16,4 +16,6 @@ interface AddView: MvpView {
     fun replaceFragment()
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun addFragment()
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun setTask()
 }

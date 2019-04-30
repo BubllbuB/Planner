@@ -16,6 +16,7 @@ import android.widget.Toast
 import com.arellomobile.mvp.MvpAppCompatActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.example.planner.fragments.AddTaskFragment
+import com.example.planner.fragments.ListFragment
 import com.example.planner.fragments.MainContentFragment
 import com.example.planner.fragments.SettingsFragment
 import com.example.planner.observer.FragmentListener
@@ -79,6 +80,15 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
         nav_view.setNavigationItemSelectedListener(this)
     }
 
+    override fun onBackPressed() {
+        if (supportFragmentManager.findFragmentById(R.id.content_fragments) is AddTaskFragment) {
+            super.onBackPressed()
+            val contentFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_CONTENT) as MainContentFragment
+            contentFragment.onSetAdapterStart()
+        }
+        super.onBackPressed()
+    }
+
     override fun onStart() {
         super.onStart()
         checkPermissions()
@@ -109,18 +119,26 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.nav_settings -> supportFragmentManager.beginTransaction()
-                .replace(R.id.content_fragments, SettingsFragment(), FRAGMENT_TAG_SETTINGS)
-                .addToBackStack(null)
-                .commit()
-            R.id.nav_tasks -> supportFragmentManager.beginTransaction()
-                .replace(R.id.content_fragments, MainContentFragment())
-                .addToBackStack(null)
-                .commit()
+            R.id.nav_settings -> {
+                val settingsFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_SETTINGS)
+                if (settingsFragment == null || !settingsFragment.isVisible) {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.content_fragments, SettingsFragment(), FRAGMENT_TAG_SETTINGS)
+                        .addToBackStack(null)
+                        .commit()
+                }
+            }
+            R.id.nav_tasks -> {
+                val contentFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_CONTENT)
+                if (contentFragment == null || !contentFragment.isVisible) {
+                    supportFragmentManager.popBackStack()
+                }
+            }
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
+
 
     private fun checkPermissions() {
         val pref = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)

@@ -18,6 +18,7 @@ class TaskPresenter(private var context: Context, private var loaderManager: Loa
     MvpPresenter<AddView>() {
     private var storage: Storage = StorageFactory.getStorage(context, loaderManager)
     private var userSelected = false
+    private var firstSetTask = true
 
     fun updateFields(context: Context, loaderManager: LoaderManager) {
         this.context = context
@@ -38,6 +39,13 @@ class TaskPresenter(private var context: Context, private var loaderManager: Loa
 
     fun onStart() {
         storage.addObserver(this)
+    }
+
+    fun onFirstInit() {
+        if(firstSetTask) {
+            viewState.setTask()
+            firstSetTask = false
+        }
     }
 
     fun onStop() {

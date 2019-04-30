@@ -19,6 +19,7 @@ class MainPresenter(
     private var loaderManager: LoaderManager
 ) : StorageObserver, MvpPresenter<MainView>() {
     private var storage: Storage = StorageFactory.getStorage(context, loaderManager)
+    private var typeStorage = storage.javaClass
 
 
     fun updateFields(context: Context, loaderManager: LoaderManager) {
@@ -31,12 +32,14 @@ class MainPresenter(
         viewState.onListUpdate(map)
 
         if (StartingPositionChecker.isNotSetStartPosition && context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            StartingPositionChecker.isNotSetStartPosition = false
-            viewState.setAdapterStartPosition()
+            setStartAdapterPosition()
         }
     }
 
     fun getTasksList() {
+        if (storage.javaClass != typeStorage) {
+            StartingPositionChecker.isNotSetStartPosition = true
+        }
         if (StartingPositionChecker.isNotSetStartPosition) {
             viewState.showProgressBars()
             storage.getList()
@@ -53,6 +56,12 @@ class MainPresenter(
             TaskAction.ACTION_FAVORITE -> storage.editTask(task)
             TaskAction.ACTION_DONE -> storage.editTask(task)
         }
+    }
+
+    fun setStartAdapterPosition() {
+        StartingPositionChecker.isNotSetStartPosition = false
+        typeStorage = storage.javaClass
+        viewState.setAdapterStartPosition()
     }
 
     fun updateAdapterPosition(position: Int) {

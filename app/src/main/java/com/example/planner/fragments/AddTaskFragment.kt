@@ -29,6 +29,7 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
     @InjectPresenter
     lateinit var presenter: TaskPresenter
     private var action = TaskAction.ACTION_ADD
+    private var task: Task? = null
 
     private val titleTextWatcher = object : TextWatcher {
         override fun afterTextChanged(p0: Editable?) {
@@ -99,16 +100,6 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
 
     private fun init(savedInstanceState: Bundle?) {
         val bundle = this.arguments
-        val task = bundle?.getParcelable<Task>(TaskKey.KEY_TASK.getKey())
-        if (task != null) action = TaskAction.ACTION_EDIT
-
-        val title =
-            if (action == TaskAction.ACTION_ADD) getString(R.string.addTaskToolbarTitle)
-            else getString(R.string.editTaskToolbarTitle)
-
-        taskTitleTextLayout.editText?.setText(task?.title)
-
-        taskDescriptionTextLayout.editText?.setText(task?.description)
 
         taskTitleTextLayout.editText?.setOnClickListener {
             taskTitleTextLayout.error = null
@@ -134,24 +125,40 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
         if (!isRecreated && savedInstanceState != null) {
             presenter.onRestore()
         } else if (isRecreated) {
+            task = bundle?.getParcelable(TaskKey.KEY_TASK.getKey())
             bundle?.putBoolean(FRAME_RECREATE, false)
         }
+
+        presenter.onFirstInit()
+    }
+
+    override fun setTask() {
+        val newTask = this.arguments?.getParcelable<Task>(TaskKey.KEY_TASK.getKey())
+
+        if (task?.id != newTask?.id) {
+            task = newTask
+
+            taskTitleTextLayout.editText?.setText(task?.title)
+            taskDescriptionTextLayout.editText?.setText(task?.description)
+
+            action = TaskAction.ACTION_EDIT
+        }
+
+        val title =
+            if (action == TaskAction.ACTION_ADD) getString(R.string.addTaskToolbarTitle)
+            else getString(R.string.editTaskToolbarTitle)
 
         if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
             mListener.setupActionBar(title, R.drawable.ic_arrow_back)
     }
 
     override fun addFragment() {
-        removeFragment()
-
         requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.edit_fragment, duplicateFragment())
+            .replace(R.id.edit_fragment, duplicateFragment(), FRAGMENT_TAG_ADDTASK)
             .commit()
     }
 
     override fun replaceFragment() {
-        removeFragment()
-
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.content_fragments, duplicateFragment(), FRAGMENT_TAG_ADDTASK)
             .addToBackStack(null)
@@ -159,21 +166,20 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
     }
 
     private fun duplicateFragment(): AddTaskFragment {
-        val task = this.arguments?.getParcelable<Task>(TaskKey.KEY_TASK.getKey())
-
+        task = this.arguments?.getParcelable(TaskKey.KEY_TASK.getKey())
         val oldState = requireActivity().supportFragmentManager.saveFragmentInstanceState(this)
         val dupFragment = AddTaskFragment()
         dupFragment.setInitialSavedState(oldState)
+
+        requireActivity().supportFragmentManager.beginTransaction().remove(this).commit()
+        requireActivity().supportFragmentManager.popBackStack()
+
         val newBundle = Bundle()
         newBundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
         newBundle.putBoolean(FRAME_RECREATE, true)
         dupFragment.arguments = newBundle
 
         return dupFragment
-    }
-
-    private fun removeFragment() {
-        requireActivity().supportFragmentManager.beginTransaction().remove(this).commit()
     }
 
     override fun onStart() {

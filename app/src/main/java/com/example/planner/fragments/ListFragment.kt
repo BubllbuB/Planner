@@ -1,12 +1,12 @@
 package com.example.planner.fragments
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.LoaderManager
 import android.view.View
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
+import com.example.planner.FRAGMENT_TAG_ADDTASK
 import com.example.planner.R
 import com.example.planner.adapter.TaskArrayAdapter
 import com.example.planner.presenters.MainPresenter
@@ -37,19 +37,20 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
     }
 
     override fun editSelectedTask(task: Task?) {
-        val fragment = AddTaskFragment()
+        var fragmentAdd = requireActivity().supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_ADDTASK)
+        val fragmentArguments = bundlePutPosition(task, adapterList.getSelectedPosition())
 
-        fragment.arguments = bundlePutPosition(task, adapterList.getSelectedPosition())
+        if (fragmentAdd == null || !fragmentAdd.isAdded) {
+            fragmentAdd = AddTaskFragment()
+            fragmentAdd.arguments = fragmentArguments
 
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.edit_fragment, fragment)
+                .replace(R.id.edit_fragment, fragmentAdd, FRAGMENT_TAG_ADDTASK)
                 .commit()
         } else {
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.content_fragments, fragment)
-                .addToBackStack(null)
-                .commit()
+            fragmentAdd as AddTaskFragment
+            fragmentAdd.arguments = fragmentArguments
+            fragmentAdd.setTask()
         }
     }
 
@@ -82,6 +83,7 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
 
     override fun setAdapterStartPosition() {
         adapterList.setSelectedStartedPosition()
+        this.arguments?.remove(ADAPTER_POSITION_ALL)
     }
 
     abstract fun checkSavedPosition(bundle: Bundle?)

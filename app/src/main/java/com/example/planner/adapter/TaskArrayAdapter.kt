@@ -142,6 +142,7 @@ class TaskArrayAdapter(
                     0
                 }
                 val offset = getOffset(posHeadOther, position, taskList[0].favorite)
+                selectedPosition = position
                 presenter.editTask(taskList[position - offset])
             }
         }

@@ -2,7 +2,6 @@ package com.example.planner.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
 import android.support.design.widget.TabLayout
 import android.view.LayoutInflater
 import android.view.View
@@ -26,16 +25,12 @@ class MainContentFragment : MvpAppCompatFragment() {
     override fun onStart() {
         super.onStart()
 
-        if(requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            val v  = requireActivity().findViewById<FrameLayout>(R.id.content_fragments)
-            val t = v.layoutParams as ConstraintLayout.LayoutParams
-            t.matchConstraintPercentWidth = 0.5f
-            v.layoutParams = t
+        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && this.isVisible) {
+            val v = requireActivity().findViewById<FrameLayout>(R.id.content_fragments)
+            v.layoutParams.width = 0
 
-            val v1  = requireActivity().findViewById<FrameLayout>(R.id.edit_fragment)
-            val t1 = v1.layoutParams as ConstraintLayout.LayoutParams
-            t1.matchConstraintPercentWidth = 0.5f
-            v1.layoutParams = t1
+            val v1 = requireActivity().findViewById<FrameLayout>(R.id.edit_fragment)
+            v1.visibility = View.VISIBLE
         }
     }
 
@@ -94,5 +89,12 @@ class MainContentFragment : MvpAppCompatFragment() {
                     .commit()
             }
         }
+    }
+
+    fun onSetAdapterStart() {
+        var currIndexTabLayout = tabLayout.selectedTabPosition
+        val tabAdapter = viewPager.adapter as TabAdapter
+        val currListFragment = tabAdapter.getItem(currIndexTabLayout) as ListFragment
+        currListFragment.setAdapterStartPosition()
     }
 }
