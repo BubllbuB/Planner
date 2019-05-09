@@ -16,7 +16,6 @@ import android.widget.Toast
 import com.arellomobile.mvp.MvpAppCompatActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.example.planner.fragments.AddTaskFragment
-import com.example.planner.fragments.ListFragment
 import com.example.planner.fragments.MainContentFragment
 import com.example.planner.fragments.SettingsFragment
 import com.example.planner.observer.FragmentListener
@@ -61,7 +60,6 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
         } else if (savedInstanceState == null) {
             setContentFragment()
         }
-
     }
 
     private fun setContentFragment() {
@@ -78,15 +76,6 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
         }
 
         nav_view.setNavigationItemSelectedListener(this)
-    }
-
-    override fun onBackPressed() {
-        if (supportFragmentManager.findFragmentById(R.id.content_fragments) is AddTaskFragment) {
-            super.onBackPressed()
-            val contentFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_CONTENT) as MainContentFragment
-            contentFragment.onSetAdapterStart()
-        }
-        super.onBackPressed()
     }
 
     override fun onStart() {

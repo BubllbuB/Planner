@@ -31,7 +31,7 @@ class MainPresenter(
     override fun onUpdateMap(map: Map<Int, Task>) {
         viewState.onListUpdate(map)
 
-        if (StartingPositionChecker.isNotSetStartPosition && context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (StartingPositionChecker.isNotSetStartPosition) {
             setStartAdapterPosition()
         }
     }
@@ -58,14 +58,17 @@ class MainPresenter(
         }
     }
 
-    fun setStartAdapterPosition() {
-        StartingPositionChecker.isNotSetStartPosition = false
-        typeStorage = storage.javaClass
-        viewState.setAdapterStartPosition()
+    private fun setStartAdapterPosition() {
+        if(context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            StartingPositionChecker.isNotSetStartPosition = false
+            typeStorage = storage.javaClass
+            viewState.setAdapterStartPosition()
+        }
     }
 
     fun updateAdapterPosition(position: Int) {
         StartingPositionChecker.isNotSetStartPosition = false
+        StartingPositionChecker.isNotUserSetPosition = false
         viewState.setAdapterSelectedPosition(position)
     }
 

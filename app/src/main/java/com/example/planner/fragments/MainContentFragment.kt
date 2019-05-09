@@ -42,8 +42,21 @@ class MainContentFragment : MvpAppCompatFragment() {
     private fun init() {
         val tabAdapter = TabAdapter(childFragmentManager)
 
-        val allTaskFragment = AllTasksFragment()
-        val favTaskFragment = FavoritesTasksFragment()
+        val fragmentAllTasks = childFragmentManager.findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + 0) as ListFragment?
+        val fragmentFavTasks = childFragmentManager.findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + 1) as ListFragment?
+
+        val allTaskFragment = if(fragmentAllTasks != null && fragmentAllTasks.adapterExist()) {
+            fragmentAllTasks
+        } else {
+            AllTasksFragment()
+        }
+
+
+        val favTaskFragment = if(fragmentFavTasks != null && fragmentFavTasks.adapterExist()) {
+            fragmentFavTasks
+        } else {
+            FavoritesTasksFragment()
+        }
 
         this.arguments?.getInt(ADAPTER_POSITION_ALL)?.let {
             val bundle = Bundle()
@@ -89,12 +102,5 @@ class MainContentFragment : MvpAppCompatFragment() {
                     .commit()
             }
         }
-    }
-
-    fun onSetAdapterStart() {
-        var currIndexTabLayout = tabLayout.selectedTabPosition
-        val tabAdapter = viewPager.adapter as TabAdapter
-        val currListFragment = tabAdapter.getItem(currIndexTabLayout) as ListFragment
-        currListFragment.setAdapterStartPosition()
     }
 }

@@ -38,7 +38,7 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
 
     override fun editSelectedTask(task: Task?) {
         var fragmentAdd = requireActivity().supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_ADDTASK)
-        val fragmentArguments = bundlePutPosition(task, adapterList.getSelectedPosition())
+        val fragmentArguments = bundlePutTask(task)
 
         if (fragmentAdd == null || !fragmentAdd.isAdded) {
             fragmentAdd = AddTaskFragment()
@@ -68,26 +68,27 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
 
     private fun initAdapter() {
         adapterList = TaskArrayAdapter(requireContext(), presenter)
-        checkSavedPosition(this.arguments)
-
-        this.arguments?.getInt(ADAPTER_POSITION_ALL)?.let {
-            presenter.updateAdapterPosition(it)
-        }
-
+        checkSavedPosition()
         init(adapterList)
     }
 
     override fun setAdapterSelectedPosition(position: Int) {
         adapterList.setSelectedPosition(position)
+        savePosition(adapterList.getSelectedPosition())
     }
 
     override fun setAdapterStartPosition() {
         adapterList.setSelectedStartedPosition()
-        this.arguments?.remove(ADAPTER_POSITION_ALL)
+        savePosition(adapterList.getSelectedPosition())
     }
 
-    abstract fun checkSavedPosition(bundle: Bundle?)
-    abstract fun bundlePutPosition(task: Task?, position: Int): Bundle
+    fun adapterExist():Boolean {
+        return ::adapterList.isInitialized
+    }
+
+    abstract fun checkSavedPosition()
+    abstract fun savePosition(position: Int)
+    abstract fun bundlePutTask(task: Task?): Bundle
     abstract fun init(adapter: TaskArrayAdapter)
     abstract fun hideProgressBars()
     abstract fun getList(tasks: Map<Int, Task>): List<Task>

@@ -22,15 +22,20 @@ class AllTasksFragment : ListFragment() {
         taskListView.adapter = adapter
     }
 
-    override fun bundlePutPosition(task: Task?, position: Int): Bundle {
+    override fun bundlePutTask(task: Task?): Bundle {
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
-        bundle.putInt(ADAPTER_POSITION_ALL, position)
         return bundle
     }
 
-    override fun checkSavedPosition(bundle: Bundle?) {
-        bundle?.getInt(ADAPTER_POSITION_ALL)?.let {
+    override fun savePosition(position: Int) {
+        val bundlePosition = Bundle()
+        bundlePosition.putInt(ADAPTER_POSITION_ALL, position)
+        this.arguments = bundlePosition
+    }
+
+    override fun checkSavedPosition() {
+        this.arguments?.getInt(ADAPTER_POSITION_ALL)?.let {
             presenter.updateAdapterPosition(it)
         }
     }

@@ -14,6 +14,7 @@ interface MainView: MvpView {
 
     fun showProgressBars()
 
+    @StateStrategyType(OneExecutionStateStrategy::class)
     fun setAdapterSelectedPosition(position: Int)
 
     @StateStrategyType(OneExecutionStateStrategy::class)
