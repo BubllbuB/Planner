@@ -195,8 +195,17 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
-        inflater.inflate(R.menu.toolbar, menu)
+        if(this.isVisible) {
+            inflater.inflate(R.menu.toolbar, menu)
+        }
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?) {
+        if(!this.isVisible) {
+            menu?.clear()
+        }
+        super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

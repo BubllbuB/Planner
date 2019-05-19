@@ -1,17 +1,18 @@
 package com.example.planner.fragments
 
-import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.v7.preference.CheckBoxPreference
 import android.support.v7.preference.PreferenceFragmentCompat
 import android.support.v7.preference.PreferenceManager
-import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
+import com.example.planner.FRAGMENT_TAG_ADDTASK
 import com.example.planner.R
 import com.example.planner.observer.FragmentListener
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -25,7 +26,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, p1: String?) {
         addPreferencesFromResource(R.xml.preferences)
         PreferenceManager.setDefaultValues(requireContext(), R.xml.preferences, false)
-        mListener.setupActionBar(getString(R.string.settingsToolbarTitle))
         initCheckboxes()
     }
 
@@ -36,12 +36,22 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onStart() {
         super.onStart()
 
-        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && this.isVisible) {
+        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && this.isAdded) {
             val v = requireActivity().findViewById<FrameLayout>(R.id.content_fragments)
             v.layoutParams.width = ConstraintLayout.LayoutParams.MATCH_PARENT
 
             val v1 = requireActivity().findViewById<FrameLayout>(R.id.edit_fragment)
             v1.visibility = View.GONE
+        }
+
+        doAsync {
+            val fragmentAdd = requireActivity().supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_ADDTASK)
+            fragmentAdd?.let {
+                requireActivity().supportFragmentManager.beginTransaction().remove(it).commit()
+            }
+            uiThread {
+                mListener.setupActionBar(getString(R.string.settingsToolbarTitle))
+            }
         }
     }
 

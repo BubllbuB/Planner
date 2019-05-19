@@ -169,6 +169,7 @@ class TaskArrayAdapter(
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
             when (item!!.itemId) {
                 R.id.editTaskButton -> {
+                    presenter.updateAdapterPosition(position)
                     presenter.editTask(task)
                 }
                 R.id.removeTaskButton -> {

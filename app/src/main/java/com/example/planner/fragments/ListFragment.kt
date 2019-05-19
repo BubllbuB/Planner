@@ -1,5 +1,6 @@
 package com.example.planner.fragments
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.LoaderManager
 import android.view.View
@@ -37,20 +38,33 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
     }
 
     override fun editSelectedTask(task: Task?) {
-        var fragmentAdd = requireActivity().supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_ADDTASK)
+        val fragmentAdd = requireActivity().supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_ADDTASK)
         val fragmentArguments = bundlePutTask(task)
 
-        if (fragmentAdd == null || !fragmentAdd.isAdded) {
-            fragmentAdd = AddTaskFragment()
-            fragmentAdd.arguments = fragmentArguments
-
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.edit_fragment, fragmentAdd, FRAGMENT_TAG_ADDTASK)
-                .commit()
+        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setNewAddFragment(fragmentArguments)
+        } else if (fragmentAdd == null || !fragmentAdd.isAdded) {
+            setNewAddFragment(fragmentArguments)
         } else {
             fragmentAdd as AddTaskFragment
             fragmentAdd.arguments = fragmentArguments
             fragmentAdd.setTask()
+        }
+    }
+
+    private fun setNewAddFragment(arguments: Bundle) {
+        val fragmentAdd = AddTaskFragment()
+        fragmentAdd.arguments = arguments
+
+        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.edit_fragment, fragmentAdd, FRAGMENT_TAG_ADDTASK)
+                .commit()
+        } else if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.content_fragments, fragmentAdd, FRAGMENT_TAG_ADDTASK)
+                .addToBackStack(null)
+                .commit()
         }
     }
 
@@ -82,7 +96,7 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
         savePosition(adapterList.getSelectedPosition())
     }
 
-    fun adapterExist():Boolean {
+    fun adapterExist(): Boolean {
         return ::adapterList.isInitialized
     }
 
