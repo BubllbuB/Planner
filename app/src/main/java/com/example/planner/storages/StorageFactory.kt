@@ -10,6 +10,7 @@ const val STORAGE_TYPE_SHARED = "storageTypeShared"
 const val STORAGE_TYPE_INTERNAL = "storageTypeInternal"
 const val STORAGE_TYPE_EXTERNAL = "storageTypeExternal"
 const val STORAGE_TYPE_DATABASE = "storageTypeDatabase"
+const val STORAGE_TYPE_FIREBASE = "storageTypeFirebase"
 
 class StorageFactory {
     companion object {
@@ -31,6 +32,10 @@ class StorageFactory {
                     loaderManager
                 )
                 pref.getBoolean(STORAGE_TYPE_DATABASE, false) -> return DatabaseStorage.init(
+                    WeakReference(context),
+                    loaderManager
+                )
+                pref.getBoolean(STORAGE_TYPE_FIREBASE, false) -> return FirebaseStorage.init(
                     WeakReference(context),
                     loaderManager
                 )

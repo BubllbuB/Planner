@@ -27,5 +27,10 @@
                 android:summary="@string/prefDatabaseSummary"
                 android:title="@string/prefStorageDatabase"
                 android:defaultValue="false"/>
+        <CheckBoxPreference
+                android:key="storageTypeFirebase"
+                android:summary="@string/prefFirebaseSummary"
+                android:title="@string/prefFirebase"
+                android:defaultValue="false"/>
     </PreferenceCategory>
 </PreferenceScreen>
