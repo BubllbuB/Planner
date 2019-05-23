@@ -1,67 +1,89 @@
 package com.example.planner.storages
 
-import android.content.Context
-import android.os.Bundle
-import android.support.v4.app.LoaderManager
-import android.support.v4.content.Loader
-import com.example.planner.asyncLoaders.DatabaseLoader
-import com.example.planner.asyncLoaders.DatabaseWriter
-import com.example.planner.enums.TaskAction
-import com.example.planner.enums.TaskKey
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
-import java.lang.ref.WeakReference
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.util.*
 
-const val FIREBASE_READ_LOADER_ID = 16
-const val FIREBASE_EDIT_LOADER_ID = 17
-const val FIREBASE_REMOVE_LOADER_ID = 18
-const val FIREBASE_ADD_LOADER_ID = 19
 
-internal object FirebaseStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
+internal object FirebaseStorage : Storage {
     private var taskMap = sortedMapOf<Int, Task>()
     private val observers: MutableList<StorageObserver> = ArrayList()
 
-    private lateinit var context: WeakReference<Context>
-    private lateinit var loaderManager: LoaderManager
+    private val database = FirebaseDatabase.getInstance()
+    private val dbReference = database.reference.child("tasks")
 
-    fun init(context: WeakReference<Context>, loaderManager: LoaderManager): FirebaseStorage {
-        this.context = context
-        this.loaderManager = loaderManager
-
+    fun init(): FirebaseStorage {
         return this
     }
 
-    override fun onCreateLoader(id: Int, bundle: Bundle?): Loader<SortedMap<Int, Task>> {
-
-        return Loader(context.get()!!)
-    }
-
-    override fun onLoadFinished(loader: Loader<SortedMap<Int, Task>>, tasks: SortedMap<Int, Task>?) {
-
-    }
-
-    override fun onLoaderReset(loader: Loader<SortedMap<Int, Task>>) {
-
-    }
-
     override fun addTask(task: Task) {
-        val bundle = Bundle()
-        bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
-        bundle.putSerializable(TaskKey.KEY_ACTION.getKey(), TaskAction.ACTION_ADD)
-        loaderManager.restartLoader(DATABASE_ADD_LOADER_ID, bundle, this).forceLoad()
+        var lastId = -1
+
+        val lastQuery = dbReference.orderByKey().limitToLast(1)
+        lastQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (child in dataSnapshot.children) {
+                    lastId = child.getValue(Task::class.java)?.id ?: -1
+                }
+
+                task.id = ++lastId
+
+                dbReference.child(task.id.toString()).setValue(
+                    task
+                ) { _, _ ->
+                    taskMap[task.id] = task
+                    notifyObservers(taskMap)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {}
+        })
     }
 
     override fun removeTask(task: Task) {
-
+        dbReference.child(task.id.toString())
+            .removeValue { _, _ ->
+                taskMap.remove(task.id)
+                notifyObservers(taskMap)
+            }
     }
 
     override fun editTask(task: Task) {
+        val updateMap = mutableMapOf<String, Any?>()
+        updateMap["title"] = task.title
+        updateMap["description"] = task.description
+        updateMap["favorite"] = task.favorite
+        updateMap["done"] = task.done
 
+        dbReference.child(task.id.toString())
+            .updateChildren(updateMap) { _, _ ->
+                taskMap[task.id] = task
+                notifyObservers(taskMap)
+            }
     }
 
     override fun getList() {
+        if (taskMap.isEmpty()) {
+            dbReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    for (postSnapshot in dataSnapshot.children) {
+                        val task = postSnapshot.getValue(Task::class.java)
+                        taskMap[task?.id] = task
+                    }
+                    notifyObservers(taskMap)
+                }
 
+                override fun onCancelled(databaseError: DatabaseError) {
+                    throw databaseError.toException()
+                }
+            })
+        } else {
+            notifyObservers(taskMap)
+        }
     }
 
     override fun addObserver(observer: StorageObserver) {

@@ -21,6 +21,7 @@ import com.example.planner.fragments.SettingsFragment
 import com.example.planner.observer.FragmentListener
 import com.example.planner.presenters.ActivityPresenter
 import com.example.planner.storages.STORAGE_TYPE_EXTERNAL
+import com.example.planner.storages.STORAGE_TYPE_FIREBASE
 import com.example.planner.storages.STORAGE_TYPE_SHARED
 import com.example.planner.viewer.ActivityView
 import kotlinx.android.synthetic.main.activity_main.*
@@ -142,6 +143,17 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
             } else {
                 //presenter.getTasksList()
             }
+        } else if(pref.getBoolean(STORAGE_TYPE_FIREBASE, false)) {
+            val permissionInternet = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.INTERNET
+            )
+
+            if (permissionInternet != PackageManager.PERMISSION_GRANTED) {
+                makeRequest()
+            } else {
+                //presenter.getTasksList()
+            }
         } else {
             //presenter.getTasksList()
         }
@@ -157,7 +169,7 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
     private fun makeRequest() {
         ActivityCompat.requestPermissions(
             this,
-            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET),
             CHECK_REQUEST
         )
     }

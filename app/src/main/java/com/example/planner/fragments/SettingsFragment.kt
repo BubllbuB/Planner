@@ -21,6 +21,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var sInternal: CheckBoxPreference
     private lateinit var sExternal: CheckBoxPreference
     private lateinit var sDatabase: CheckBoxPreference
+    private lateinit var sFirebase: CheckBoxPreference
     private lateinit var mListener: FragmentListener
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, p1: String?) {
@@ -67,6 +68,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         sInternal = findPreference("storageTypeInternal") as CheckBoxPreference
         sExternal = findPreference("storageTypeExternal") as CheckBoxPreference
         sDatabase = findPreference("storageTypeDatabase") as CheckBoxPreference
+        sFirebase = findPreference("storageTypeFirebase") as CheckBoxPreference
 
         sCache.setOnPreferenceChangeListener { _, _ ->
             if (!sCache.isChecked) {
@@ -103,6 +105,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             false
         }
+        sFirebase.setOnPreferenceChangeListener { _, _ ->
+            if (!sFirebase.isChecked) {
+                setAllUnchecked()
+                sFirebase.isChecked = true
+            }
+            false
+        }
     }
 
     private fun setAllUnchecked() {
@@ -111,5 +120,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         sInternal.isChecked = false
         sExternal.isChecked = false
         sDatabase.isChecked = false
+        sFirebase.isChecked = false
     }
 }
