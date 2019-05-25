@@ -35,7 +35,7 @@ class StorageFactory {
                     WeakReference(context),
                     loaderManager
                 )
-                pref.getBoolean(STORAGE_TYPE_FIREBASE, false) -> return FirebaseStorage.init()
+                pref.getBoolean(STORAGE_TYPE_FIREBASE, false) -> return FirebaseStorage.init(WeakReference(context))
             }
             return CacheStorage
         }
