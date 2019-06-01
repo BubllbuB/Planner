@@ -3,7 +3,6 @@ package com.example.planner.storages
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import com.google.android.gms.tasks.OnCompleteListener
@@ -13,6 +12,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -23,7 +23,6 @@ internal object FirebaseStorage : Storage {
 
     private val database = FirebaseDatabase.getInstance()
     private val dbReference = database.reference.child("tasks")
-    private val dbFunctions = FirebaseFunctions.getInstance()
 
     fun init(context: WeakReference<Context>): FirebaseStorage {
         FirebaseInstanceId.getInstance().instanceId
@@ -32,12 +31,9 @@ internal object FirebaseStorage : Storage {
                     Log.w(TAG, "getInstanceId failed", task.exception)
                     return@OnCompleteListener
                 }
-
-                val token = task.result?.token
-                Toast.makeText(context.get(), token, Toast.LENGTH_SHORT).show()
-                Log.d(TAG, "Token: $token")
             })
-
+        FirebaseFunctions.getInstance()
+        FirebaseMessaging.getInstance().subscribeToTopic("tasks-notifications")
         return this
     }
 

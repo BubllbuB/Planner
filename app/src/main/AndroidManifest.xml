@@ -35,6 +35,13 @@
             </intent-filter>
         </service>
 
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_icon"
+                android:resource="@mipmap/ic_launcher" />
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_color"
+                android:resource="@color/colorPrimaryDark" />
+
         <provider
                 android:name="android.support.v4.content.FileProvider"
                 android:authorities=".provider"

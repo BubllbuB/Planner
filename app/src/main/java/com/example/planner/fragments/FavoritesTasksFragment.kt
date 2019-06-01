@@ -9,7 +9,7 @@ import com.example.planner.R
 import com.example.planner.adapter.TaskArrayAdapter
 import com.example.planner.enums.TaskKey
 import com.example.planner.task.Task
-import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.fragment_fav_tasks.*
 
 class FavoritesTasksFragment : ListFragment() {
 

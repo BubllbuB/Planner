@@ -42,6 +42,8 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        val intent = intent
+
         presenter.onSetContent(savedInstanceState)
 
         init()
