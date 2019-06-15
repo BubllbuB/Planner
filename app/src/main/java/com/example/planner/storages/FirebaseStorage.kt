@@ -1,8 +1,10 @@
 package com.example.planner.storages
 
-import android.content.ContentValues.TAG
 import android.content.Context
-import android.util.Log
+import android.content.res.Resources
+import android.net.ConnectivityManager
+import com.example.planner.R
+import com.example.planner.observer.ErrorObserver
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import com.google.android.gms.tasks.OnCompleteListener
@@ -20,24 +22,32 @@ import java.util.*
 internal object FirebaseStorage : Storage {
     private var taskMap = sortedMapOf<Int, Task>()
     private val observers: MutableList<StorageObserver> = ArrayList()
+    private val errorObservers: MutableList<ErrorObserver> = ArrayList()
 
     private val database = FirebaseDatabase.getInstance()
     private val dbReference = database.reference.child("tasks")
+    private lateinit var connectManager: ConnectivityManager
+    private lateinit var res: Resources
 
     fun init(context: WeakReference<Context>): FirebaseStorage {
         FirebaseInstanceId.getInstance().instanceId
             .addOnCompleteListener(OnCompleteListener { task ->
                 if (!task.isSuccessful) {
-                    Log.w(TAG, "getInstanceId failed", task.exception)
                     return@OnCompleteListener
                 }
             })
+        res = context.get()?.resources!!
+        connectManager = context.get()?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        dbReference.keepSynced(true)
+
         FirebaseFunctions.getInstance()
         FirebaseMessaging.getInstance().subscribeToTopic("tasks-notifications")
         return this
     }
 
     override fun addTask(task: Task) {
+        checkConnection(res.getString(R.string.networkErrorBack), false)
+
         var lastId = -1
 
         val lastQuery = dbReference.orderByKey().limitToLast(1)
@@ -51,9 +61,13 @@ internal object FirebaseStorage : Storage {
 
                 dbReference.child(task.id.toString()).setValue(
                     task
-                ) { _, _ ->
+                ) { databaseError, _ ->
                     taskMap[task.id] = task
                     notifyObservers(taskMap)
+
+                    if (databaseError != null) {
+
+                    }
                 }
             }
 
@@ -62,6 +76,8 @@ internal object FirebaseStorage : Storage {
     }
 
     override fun removeTask(task: Task) {
+        checkConnection(res.getString(R.string.networkErrorSimple), false)
+
         dbReference.child(task.id.toString())
             .removeValue { _, _ ->
                 taskMap.remove(task.id)
@@ -70,6 +86,9 @@ internal object FirebaseStorage : Storage {
     }
 
     override fun editTask(task: Task) {
+
+        checkConnection(res.getString(R.string.networkErrorBack), false)
+
         val updateMap = mutableMapOf<String, Any?>()
         updateMap["title"] = task.title
         updateMap["description"] = task.description
@@ -84,23 +103,21 @@ internal object FirebaseStorage : Storage {
     }
 
     override fun getList() {
-        if (taskMap.isEmpty()) {
-            dbReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    for (postSnapshot in dataSnapshot.children) {
-                        val task = postSnapshot.getValue(Task::class.java)
-                        taskMap[task?.id] = task
-                    }
-                    notifyObservers(taskMap)
-                }
+        checkConnection(res.getString(R.string.networkErrorReload), true)
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    throw databaseError.toException()
+        dbReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (postSnapshot in dataSnapshot.children) {
+                    val task = postSnapshot.getValue(Task::class.java)
+                    taskMap[task?.id] = task
                 }
-            })
-        } else {
-            notifyObservers(taskMap)
-        }
+                notifyObservers(taskMap)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                throw databaseError.toException()
+            }
+        })
     }
 
     override fun addObserver(observer: StorageObserver) {
@@ -113,5 +130,24 @@ internal object FirebaseStorage : Storage {
 
     private fun notifyObservers(tasks: Map<Int, Task>) {
         observers.forEach { it.onUpdateMap(tasks) }
+    }
+
+    override fun addErrorObserver(observer: ErrorObserver) {
+        errorObservers.add(observer)
+    }
+
+    override fun removeErrorObserver(observer: ErrorObserver) {
+        errorObservers.remove(observer)
+    }
+
+    private fun notifyErrorObservers(message: String, reload: Boolean) {
+        errorObservers.forEach { it.showError(message, reload) }
+    }
+
+    private fun checkConnection(message: String, reload: Boolean) {
+        val activeNetwork = connectManager.activeNetworkInfo
+        if (activeNetwork == null || !activeNetwork.isConnected) {
+            notifyErrorObservers(message, reload)
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.planner.storages
 
+import com.example.planner.observer.ErrorObserver
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import java.util.*
@@ -39,5 +40,11 @@ internal object CacheStorage : Storage {
 
     private fun notifyObservers(tasks: Map<Int, Task>) {
         observers.forEach { it.onUpdateMap(tasks) }
+    }
+
+    override fun addErrorObserver(observer: ErrorObserver) {
+    }
+
+    override fun removeErrorObserver(observer: ErrorObserver) {
     }
 }

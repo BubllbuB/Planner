@@ -1,6 +1,7 @@
 package com.example.planner
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
@@ -41,8 +42,6 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-        val intent = intent
 
         presenter.onSetContent(savedInstanceState)
 
@@ -88,11 +87,14 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
 
     override fun onAttachFragment(fragment: Fragment?) {
         super.onAttachFragment(fragment)
-        if (fragment is SettingsFragment) {
-            fragment.setFragmentListener(this)
-        } else if (fragment is AddTaskFragment) {
-            fragment.setFragmentListener(this)
+        when (fragment) {
+            is SettingsFragment -> fragment.setFragmentListener(this)
+            is AddTaskFragment -> fragment.setFragmentListener(this)
         }
+    }
+
+    fun checkBundle(): Intent {
+        return intent
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -142,10 +144,8 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
 
             if (permissionWrite != PackageManager.PERMISSION_GRANTED) {
                 makeRequest()
-            } else {
-                //presenter.getTasksList()
             }
-        } else if(pref.getBoolean(STORAGE_TYPE_FIREBASE, false)) {
+        } else if (pref.getBoolean(STORAGE_TYPE_FIREBASE, false)) {
             val permissionInternet = ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.INTERNET
@@ -153,11 +153,7 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
 
             if (permissionInternet != PackageManager.PERMISSION_GRANTED) {
                 makeRequest()
-            } else {
-                //presenter.getTasksList()
             }
-        } else {
-            //presenter.getTasksList()
         }
     }
 
@@ -188,9 +184,6 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
                 editor.putBoolean(STORAGE_TYPE_EXTERNAL, false)
                 editor.apply()
                 Toast.makeText(this@MainActivity, R.string.error_external_permission, Toast.LENGTH_SHORT).show()
-                //presenter.getTasksList()
-            } else {
-                //presenter.getTasksList()
             }
         }
     }

@@ -3,6 +3,8 @@ package com.example.planner.fragments
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
+import android.support.design.widget.Snackbar
 import android.support.v4.app.LoaderManager
 import android.text.Editable
 import android.text.TextWatcher
@@ -20,6 +22,8 @@ import com.example.planner.presenters.TaskPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
 import kotlinx.android.synthetic.main.fragment_add_task.*
+import java.util.*
+import kotlin.concurrent.schedule
 
 
 const val FRAME_RECREATE = "frameRecreate"
@@ -186,23 +190,36 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
         super.onStart()
         presenter.updateFields(requireContext(), LoaderManager.getInstance(this))
         presenter.onStart()
+        presenter.onSubscribeError()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         presenter.onStop()
         mListener.setupActionBar(getString(R.string.mainToolbarTitle))
+        presenter.onUnsubscribeError()
+    }
+
+    override fun onError(message: String, reload: Boolean) {
+        if (requireContext().resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            val coordinatorLayout = requireActivity().findViewById<ConstraintLayout>(R.id.addTask_fragment_layout)
+            Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show()
+
+            Timer("BackStack", false).schedule(2500) {
+                activity?.supportFragmentManager?.popBackStack()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
-        if(this.isVisible) {
+        if (this.isVisible) {
             inflater.inflate(R.menu.toolbar, menu)
         }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?) {
-        if(!this.isVisible) {
+        if (!this.isVisible) {
             menu?.clear()
         }
         super.onPrepareOptionsMenu(menu)

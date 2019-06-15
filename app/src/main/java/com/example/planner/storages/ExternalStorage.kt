@@ -8,6 +8,7 @@ import com.example.planner.asyncLoaders.ExternalLoader
 import com.example.planner.asyncLoaders.ExternalWriter
 import com.example.planner.enums.TaskAction
 import com.example.planner.enums.TaskKey
+import com.example.planner.observer.ErrorObserver
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import java.lang.ref.WeakReference
@@ -97,5 +98,11 @@ internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
 
     private fun notifyObservers(tasks: Map<Int, Task>) {
         observers.forEach { it.onUpdateMap(tasks) }
+    }
+
+    override fun addErrorObserver(observer: ErrorObserver) {
+    }
+
+    override fun removeErrorObserver(observer: ErrorObserver) {
     }
 }

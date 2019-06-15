@@ -37,4 +37,7 @@
     <string name="notificationTitleRemove">Remove task</string>
     <string name="notificationDescriptionMore">Click for details</string>
     <string name="notificationDescriptionClose">Click for remove notification</string>
+    <string name="networkErrorReload">Network error. Selected database storage.</string>
+    <string name="networkErrorBack">Network error. Back to main screen.</string>
+    <string name="networkErrorSimple">Network error. Try later.</string>
 </resources>

@@ -8,6 +8,7 @@ import com.example.planner.asyncLoaders.SharedLoader
 import com.example.planner.asyncLoaders.SharedWriter
 import com.example.planner.enums.TaskAction
 import com.example.planner.enums.TaskKey
+import com.example.planner.observer.ErrorObserver
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import java.lang.ref.WeakReference
@@ -98,5 +99,11 @@ internal object SharedPreferencesStorage : Storage, LoaderManager.LoaderCallback
 
     private fun notifyObservers(tasks: Map<Int, Task>) {
         observers.forEach { it.onUpdateMap(tasks) }
+    }
+
+    override fun addErrorObserver(observer: ErrorObserver) {
+    }
+
+    override fun removeErrorObserver(observer: ErrorObserver) {
     }
 }

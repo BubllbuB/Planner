@@ -14,8 +14,6 @@ import com.example.planner.task.Task
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
-
-const val INTENT_ACTIVITY_NAME = "android.intent.action.MAIN"
 const val CHANNEL_ID = "notification_channel_id"
 
 class FirebasePushService : FirebaseMessagingService() {
@@ -60,11 +58,14 @@ class FirebasePushService : FirebaseMessagingService() {
             .setGroupSummary(true)
             .setAutoCancel(true)
 
-
-        val intent = Intent(this, MainActivity::class.java)
-        if (action != "remove") {
-            intent.putExtra("task", task)
+        val intent = if (action != "remove") {
+            Intent(this, MainActivity::class.java)
+        } else {
+            Intent()
         }
+
+        intent.putExtra("task", task)
+
         intent.putExtra("action", action)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -73,7 +74,6 @@ class FirebasePushService : FirebaseMessagingService() {
             PendingIntent.FLAG_ONE_SHOT
         )
         notificationBuilder.setContentIntent(resultPendingIntent)
-
 
         val mNotificationId = 1
         val mNotifyMgr = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

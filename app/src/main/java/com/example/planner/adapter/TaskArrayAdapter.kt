@@ -190,6 +190,16 @@ class TaskArrayAdapter(
         popup.show()
     }
 
+    fun setSelectedTask(task: Task) {
+        val position = taskList.indexOfFirst { it.id == task.id }
+        val offset = getOffset(posHeadOther, position, taskList[0].favorite)
+
+        val adapterPos = position+offset
+
+        presenter.updateAdapterPosition(adapterPos)
+        presenter.editTask(taskList[position])
+    }
+
     private inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var titleTextView: TextView? = view.findViewById(R.id.listTaskTitle)
         var descriptionTextView: TextView? = view.findViewById(R.id.listTaskDescription)

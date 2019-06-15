@@ -6,6 +6,7 @@ import android.support.v4.app.LoaderManager
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.example.planner.enums.TaskAction
+import com.example.planner.observer.ErrorObserver
 import com.example.planner.observer.StorageObserver
 import com.example.planner.storages.Storage
 import com.example.planner.storages.StorageFactory
@@ -15,6 +16,7 @@ import com.example.planner.viewer.AddView
 @InjectViewState
 class TaskPresenter(private var context: Context, private var loaderManager: LoaderManager) :
     StorageObserver,
+    ErrorObserver,
     MvpPresenter<AddView>() {
     private var storage: Storage = StorageFactory.getStorage(context, loaderManager)
     private var userSelected = false
@@ -28,6 +30,12 @@ class TaskPresenter(private var context: Context, private var loaderManager: Loa
 
     override fun onUpdateMap(map: Map<Int, Task>) {
         viewState.onTaskSaveSuccess()
+    }
+
+    override fun reloadStorage() { }
+
+    override fun showError(error: String, reload: Boolean) {
+        viewState.onError(error, false)
     }
 
     fun updateTask(action: TaskAction, task: Task) {
@@ -50,6 +58,14 @@ class TaskPresenter(private var context: Context, private var loaderManager: Loa
 
     fun onStop() {
         storage.removeObserver(this)
+    }
+
+    fun onSubscribeError() {
+        storage.addErrorObserver(this)
+    }
+
+    fun onUnsubscribeError() {
+        storage.removeErrorObserver(this)
     }
 
     fun onSetTitle(title: String, startPos: Int, endPos: Int) {

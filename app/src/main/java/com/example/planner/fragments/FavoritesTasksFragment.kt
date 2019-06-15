@@ -28,6 +28,9 @@ class FavoritesTasksFragment : ListFragment() {
         return bundle
     }
 
+    override fun checkNotificationDetails() {
+    }
+
     override fun savePosition(position: Int) {
         val bundlePosition = Bundle()
         bundlePosition.putInt(ADAPTER_POSITION_FAV, position)

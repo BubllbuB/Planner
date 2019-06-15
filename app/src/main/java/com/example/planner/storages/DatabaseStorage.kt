@@ -8,6 +8,7 @@ import com.example.planner.asyncLoaders.DatabaseLoader
 import com.example.planner.asyncLoaders.DatabaseWriter
 import com.example.planner.enums.TaskAction
 import com.example.planner.enums.TaskKey
+import com.example.planner.observer.ErrorObserver
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import java.lang.ref.WeakReference
@@ -96,5 +97,11 @@ internal object DatabaseStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
 
     private fun notifyObservers(tasks: Map<Int, Task>) {
         observers.forEach { it.onUpdateMap(tasks) }
+    }
+
+    override fun addErrorObserver(observer: ErrorObserver) {
+    }
+
+    override fun removeErrorObserver(observer: ErrorObserver) {
     }
 }

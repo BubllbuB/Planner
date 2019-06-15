@@ -7,6 +7,7 @@ import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.example.planner.enums.TaskAction
 import com.example.planner.fragments.StartingPositionChecker
+import com.example.planner.observer.ErrorObserver
 import com.example.planner.observer.StorageObserver
 import com.example.planner.storages.Storage
 import com.example.planner.storages.StorageFactory
@@ -17,15 +18,16 @@ import com.example.planner.viewer.MainView
 class MainPresenter(
     private var context: Context,
     private var loaderManager: LoaderManager
-) : StorageObserver, MvpPresenter<MainView>() {
-    private var storage: Storage = StorageFactory.getStorage(context, loaderManager)
-    private var typeStorage = storage.javaClass
+) : StorageObserver, ErrorObserver, MvpPresenter<MainView>() {
+    private lateinit var storage: Storage
+    private lateinit var typeStorage: Class<Storage>
 
 
     fun updateFields(context: Context, loaderManager: LoaderManager) {
         this.context = context
         this.loaderManager = loaderManager
-        this.storage = StorageFactory.getStorage(context, loaderManager)
+        storage = StorageFactory.getStorage(context, loaderManager)
+        typeStorage = storage.javaClass
     }
 
     override fun onUpdateMap(map: Map<Int, Task>) {
@@ -34,16 +36,25 @@ class MainPresenter(
         if (StartingPositionChecker.isNotSetStartPosition) {
             setStartAdapterPosition()
         }
+
+        viewState.checkNotificationDetails()
+    }
+
+    override fun showError(error: String, reload: Boolean) {
+        viewState.onError(error, reload)
+    }
+
+    override fun reloadStorage() {
+        viewState.onReloadStorage()
     }
 
     fun getTasksList() {
         if (storage.javaClass != typeStorage) {
             StartingPositionChecker.isNotSetStartPosition = true
         }
-        if (StartingPositionChecker.isNotSetStartPosition) {
-            viewState.showProgressBars()
-            storage.getList()
-        }
+
+        viewState.showProgressBars()
+        storage.getList()
     }
 
     fun updateTask(action: TaskAction, task: Task) {
@@ -59,7 +70,7 @@ class MainPresenter(
     }
 
     private fun setStartAdapterPosition() {
-        if(context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             StartingPositionChecker.isNotSetStartPosition = false
             typeStorage = storage.javaClass
             viewState.setAdapterStartPosition()
@@ -80,7 +91,19 @@ class MainPresenter(
         storage.removeObserver(this)
     }
 
+    fun onSubscribeError() {
+        storage.addErrorObserver(this)
+    }
+
+    fun onUnsubscribeError() {
+        storage.removeErrorObserver(this)
+    }
+
     fun editTask(task: Task) {
         viewState.editSelectedTask(task)
+    }
+
+    fun onNotificationDetails(task: Task) {
+        viewState.showDetails(task)
     }
 }
