@@ -22,6 +22,7 @@ import java.util.*
 internal object FirebaseStorage : Storage {
     private var taskMap = sortedMapOf<Int, Task>()
     private val observers: MutableList<StorageObserver> = ArrayList()
+    private var actualObservers: MutableList<StorageObserver> = ArrayList()
     private val errorObservers: MutableList<ErrorObserver> = ArrayList()
 
     private val database = FirebaseDatabase.getInstance()
@@ -104,6 +105,8 @@ internal object FirebaseStorage : Storage {
 
     override fun getList() {
         checkConnection(res.getString(R.string.networkErrorReload), true)
+
+        actualObservers = observers
 
         dbReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {

@@ -56,7 +56,7 @@ class AllTasksFragment : ListFragment() {
         val activity = requireActivity() as MainActivity
         val intentActivity = activity.checkBundle()
 
-        if (intentActivity.extras != null && !intentActivity.hasExtra("DONE")) {
+        if (intentActivity.extras != null && !intentActivity.hasExtra("DONE") && intentActivity.hasExtra("task")) {
             val task = intentActivity.getParcelableExtra<Task>("task")
             intentActivity.putExtra("DONE", 0)
             presenter.onNotificationDetails(task)
