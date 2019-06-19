@@ -1,7 +1,6 @@
 package com.example.planner.storages
 
 import android.content.Context
-import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.LoaderManager
 import android.support.v7.preference.PreferenceManager
 import java.lang.ref.WeakReference

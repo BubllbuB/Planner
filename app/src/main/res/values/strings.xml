@@ -40,4 +40,5 @@
     <string name="networkErrorReload">Network error. Selected database storage.</string>
     <string name="networkErrorBack">Network error. Back to main screen.</string>
     <string name="networkErrorSimple">Network error. Try later.</string>
+    <string name="SaveButton">save</string>
 </resources>

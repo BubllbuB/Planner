@@ -9,7 +9,6 @@ import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.example.planner.FRAGMENT_TAG_ADDTASK
-import com.example.planner.MainActivity
 import com.example.planner.R
 import com.example.planner.adapter.TaskArrayAdapter
 import com.example.planner.presenters.MainPresenter
