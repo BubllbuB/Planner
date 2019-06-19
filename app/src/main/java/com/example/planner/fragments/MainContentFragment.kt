@@ -1,16 +1,13 @@
 package com.example.planner.fragments
 
-import android.content.ContentValues
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.design.widget.TabLayout
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.arellomobile.mvp.MvpAppCompatFragment
-import com.example.planner.FRAGMENT_TAG_ADDTASK
 import com.example.planner.FRAGMENT_TAG_ADD_TASK
 import com.example.planner.R
 import com.example.planner.adapter.TabAdapter
@@ -20,10 +17,6 @@ import kotlinx.android.synthetic.main.fragment_main.*
 const val ID_FAV_TAB = 1
 
 class MainContentFragment : MvpAppCompatFragment() {
-
-    init {
-        Log.d(ContentValues.TAG, "init")
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main, container, false)
@@ -49,17 +42,19 @@ class MainContentFragment : MvpAppCompatFragment() {
     private fun init() {
         val tabAdapter = TabAdapter(childFragmentManager)
 
-        val fragmentAllTasks = childFragmentManager.findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + 0) as ListFragment?
-        val fragmentFavTasks = childFragmentManager.findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + 1) as ListFragment?
+        val fragmentAllTasks =
+            childFragmentManager.findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + 0) as ListFragment?
+        val fragmentFavTasks =
+            childFragmentManager.findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + 1) as ListFragment?
 
-        val allTaskFragment = if(fragmentAllTasks != null && fragmentAllTasks.adapterExist()) {
+        val allTaskFragment = if (fragmentAllTasks != null && fragmentAllTasks.adapterExist()) {
             fragmentAllTasks
         } else {
             AllTasksFragment()
         }
 
 
-        val favTaskFragment = if(fragmentFavTasks != null && fragmentFavTasks.adapterExist()) {
+        val favTaskFragment = if (fragmentFavTasks != null && fragmentFavTasks.adapterExist()) {
             fragmentFavTasks
         } else {
             FavoritesTasksFragment()

@@ -130,8 +130,10 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
             presenter.onRestore()
         } else if (isRecreated) {
             task = bundle?.getParcelable(TaskKey.KEY_TASK.getKey())
-            bundle?.putBoolean(FRAME_RECREATE, false)
+            action = bundle?.getSerializable(TaskKey.KEY_ACTION.getKey()) as TaskAction
+            bundle.putBoolean(FRAME_RECREATE, false)
         }
+        setTitle()
 
         presenter.onFirstInit()
     }
@@ -147,13 +149,7 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
 
             action = TaskAction.ACTION_EDIT
         }
-
-        val title =
-            if (action == TaskAction.ACTION_ADD) getString(R.string.addTaskToolbarTitle)
-            else getString(R.string.editTaskToolbarTitle)
-
-        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
-            mListener.setupActionBar(title, R.drawable.ic_arrow_back)
+        setTitle()
     }
 
     override fun addFragment() {
@@ -171,6 +167,7 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
 
     private fun duplicateFragment(): AddTaskFragment {
         task = this.arguments?.getParcelable(TaskKey.KEY_TASK.getKey())
+        if(task != null) action = TaskAction.ACTION_EDIT
         val oldState = requireActivity().supportFragmentManager.saveFragmentInstanceState(this)
         val dupFragment = AddTaskFragment()
         dupFragment.setInitialSavedState(oldState)
@@ -181,9 +178,20 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
         val newBundle = Bundle()
         newBundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
         newBundle.putBoolean(FRAME_RECREATE, true)
+        newBundle.putSerializable(TaskKey.KEY_ACTION.getKey(), action)
         dupFragment.arguments = newBundle
 
         return dupFragment
+    }
+
+    private fun setTitle() {
+        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            val title =
+                if (action == TaskAction.ACTION_ADD) getString(R.string.addTaskToolbarTitle)
+                else getString(R.string.editTaskToolbarTitle)
+
+            mListener.setupActionBar(title, R.drawable.ic_arrow_back)
+        }
     }
 
     override fun onStart() {

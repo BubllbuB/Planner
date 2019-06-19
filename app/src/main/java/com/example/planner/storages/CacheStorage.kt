@@ -10,24 +10,41 @@ internal object CacheStorage : Storage {
     private var taskId = 0
     private val observers: MutableList<StorageObserver> = ArrayList()
 
+    private var actualObserversGet: MutableList<StorageObserver> = ArrayList()
+    private var actualObserversAdd: MutableList<StorageObserver> = ArrayList()
+    private var actualObserversEdit: MutableList<StorageObserver> = ArrayList()
+    private var actualObserversRemove: MutableList<StorageObserver> = ArrayList()
+
     override fun addTask(task: Task) {
+        actualObserversAdd.clear()
+        actualObserversAdd.addAll(observers)
+
         task.id = taskId++
         tasksList[task.id] = task
-        notifyObservers(tasksList)
+        notifyObservers(tasksList, actualObserversAdd)
     }
 
     override fun removeTask(task: Task) {
+        actualObserversRemove.clear()
+        actualObserversRemove.addAll(observers)
+
         tasksList.remove(task.id)
-        notifyObservers(tasksList)
+        notifyObservers(tasksList, actualObserversRemove)
     }
 
     override fun editTask(task: Task) {
+        actualObserversEdit.clear()
+        actualObserversEdit.addAll(observers)
+
         tasksList[task.id] = task
-        notifyObservers(tasksList)
+        notifyObservers(tasksList, actualObserversEdit)
     }
 
     override fun getList() {
-        notifyObservers(tasksList)
+        actualObserversGet.clear()
+        actualObserversGet.addAll(observers)
+
+        notifyObservers(tasksList, actualObserversGet)
     }
 
     override fun addObserver(observer: StorageObserver) {
@@ -36,9 +53,13 @@ internal object CacheStorage : Storage {
 
     override fun removeObserver(observer: StorageObserver) {
         observers.remove(observer)
+        actualObserversGet.remove(observer)
+        actualObserversAdd.remove(observer)
+        actualObserversEdit.remove(observer)
+        actualObserversRemove.remove(observer)
     }
 
-    private fun notifyObservers(tasks: Map<Int, Task>) {
+    private fun notifyObservers(tasks: Map<Int, Task>, observers: MutableList<StorageObserver>) {
         observers.forEach { it.onUpdateMap(tasks) }
     }
 

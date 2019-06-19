@@ -4,7 +4,10 @@ import android.content.Context
 import android.os.Environment
 import android.support.v4.content.AsyncTaskLoader
 import com.example.planner.enums.TaskAction
+import com.example.planner.storages.EXTERNAL_ADD_TAG
+import com.example.planner.storages.EXTERNAL_EDIT_TAG
 import com.example.planner.storages.EXTERNAL_FILE_TASKS
+import com.example.planner.storages.EXTERNAL_REMOVE_TAG
 import com.example.planner.task.Task
 import com.google.gson.Gson
 import java.io.File
@@ -17,9 +20,9 @@ class ExternalWriter(
     private var task: Task?,
     private val action: TaskAction,
     private val tasks: SortedMap<Int, Task>
-) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {
+) : AsyncTaskLoader<Pair<SortedMap<Int, Task>, String>>(context) {
 
-    override fun loadInBackground(): SortedMap<Int, Task>? {
+    override fun loadInBackground(): Pair<SortedMap<Int, Task>, String>? {
         val file = File(
             Environment.getExternalStorageDirectory(), EXTERNAL_FILE_TASKS
         )
@@ -46,6 +49,16 @@ class ExternalWriter(
         osw.flush()
         osw.close()
 
-        return tasks
+        return when (action) {
+            TaskAction.ACTION_ADD -> {
+                Pair(tasks, EXTERNAL_ADD_TAG)
+            }
+            TaskAction.ACTION_REMOVE -> {
+                Pair(tasks, EXTERNAL_REMOVE_TAG)
+            }
+            else -> {
+                Pair(tasks, EXTERNAL_EDIT_TAG)
+            }
+        }
     }
 }

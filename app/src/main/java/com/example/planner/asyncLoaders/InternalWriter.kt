@@ -3,7 +3,10 @@ package com.example.planner.asyncLoaders
 import android.content.Context
 import android.support.v4.content.AsyncTaskLoader
 import com.example.planner.enums.TaskAction
+import com.example.planner.storages.INTERNAL_ADD_TAG
+import com.example.planner.storages.INTERNAL_EDIT_TAG
 import com.example.planner.storages.INTERNAL_FILE_TASKS
+import com.example.planner.storages.INTERNAL_REMOVE_TAG
 import com.example.planner.task.Task
 import com.google.gson.Gson
 import java.io.OutputStreamWriter
@@ -14,9 +17,9 @@ class InternalWriter(
     private var task: Task?,
     private val action: TaskAction,
     private val tasks: SortedMap<Int, Task>
-) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {
+) : AsyncTaskLoader<Pair<SortedMap<Int, Task>, String>>(context) {
 
-    override fun loadInBackground(): SortedMap<Int, Task>? {
+    override fun loadInBackground(): Pair<SortedMap<Int, Task>, String>? {
         val osw = OutputStreamWriter(context.openFileOutput(INTERNAL_FILE_TASKS, 0))
 
         val lastId = if (tasks.isEmpty()) 0 else tasks.lastKey()
@@ -40,6 +43,16 @@ class InternalWriter(
         osw.flush()
         osw.close()
 
-        return tasks
+        return when (action) {
+            TaskAction.ACTION_ADD -> {
+                Pair(tasks, INTERNAL_ADD_TAG)
+            }
+            TaskAction.ACTION_REMOVE -> {
+                Pair(tasks, INTERNAL_REMOVE_TAG)
+            }
+            else -> {
+                Pair(tasks, INTERNAL_EDIT_TAG)
+            }
+        }
     }
 }
