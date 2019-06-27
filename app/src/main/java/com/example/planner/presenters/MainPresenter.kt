@@ -79,7 +79,6 @@ class MainPresenter(
 
     fun updateAdapterPosition(position: Int) {
         StartingPositionChecker.isNotSetStartPosition = false
-        StartingPositionChecker.isNotUserSetPosition = false
         viewState.setAdapterSelectedPosition(position)
     }
 

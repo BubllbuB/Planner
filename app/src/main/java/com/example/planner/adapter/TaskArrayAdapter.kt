@@ -34,7 +34,6 @@ class TaskArrayAdapter(
     private var posHeadOther = -1
     private var selectedPosition = -1
 
-
     override fun getItemCount(): Int {
         return if (taskList.isNotEmpty()) {
             if (taskList[0].favorite && posHeadOther > 0) {
@@ -58,44 +57,51 @@ class TaskArrayAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder.itemViewType == ID_HEADER) {
-            val vh = holder as ViewHolderHeader
-
-            if (position == 0) {
-                vh.headerTextView?.text = TITLE_FAVORITE
-            } else {
-                vh.headerTextView?.text = TITLE_OTHERS
-            }
+            onBindHeaderView(holder, position)
         } else {
-            val vh = holder as ViewHolder
-            val offset = getOffset(posHeadOther, position, taskList[0].favorite)
+            onBindElementView(holder, position)
+        }
+    }
 
-            vh.titleTextView?.text = taskList[vh.adapterPosition - offset].title
-            vh.descriptionTextView?.text = taskList[vh.adapterPosition - offset].description
+    private fun onBindHeaderView(holder: RecyclerView.ViewHolder, position: Int) {
+        val vh = holder as ViewHolderHeader
 
-            if (taskList[vh.adapterPosition - offset].done) {
-                vh.titleTextView?.paintFlags = ((vh.titleTextView?.paintFlags ?: 0)
-                        or (Paint.STRIKE_THRU_TEXT_FLAG))
-                vh.descriptionTextView?.paintFlags = ((vh.descriptionTextView?.paintFlags ?: 0)
-                        or (Paint.STRIKE_THRU_TEXT_FLAG))
-            } else {
-                vh.titleTextView?.paintFlags = 0
-                vh.descriptionTextView?.paintFlags = 0
-            }
+        if (position == 0) {
+            vh.headerTextView?.text = TITLE_FAVORITE
+        } else {
+            vh.headerTextView?.text = TITLE_OTHERS
+        }
+    }
 
-            vh.moreImageView?.setOnClickListener {
-                showPopup(context, it, vh.adapterPosition)
-            }
-            //selectable item
-            if (selectedPosition < 0) {
-                selectedPosition = vh.adapterPosition
-            }
+    private fun onBindElementView(holder: RecyclerView.ViewHolder, position: Int) {
+        val vh = holder as ViewHolder
+        val offset = getOffset(posHeadOther, position, taskList[0].favorite)
 
-            if (selectedPosition == position) {
-                vh.cardView?.setBackgroundColor(Color.rgb(235, 233, 240))
-            } else {
-                vh.cardView?.setBackgroundColor(Color.WHITE)
-            }
+        vh.titleTextView?.text = taskList[vh.adapterPosition - offset].title
+        vh.descriptionTextView?.text = taskList[vh.adapterPosition - offset].description
 
+        if (taskList[vh.adapterPosition - offset].done) {
+            vh.titleTextView?.paintFlags = ((vh.titleTextView?.paintFlags ?: 0)
+                    or (Paint.STRIKE_THRU_TEXT_FLAG))
+            vh.descriptionTextView?.paintFlags = ((vh.descriptionTextView?.paintFlags ?: 0)
+                    or (Paint.STRIKE_THRU_TEXT_FLAG))
+        } else {
+            vh.titleTextView?.paintFlags = 0
+            vh.descriptionTextView?.paintFlags = 0
+        }
+
+        vh.moreImageView?.setOnClickListener {
+            showPopup(context, it, vh.adapterPosition)
+        }
+        //selectable item
+        if (selectedPosition < 0) {
+            selectedPosition = vh.adapterPosition
+        }
+
+        if (selectedPosition == position) {
+            vh.cardView?.setBackgroundColor(Color.rgb(235, 233, 240))
+        } else {
+            vh.cardView?.setBackgroundColor(Color.WHITE)
         }
     }
 
@@ -129,25 +135,25 @@ class TaskArrayAdapter(
         }
     }
 
+    fun getSelectedPosition(): Int = selectedPosition
+
     fun setSelectedStartedPosition() {
         if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && taskList.isNotEmpty()) {
-                val position = if (taskList[0].favorite) {
-                    if (posHeadOther > 0) {
-                        1
-                    } else {
-                        0
-                    }
+            val position = if (taskList[0].favorite) {
+                if (posHeadOther > 0) {
+                    1
                 } else {
                     0
                 }
-                val offset = getOffset(posHeadOther, position, taskList[0].favorite)
-                selectedPosition = position
-                presenter.editTask(taskList[position - offset])
+            } else {
+                0
+            }
+            val offset = getOffset(posHeadOther, position, taskList[0].favorite)
+            selectedPosition = position
+            presenter.editTask(taskList[position - offset])
 
         }
     }
-
-    fun getSelectedPosition(): Int = selectedPosition
 
     private fun showPopup(context: Context, view: View, position: Int) {
         val popup: PopupMenu?
@@ -193,7 +199,7 @@ class TaskArrayAdapter(
         val position = taskList.indexOfFirst { it.id == task.id }
         val offset = getOffset(posHeadOther, position, taskList[0].favorite)
 
-        val adapterPos = position+offset
+        val adapterPos = position + offset
 
         presenter.updateAdapterPosition(adapterPos)
         presenter.editTask(taskList[position])
@@ -212,7 +218,7 @@ class TaskArrayAdapter(
         }
     }
 
-    private class ViewHolderHeader(view: View) : RecyclerView.ViewHolder(view) {
+    private inner class ViewHolderHeader(view: View) : RecyclerView.ViewHolder(view) {
         var headerTextView: TextView? = view.findViewById(R.id.listHeader)
     }
 }

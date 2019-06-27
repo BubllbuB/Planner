@@ -28,7 +28,6 @@ import com.example.planner.viewer.ActivityView
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val CHECK_REQUEST = 3
-const val FRAGMENT_TAG_ADD_TASK = "FragmentAdd"
 const val FRAGMENT_TAG_CONTENT = "FragmentContent"
 const val FRAGMENT_TAG_ADDTASK = "FragmentAddTask"
 const val FRAGMENT_TAG_SETTINGS = "FragmentSettings"
@@ -99,7 +98,7 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            val addFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_ADD_TASK)
+            val addFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_ADDTASK)
             if (addFragment != null && addFragment.isVisible) {
                 supportFragmentManager.popBackStack()
                 return true

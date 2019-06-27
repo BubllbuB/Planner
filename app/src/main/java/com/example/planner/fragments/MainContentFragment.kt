@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.arellomobile.mvp.MvpAppCompatFragment
-import com.example.planner.FRAGMENT_TAG_ADD_TASK
+import com.example.planner.FRAGMENT_TAG_ADDTASK
 import com.example.planner.R
 import com.example.planner.adapter.TabAdapter
 import com.example.planner.enums.TaskKey
@@ -99,7 +99,7 @@ class MainContentFragment : MvpAppCompatFragment() {
                     .commit()
             } else {
                 requireActivity().supportFragmentManager.beginTransaction()
-                    .replace(R.id.content_fragments, fragment, FRAGMENT_TAG_ADD_TASK)
+                    .replace(R.id.content_fragments, fragment, FRAGMENT_TAG_ADDTASK)
                     .addToBackStack(null)
                     .commit()
             }
