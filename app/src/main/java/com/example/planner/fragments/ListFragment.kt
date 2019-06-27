@@ -3,17 +3,15 @@ package com.example.planner.fragments
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.LoaderManager
-import android.support.v7.preference.PreferenceManager
 import android.view.View
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.example.planner.FRAGMENT_TAG_ADDTASK
+import com.example.planner.MainActivity
 import com.example.planner.R
 import com.example.planner.adapter.TaskArrayAdapter
 import com.example.planner.presenters.MainPresenter
-import com.example.planner.storages.STORAGE_TYPE_DATABASE
-import com.example.planner.storages.STORAGE_TYPE_FIREBASE
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
 
@@ -48,7 +46,9 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
         if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             setNewAddFragment(fragmentArguments)
         } else if (fragmentAdd == null || !fragmentAdd.isAdded) {
-            setNewAddFragment(fragmentArguments)
+            if(!(requireActivity() as MainActivity).existAddFragment) {
+                setNewAddFragment(fragmentArguments)
+            }
         } else {
             fragmentAdd as AddTaskFragment
             fragmentAdd.arguments = fragmentArguments

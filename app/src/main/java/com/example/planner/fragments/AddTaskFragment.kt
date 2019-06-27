@@ -14,6 +14,7 @@ import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
 import com.example.planner.FRAGMENT_TAG_ADDTASK
+import com.example.planner.MainActivity
 import com.example.planner.R
 import com.example.planner.enums.TaskAction
 import com.example.planner.enums.TaskKey
@@ -65,6 +66,7 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
+        (requireActivity() as MainActivity).existAddFragment = true
         super.onCreate(savedInstanceState)
     }
 
@@ -167,7 +169,7 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
 
     private fun duplicateFragment(): AddTaskFragment {
         task = this.arguments?.getParcelable(TaskKey.KEY_TASK.getKey())
-        if(task != null) action = TaskAction.ACTION_EDIT
+        if (task != null) action = TaskAction.ACTION_EDIT
         val oldState = requireActivity().supportFragmentManager.saveFragmentInstanceState(this)
         val dupFragment = AddTaskFragment()
         dupFragment.setInitialSavedState(oldState)
@@ -203,6 +205,7 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
 
     override fun onDestroy() {
         super.onDestroy()
+        (requireActivity() as MainActivity).existAddFragment = true
         presenter.onStop()
         mListener.setupActionBar(getString(R.string.mainToolbarTitle))
         presenter.onUnsubscribeError()

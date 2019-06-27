@@ -36,6 +36,7 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
     ActivityView {
     @InjectPresenter
     lateinit var presenter: ActivityPresenter
+    var existAddFragment = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
