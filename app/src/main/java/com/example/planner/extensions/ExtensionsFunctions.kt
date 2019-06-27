@@ -17,10 +17,10 @@ fun Cursor.parseTask(): Task {
 }
 
 fun String.getTaskMap(): SortedMap<Int, Task> =
-    Gson().fromJson<SortedMap<Int, Task>>(this, object : TypeToken<SortedMap<Int, Task>>() {}.type)
+    Gson().fromJson(this, object : TypeToken<SortedMap<Int, Task>>() {}.type)
 
 
-fun String.getTask(): Task = Gson().fromJson<Task>(this, Task::class.java)
+fun String.getTask(): Task = Gson().fromJson(this, Task::class.java)
 
 fun getOffset(posHeadOther: Int, position: Int, firstFav: Boolean): Int {
     return if (posHeadOther in 1..position && firstFav) {

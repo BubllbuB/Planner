@@ -66,10 +66,10 @@ class TaskArrayAdapter(
     private fun onBindHeaderView(holder: RecyclerView.ViewHolder, position: Int) {
         val vh = holder as ViewHolderHeader
 
-        if (position == 0) {
-            vh.headerTextView?.text = TITLE_FAVORITE
+        vh.headerTextView?.text =  if (position == 0) {
+            TITLE_FAVORITE
         } else {
-            vh.headerTextView?.text = TITLE_OTHERS
+            TITLE_OTHERS
         }
     }
 
