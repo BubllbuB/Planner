@@ -3,6 +3,8 @@ package com.example.planner.fragments
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
+import android.support.design.widget.Snackbar
 import android.support.v4.app.LoaderManager
 import android.text.Editable
 import android.text.TextWatcher
@@ -20,6 +22,8 @@ import com.example.planner.presenters.TaskPresenter
 import com.example.planner.task.Task
 import com.example.planner.viewer.AddView
 import kotlinx.android.synthetic.main.fragment_add_task.*
+import java.util.*
+import kotlin.concurrent.schedule
 
 
 const val FRAME_RECREATE = "frameRecreate"
@@ -29,6 +33,7 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
     @InjectPresenter
     lateinit var presenter: TaskPresenter
     private var action = TaskAction.ACTION_ADD
+    private var task: Task? = null
 
     private val titleTextWatcher = object : TextWatcher {
         override fun afterTextChanged(p0: Editable?) {
@@ -99,16 +104,6 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
 
     private fun init(savedInstanceState: Bundle?) {
         val bundle = this.arguments
-        val task = bundle?.getParcelable<Task>(TaskKey.KEY_TASK.getKey())
-        if (task != null) action = TaskAction.ACTION_EDIT
-
-        val title =
-            if (action == TaskAction.ACTION_ADD) getString(R.string.addTaskToolbarTitle)
-            else getString(R.string.editTaskToolbarTitle)
-
-        taskTitleTextLayout.editText?.setText(task?.title)
-
-        taskDescriptionTextLayout.editText?.setText(task?.description)
 
         taskTitleTextLayout.editText?.setOnClickListener {
             taskTitleTextLayout.error = null
@@ -134,24 +129,36 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
         if (!isRecreated && savedInstanceState != null) {
             presenter.onRestore()
         } else if (isRecreated) {
-            bundle?.putBoolean(FRAME_RECREATE, false)
+            task = bundle?.getParcelable(TaskKey.KEY_TASK.getKey())
+            action = bundle?.getSerializable(TaskKey.KEY_ACTION.getKey()) as TaskAction
+            bundle.putBoolean(FRAME_RECREATE, false)
         }
+        setTitle()
 
-        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
-            mListener.setupActionBar(title, R.drawable.ic_arrow_back)
+        presenter.onFirstInit()
+    }
+
+    override fun setTask() {
+        val newTask = this.arguments?.getParcelable<Task>(TaskKey.KEY_TASK.getKey())
+
+        if (task?.id != newTask?.id) {
+            task = newTask
+
+            taskTitleTextLayout.editText?.setText(task?.title)
+            taskDescriptionTextLayout.editText?.setText(task?.description)
+
+            action = TaskAction.ACTION_EDIT
+        }
+        setTitle()
     }
 
     override fun addFragment() {
-        removeFragment()
-
         requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.edit_fragment, duplicateFragment())
+            .replace(R.id.edit_fragment, duplicateFragment(), FRAGMENT_TAG_ADDTASK)
             .commit()
     }
 
     override fun replaceFragment() {
-        removeFragment()
-
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.content_fragments, duplicateFragment(), FRAGMENT_TAG_ADDTASK)
             .addToBackStack(null)
@@ -159,38 +166,71 @@ class AddTaskFragment : MvpAppCompatFragment(), AddView {
     }
 
     private fun duplicateFragment(): AddTaskFragment {
-        val task = this.arguments?.getParcelable<Task>(TaskKey.KEY_TASK.getKey())
-
+        task = this.arguments?.getParcelable(TaskKey.KEY_TASK.getKey())
+        if(task != null) action = TaskAction.ACTION_EDIT
         val oldState = requireActivity().supportFragmentManager.saveFragmentInstanceState(this)
         val dupFragment = AddTaskFragment()
         dupFragment.setInitialSavedState(oldState)
+
+        requireActivity().supportFragmentManager.beginTransaction().remove(this).commit()
+        requireActivity().supportFragmentManager.popBackStack()
+
         val newBundle = Bundle()
         newBundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
         newBundle.putBoolean(FRAME_RECREATE, true)
+        newBundle.putSerializable(TaskKey.KEY_ACTION.getKey(), action)
         dupFragment.arguments = newBundle
 
         return dupFragment
     }
 
-    private fun removeFragment() {
-        requireActivity().supportFragmentManager.beginTransaction().remove(this).commit()
+    private fun setTitle() {
+        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            val title =
+                if (action == TaskAction.ACTION_ADD) getString(R.string.addTaskToolbarTitle)
+                else getString(R.string.editTaskToolbarTitle)
+
+            mListener.setupActionBar(title, R.drawable.ic_arrow_back)
+        }
     }
 
     override fun onStart() {
         super.onStart()
         presenter.updateFields(requireContext(), LoaderManager.getInstance(this))
         presenter.onStart()
+        presenter.onSubscribeError()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         presenter.onStop()
         mListener.setupActionBar(getString(R.string.mainToolbarTitle))
+        presenter.onUnsubscribeError()
+    }
+
+    override fun onError(message: String, reload: Boolean) {
+        if (requireContext().resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            val coordinatorLayout = requireActivity().findViewById<ConstraintLayout>(R.id.addTask_fragment_layout)
+            Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show()
+
+            Timer("BackStack", false).schedule(2500) {
+                activity?.supportFragmentManager?.popBackStack()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
-        inflater.inflate(R.menu.toolbar, menu)
+        if (this.isVisible) {
+            inflater.inflate(R.menu.toolbar, menu)
+        }
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?) {
+        if (!this.isVisible) {
+            menu?.clear()
+        }
+        super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -9,7 +9,7 @@ import com.example.planner.R
 import com.example.planner.adapter.TaskArrayAdapter
 import com.example.planner.enums.TaskKey
 import com.example.planner.task.Task
-import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.fragment_fav_tasks.*
 
 class FavoritesTasksFragment : ListFragment() {
 
@@ -22,15 +22,23 @@ class FavoritesTasksFragment : ListFragment() {
         taskFavListView.adapter = adapter
     }
 
-    override fun bundlePutPosition(task: Task?, position: Int): Bundle {
+    override fun bundlePutTask(task: Task?): Bundle {
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
-        bundle.putInt(ADAPTER_POSITION_FAV, position)
         return bundle
     }
 
-    override fun checkSavedPosition(bundle: Bundle?) {
-        bundle?.getInt(ADAPTER_POSITION_FAV)?.let {
+    override fun checkNotificationDetails() {
+    }
+
+    override fun savePosition(position: Int) {
+        val bundlePosition = Bundle()
+        bundlePosition.putInt(ADAPTER_POSITION_FAV, position)
+        this.arguments = bundlePosition
+    }
+
+    override fun checkSavedPosition() {
+        this.arguments?.getInt(ADAPTER_POSITION_FAV)?.let {
             presenter.updateAdapterPosition(it)
         }
     }

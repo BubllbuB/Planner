@@ -5,15 +5,16 @@ import android.support.v4.content.AsyncTaskLoader
 import com.example.planner.extensions.parseTask
 import com.example.planner.sqlhelper.DB_TABLE_NAME
 import com.example.planner.sqlhelper.StorageSQLiteOpenHelper
+import com.example.planner.storages.DATABASE_READ_TAG
 import com.example.planner.task.Task
 import java.util.*
 
 
-class DatabaseLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {
+class DatabaseLoader(context: Context) : AsyncTaskLoader<Pair<SortedMap<Int, Task>, String>>(context) {
     private var tasksList = sortedMapOf<Int, Task>()
     private val database = StorageSQLiteOpenHelper(context, DB_TABLE_NAME, null, 1)
 
-    override fun loadInBackground(): SortedMap<Int, Task>? {
+    override fun loadInBackground(): Pair<SortedMap<Int, Task>,String>? {
         val db = database.readableDatabase
         val cursor = db.rawQuery("select * from $DB_TABLE_NAME", null)
 
@@ -27,6 +28,6 @@ class DatabaseLoader(context: Context) : AsyncTaskLoader<SortedMap<Int, Task>>(c
         }
         cursor.close()
         db.close()
-        return tasksList
+        return Pair(tasksList, DATABASE_READ_TAG)
     }
 }

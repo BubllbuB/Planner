@@ -141,6 +141,7 @@ class TaskArrayAdapter(
                     0
                 }
                 val offset = getOffset(posHeadOther, position, taskList[0].favorite)
+                selectedPosition = position
                 presenter.editTask(taskList[position - offset])
 
         }
@@ -167,6 +168,7 @@ class TaskArrayAdapter(
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
             when (item!!.itemId) {
                 R.id.editTaskButton -> {
+                    presenter.updateAdapterPosition(position)
                     presenter.editTask(task)
                 }
                 R.id.removeTaskButton -> {
@@ -185,6 +187,16 @@ class TaskArrayAdapter(
         })
 
         popup.show()
+    }
+
+    fun setSelectedTask(task: Task) {
+        val position = taskList.indexOfFirst { it.id == task.id }
+        val offset = getOffset(posHeadOther, position, taskList[0].favorite)
+
+        val adapterPos = position+offset
+
+        presenter.updateAdapterPosition(adapterPos)
+        presenter.editTask(taskList[position])
     }
 
     private inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

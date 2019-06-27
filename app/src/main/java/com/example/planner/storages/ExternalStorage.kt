@@ -8,6 +8,7 @@ import com.example.planner.asyncLoaders.ExternalLoader
 import com.example.planner.asyncLoaders.ExternalWriter
 import com.example.planner.enums.TaskAction
 import com.example.planner.enums.TaskKey
+import com.example.planner.observer.ErrorObserver
 import com.example.planner.observer.StorageObserver
 import com.example.planner.task.Task
 import java.lang.ref.WeakReference
@@ -19,9 +20,19 @@ const val EXTERNAL_EDIT = 9
 const val EXTERNAL_REMOVE = 10
 const val EXTERNAL_ADD = 11
 
-internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedMap<Int, Task>> {
+const val EXTERNAL_READ_TAG = "get"
+const val EXTERNAL_EDIT_TAG = "edit"
+const val EXTERNAL_REMOVE_TAG = "remove"
+const val EXTERNAL_ADD_TAG = "add"
+
+internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<Pair<SortedMap<Int, Task>, String>> {
     private var taskMap = sortedMapOf<Int, Task>()
     private val observers: MutableList<StorageObserver> = ArrayList()
+
+    private var actualObserversGet: MutableList<StorageObserver> = ArrayList()
+    private var actualObserversAdd: MutableList<StorageObserver> = ArrayList()
+    private var actualObserversEdit: MutableList<StorageObserver> = ArrayList()
+    private var actualObserversRemove: MutableList<StorageObserver> = ArrayList()
 
     private lateinit var context: WeakReference<Context>
     private lateinit var loaderManager: LoaderManager
@@ -33,7 +44,7 @@ internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
         return this
     }
 
-    override fun onCreateLoader(id: Int, bundle: Bundle?): Loader<SortedMap<Int, Task>> {
+    override fun onCreateLoader(id: Int, bundle: Bundle?): Loader<Pair<SortedMap<Int, Task>, String>> {
         context.get()?.let {
             return when (id) {
                 EXTERNAL_LOADER -> ExternalLoader(it)
@@ -48,16 +59,28 @@ internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
         return Loader(context.get()!!)
     }
 
-    override fun onLoadFinished(loader: Loader<SortedMap<Int, Task>>, tasks: SortedMap<Int, Task>?) {
-        taskMap = tasks ?: sortedMapOf()
-        notifyObservers(taskMap)
+    override fun onLoadFinished(
+        loader: Loader<Pair<SortedMap<Int, Task>, String>>,
+        tasks: Pair<SortedMap<Int, Task>, String>?
+    ) {
+        taskMap = tasks?.first ?: sortedMapOf()
+
+        when (tasks?.second) {
+            EXTERNAL_READ_TAG -> notifyObservers(taskMap, actualObserversGet)
+            EXTERNAL_ADD_TAG -> notifyObservers(taskMap, actualObserversAdd)
+            EXTERNAL_EDIT_TAG -> notifyObservers(taskMap, actualObserversEdit)
+            EXTERNAL_REMOVE_TAG -> notifyObservers(taskMap, actualObserversRemove)
+        }
     }
 
-    override fun onLoaderReset(loader: Loader<SortedMap<Int, Task>>) {
+    override fun onLoaderReset(loader: Loader<Pair<SortedMap<Int, Task>, String>>) {
         taskMap = sortedMapOf()
     }
 
     override fun addTask(task: Task) {
+        actualObserversAdd.clear()
+        actualObserversAdd.addAll(observers)
+
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
         bundle.putSerializable(TaskKey.KEY_ACTION.getKey(), TaskAction.ACTION_ADD)
@@ -65,6 +88,9 @@ internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
     }
 
     override fun removeTask(task: Task) {
+        actualObserversRemove.clear()
+        actualObserversRemove.addAll(observers)
+
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
         bundle.putSerializable(TaskKey.KEY_ACTION.getKey(), TaskAction.ACTION_REMOVE)
@@ -73,6 +99,9 @@ internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
     }
 
     override fun editTask(task: Task) {
+        actualObserversEdit.clear()
+        actualObserversEdit.addAll(observers)
+
         val bundle = Bundle()
         bundle.putParcelable(TaskKey.KEY_TASK.getKey(), task)
         bundle.putSerializable(TaskKey.KEY_ACTION.getKey(), TaskAction.ACTION_EDIT)
@@ -80,10 +109,13 @@ internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
     }
 
     override fun getList() {
+        actualObserversGet.clear()
+        actualObserversGet.addAll(observers)
+
         if (taskMap.isEmpty()) {
             loaderManager.restartLoader(EXTERNAL_LOADER, null, this).forceLoad()
         } else {
-            notifyObservers(taskMap)
+            notifyObservers(taskMap, actualObserversGet)
         }
     }
 
@@ -93,9 +125,19 @@ internal object ExternalStorage : Storage, LoaderManager.LoaderCallbacks<SortedM
 
     override fun removeObserver(observer: StorageObserver) {
         observers.remove(observer)
+        actualObserversGet.remove(observer)
+        actualObserversAdd.remove(observer)
+        actualObserversEdit.remove(observer)
+        actualObserversRemove.remove(observer)
     }
 
-    private fun notifyObservers(tasks: Map<Int, Task>) {
+    private fun notifyObservers(tasks: Map<Int, Task>, observers: MutableList<StorageObserver>) {
         observers.forEach { it.onUpdateMap(tasks) }
+    }
+
+    override fun addErrorObserver(observer: ErrorObserver) {
+    }
+
+    override fun removeErrorObserver(observer: ErrorObserver) {
     }
 }

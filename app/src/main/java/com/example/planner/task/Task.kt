@@ -4,8 +4,8 @@ import android.os.Parcel
 import android.os.Parcelable
 
 open class Task(
-    var title: String?,
-    var description: String?,
+    var title: String? = "",
+    var description: String? = "",
     var id: Int = 0,
     var favorite: Boolean = false,
     var done: Boolean = false

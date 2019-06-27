@@ -5,6 +5,9 @@ import android.content.Context
 import android.support.v4.content.AsyncTaskLoader
 import com.example.planner.enums.TaskAction
 import com.example.planner.sqlhelper.*
+import com.example.planner.storages.DATABASE_ADD_TAG
+import com.example.planner.storages.DATABASE_EDIT_TAG
+import com.example.planner.storages.DATABASE_REMOVE_TAG
 import com.example.planner.task.Task
 import java.util.*
 
@@ -14,10 +17,10 @@ class DatabaseWriter(
     private var task: Task?,
     private val action: TaskAction,
     private val tasks: SortedMap<Int, Task>
-) : AsyncTaskLoader<SortedMap<Int, Task>>(context) {
+) : AsyncTaskLoader<Pair<SortedMap<Int, Task>, String>>(context) {
     private val database = StorageSQLiteOpenHelper(context, DB_TABLE_NAME, null, 1)
 
-    override fun loadInBackground(): SortedMap<Int, Task>? {
+    override fun loadInBackground(): Pair<SortedMap<Int, Task>, String>? {
         val db = database.writableDatabase
         val taskValues = ContentValues()
 
@@ -48,7 +51,18 @@ class DatabaseWriter(
         }
 
         db.close()
-        return tasks
+
+        return when (action) {
+            TaskAction.ACTION_ADD -> {
+                Pair(tasks, DATABASE_ADD_TAG)
+            }
+            TaskAction.ACTION_REMOVE -> {
+                Pair(tasks, DATABASE_REMOVE_TAG)
+            }
+            else -> {
+                Pair(tasks, DATABASE_EDIT_TAG)
+            }
+        }
     }
 
     private fun getLastId(): Int {

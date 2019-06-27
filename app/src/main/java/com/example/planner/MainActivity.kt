@@ -1,6 +1,7 @@
 package com.example.planner
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
@@ -21,6 +22,7 @@ import com.example.planner.fragments.SettingsFragment
 import com.example.planner.observer.FragmentListener
 import com.example.planner.presenters.ActivityPresenter
 import com.example.planner.storages.STORAGE_TYPE_EXTERNAL
+import com.example.planner.storages.STORAGE_TYPE_FIREBASE
 import com.example.planner.storages.STORAGE_TYPE_SHARED
 import com.example.planner.viewer.ActivityView
 import kotlinx.android.synthetic.main.activity_main.*
@@ -60,7 +62,6 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
         } else if (savedInstanceState == null) {
             setContentFragment()
         }
-
     }
 
     private fun setContentFragment() {
@@ -86,11 +87,14 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
 
     override fun onAttachFragment(fragment: Fragment?) {
         super.onAttachFragment(fragment)
-        if (fragment is SettingsFragment) {
-            fragment.setFragmentListener(this)
-        } else if (fragment is AddTaskFragment) {
-            fragment.setFragmentListener(this)
+        when (fragment) {
+            is SettingsFragment -> fragment.setFragmentListener(this)
+            is AddTaskFragment -> fragment.setFragmentListener(this)
         }
+    }
+
+    fun checkBundle(): Intent {
+        return intent
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -109,18 +113,26 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.nav_settings -> supportFragmentManager.beginTransaction()
-                .replace(R.id.content_fragments, SettingsFragment(), FRAGMENT_TAG_SETTINGS)
-                .addToBackStack(null)
-                .commit()
-            R.id.nav_tasks -> supportFragmentManager.beginTransaction()
-                .replace(R.id.content_fragments, MainContentFragment())
-                .addToBackStack(null)
-                .commit()
+            R.id.nav_settings -> {
+                val settingsFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_SETTINGS)
+                if (settingsFragment == null || !settingsFragment.isVisible) {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.content_fragments, SettingsFragment(), FRAGMENT_TAG_SETTINGS)
+                        .addToBackStack(null)
+                        .commit()
+                }
+            }
+            R.id.nav_tasks -> {
+                val contentFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_CONTENT)
+                if (contentFragment == null || !contentFragment.isVisible) {
+                    supportFragmentManager.popBackStack()
+                }
+            }
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
+
 
     private fun checkPermissions() {
         val pref = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
@@ -132,11 +144,16 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
 
             if (permissionWrite != PackageManager.PERMISSION_GRANTED) {
                 makeRequest()
-            } else {
-                //presenter.getTasksList()
             }
-        } else {
-            //presenter.getTasksList()
+        } else if (pref.getBoolean(STORAGE_TYPE_FIREBASE, false)) {
+            val permissionInternet = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.INTERNET
+            )
+
+            if (permissionInternet != PackageManager.PERMISSION_GRANTED) {
+                makeRequest()
+            }
         }
     }
 
@@ -150,7 +167,7 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
     private fun makeRequest() {
         ActivityCompat.requestPermissions(
             this,
-            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET),
             CHECK_REQUEST
         )
     }
@@ -167,9 +184,6 @@ class MainActivity : MvpAppCompatActivity(), NavigationView.OnNavigationItemSele
                 editor.putBoolean(STORAGE_TYPE_EXTERNAL, false)
                 editor.apply()
                 Toast.makeText(this@MainActivity, R.string.error_external_permission, Toast.LENGTH_SHORT).show()
-                //presenter.getTasksList()
-            } else {
-                //presenter.getTasksList()
             }
         }
     }

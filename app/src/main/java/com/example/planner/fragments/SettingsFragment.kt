@@ -1,13 +1,18 @@
 package com.example.planner.fragments
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.v7.preference.CheckBoxPreference
 import android.support.v7.preference.PreferenceFragmentCompat
 import android.support.v7.preference.PreferenceManager
+import android.view.View
 import android.widget.FrameLayout
+import com.example.planner.FRAGMENT_TAG_ADDTASK
 import com.example.planner.R
 import com.example.planner.observer.FragmentListener
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -16,12 +21,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var sInternal: CheckBoxPreference
     private lateinit var sExternal: CheckBoxPreference
     private lateinit var sDatabase: CheckBoxPreference
+    private lateinit var sFirebase: CheckBoxPreference
     private lateinit var mListener: FragmentListener
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, p1: String?) {
         addPreferencesFromResource(R.xml.preferences)
         PreferenceManager.setDefaultValues(requireContext(), R.xml.preferences, false)
-        mListener.setupActionBar(getString(R.string.settingsToolbarTitle))
         initCheckboxes()
     }
 
@@ -31,30 +36,29 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onStart() {
         super.onStart()
-        val v  = requireActivity().findViewById<FrameLayout>(R.id.content_fragments)
-        val t = v.layoutParams as ConstraintLayout.LayoutParams
-        t.matchConstraintPercentWidth = 1.0f
-        v.layoutParams = t
 
-        val v1  = requireActivity().findViewById<FrameLayout>(R.id.edit_fragment)
-        val t1 = v1.layoutParams as ConstraintLayout.LayoutParams
-        t1.matchConstraintPercentWidth = 0.0f
-        v1.layoutParams = t1
+        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && this.isAdded) {
+            val v = requireActivity().findViewById<FrameLayout>(R.id.content_fragments)
+            v.layoutParams.width = ConstraintLayout.LayoutParams.MATCH_PARENT
+
+            val v1 = requireActivity().findViewById<FrameLayout>(R.id.edit_fragment)
+            v1.visibility = View.GONE
+        }
+
+        doAsync {
+            val fragmentAdd = requireActivity().supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_ADDTASK)
+            fragmentAdd?.let {
+                requireActivity().supportFragmentManager.beginTransaction().remove(it).commit()
+            }
+            uiThread {
+                mListener.setupActionBar(getString(R.string.settingsToolbarTitle))
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mListener.setupActionBar(getString(R.string.mainToolbarTitle))
-
-        val v  = requireActivity().findViewById<FrameLayout>(R.id.content_fragments)
-        val t = v.layoutParams as ConstraintLayout.LayoutParams
-        t.matchConstraintPercentWidth = 0.5f
-        v.layoutParams = t
-
-        val v1  = requireActivity().findViewById<FrameLayout>(R.id.edit_fragment)
-        val t1 = v1.layoutParams as ConstraintLayout.LayoutParams
-        t1.matchConstraintPercentWidth = 0.5f
-        v1.layoutParams = t1
     }
 
 
@@ -64,6 +68,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         sInternal = findPreference("storageTypeInternal") as CheckBoxPreference
         sExternal = findPreference("storageTypeExternal") as CheckBoxPreference
         sDatabase = findPreference("storageTypeDatabase") as CheckBoxPreference
+        sFirebase = findPreference("storageTypeFirebase") as CheckBoxPreference
 
         sCache.setOnPreferenceChangeListener { _, _ ->
             if (!sCache.isChecked) {
@@ -100,6 +105,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             false
         }
+        sFirebase.setOnPreferenceChangeListener { _, _ ->
+            if (!sFirebase.isChecked) {
+                setAllUnchecked()
+                sFirebase.isChecked = true
+            }
+            false
+        }
     }
 
     private fun setAllUnchecked() {
@@ -108,5 +120,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         sInternal.isChecked = false
         sExternal.isChecked = false
         sDatabase.isChecked = false
+        sFirebase.isChecked = false
     }
 }

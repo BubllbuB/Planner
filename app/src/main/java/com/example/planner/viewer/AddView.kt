@@ -7,13 +7,20 @@ import com.arellomobile.mvp.viewstate.strategy.SkipStrategy
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType
 
 @StateStrategyType(AddToEndSingleStrategy::class)
-interface AddView: MvpView {
+interface AddView : MvpView {
     fun onTaskSaveSuccess()
     fun setTitle(title: String, startPos: Int, endPos: Int)
     fun setDescription(title: String, startPos: Int, endPos: Int)
     fun setFocus(focusId: Int = 0)
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun replaceFragment()
+
     @StateStrategyType(OneExecutionStateStrategy::class)
     fun addFragment()
+
+    @StateStrategyType(OneExecutionStateStrategy::class)
+    fun setTask()
+
+    @StateStrategyType(SkipStrategy::class)
+    fun onError(message: String, reload: Boolean)
 }

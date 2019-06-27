@@ -6,6 +6,7 @@ import android.support.design.widget.TabLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.example.planner.FRAGMENT_TAG_ADD_TASK
 import com.example.planner.R
@@ -21,6 +22,18 @@ class MainContentFragment : MvpAppCompatFragment() {
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && this.isVisible) {
+            val v = requireActivity().findViewById<FrameLayout>(R.id.content_fragments)
+            v.layoutParams.width = 0
+
+            val v1 = requireActivity().findViewById<FrameLayout>(R.id.edit_fragment)
+            v1.visibility = View.VISIBLE
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
@@ -29,8 +42,23 @@ class MainContentFragment : MvpAppCompatFragment() {
     private fun init() {
         val tabAdapter = TabAdapter(childFragmentManager)
 
-        val allTaskFragment = AllTasksFragment()
-        val favTaskFragment = FavoritesTasksFragment()
+        val fragmentAllTasks =
+            childFragmentManager.findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + 0) as ListFragment?
+        val fragmentFavTasks =
+            childFragmentManager.findFragmentByTag("android:switcher:" + R.id.viewPager + ":" + 1) as ListFragment?
+
+        val allTaskFragment = if (fragmentAllTasks != null && fragmentAllTasks.adapterExist()) {
+            fragmentAllTasks
+        } else {
+            AllTasksFragment()
+        }
+
+
+        val favTaskFragment = if (fragmentFavTasks != null && fragmentFavTasks.adapterExist()) {
+            fragmentFavTasks
+        } else {
+            FavoritesTasksFragment()
+        }
 
         this.arguments?.getInt(ADAPTER_POSITION_ALL)?.let {
             val bundle = Bundle()

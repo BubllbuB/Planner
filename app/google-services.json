@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "453761040798",
+    "firebase_url": "https://bubllbub-planner.firebaseio.com",
+    "project_id": "bubllbub-planner",
+    "storage_bucket": "bubllbub-planner.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:453761040798:android:fba16ac19854f6b6",
+        "android_client_info": {
+          "package_name": "com.example.planner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "453761040798-dfd7l3u98dks1vcsji27d3ar7hb5r1uj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.planner",
+            "certificate_hash": "0db333ce687c83f786bd9a0718a497114e5bd8de"
+          }
+        },
+        {
+          "client_id": "453761040798-atr4sm3k2jd4cs4n8spur4pml3ourbh1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB46v07BwgeN3jhdxX0sEEuy2ttOWzWP0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "453761040798-atr4sm3k2jd4cs4n8spur4pml3ourbh1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

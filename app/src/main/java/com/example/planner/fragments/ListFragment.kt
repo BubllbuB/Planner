@@ -3,13 +3,17 @@ package com.example.planner.fragments
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.LoaderManager
+import android.support.v7.preference.PreferenceManager
 import android.view.View
 import com.arellomobile.mvp.MvpAppCompatFragment
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.ProvidePresenter
+import com.example.planner.FRAGMENT_TAG_ADDTASK
 import com.example.planner.R
 import com.example.planner.adapter.TaskArrayAdapter
 import com.example.planner.presenters.MainPresenter
+import com.example.planner.storages.STORAGE_TYPE_DATABASE
+import com.example.planner.storages.STORAGE_TYPE_FIREBASE
 import com.example.planner.task.Task
 import com.example.planner.viewer.MainView
 
@@ -34,20 +38,35 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
     override fun onListUpdate(tasks: Map<Int, Task>) {
         hideProgressBars()
         adapterList.setList(getList(tasks))
+        checkSavedPosition()
     }
 
     override fun editSelectedTask(task: Task?) {
-        val fragment = AddTaskFragment()
+        val fragmentAdd = requireActivity().supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_ADDTASK)
+        val fragmentArguments = bundlePutTask(task)
 
-        fragment.arguments = bundlePutPosition(task, adapterList.getSelectedPosition())
-
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.edit_fragment, fragment)
-                .commit()
+        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setNewAddFragment(fragmentArguments)
+        } else if (fragmentAdd == null || !fragmentAdd.isAdded) {
+            setNewAddFragment(fragmentArguments)
         } else {
+            fragmentAdd as AddTaskFragment
+            fragmentAdd.arguments = fragmentArguments
+            fragmentAdd.setTask()
+        }
+    }
+
+    private fun setNewAddFragment(arguments: Bundle) {
+        val fragmentAdd = AddTaskFragment()
+        fragmentAdd.arguments = arguments
+
+        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.content_fragments, fragment)
+                .replace(R.id.edit_fragment, fragmentAdd, FRAGMENT_TAG_ADDTASK)
+                .commit()
+        } else if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.content_fragments, fragmentAdd, FRAGMENT_TAG_ADDTASK)
                 .addToBackStack(null)
                 .commit()
         }
@@ -67,25 +86,53 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
 
     private fun initAdapter() {
         adapterList = TaskArrayAdapter(requireContext(), presenter)
-        checkSavedPosition(this.arguments)
-
-        this.arguments?.getInt(ADAPTER_POSITION_ALL)?.let {
-            presenter.updateAdapterPosition(it)
-        }
-
+        checkSavedPosition()
         init(adapterList)
     }
 
     override fun setAdapterSelectedPosition(position: Int) {
         adapterList.setSelectedPosition(position)
+        savePosition(adapterList.getSelectedPosition())
     }
 
     override fun setAdapterStartPosition() {
         adapterList.setSelectedStartedPosition()
+        savePosition(adapterList.getSelectedPosition())
     }
 
-    abstract fun checkSavedPosition(bundle: Bundle?)
-    abstract fun bundlePutPosition(task: Task?, position: Int): Bundle
+    fun adapterExist(): Boolean {
+        return ::adapterList.isInitialized
+    }
+
+    override fun showDetails(task: Task) {
+        adapterList.setSelectedTask(task)
+    }
+
+    override fun onReloadStorage() {
+        if(this.isVisible) {
+            hideProgressBars()
+
+            val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            val editor = pref.edit()
+            editor.putBoolean(STORAGE_TYPE_DATABASE, true)
+            editor.putBoolean(STORAGE_TYPE_FIREBASE, false)
+            editor.apply()
+
+            presenter.onStop()
+            presenter.onUnsubscribeError()
+
+            presenter.updateFields(requireContext(), LoaderManager.getInstance(this))
+            presenter.onStart()
+            presenter.getTasksList()
+        }
+    }
+
+    override fun onError(message: String, reload: Boolean) {}
+
+    abstract override fun checkNotificationDetails()
+    abstract fun checkSavedPosition()
+    abstract fun savePosition(position: Int)
+    abstract fun bundlePutTask(task: Task?): Bundle
     abstract fun init(adapter: TaskArrayAdapter)
     abstract fun hideProgressBars()
     abstract fun getList(tasks: Map<Int, Task>): List<Task>

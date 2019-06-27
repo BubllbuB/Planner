@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-            android:title="@string/prefStorageTitle"
-            android:key="storageType">
+            android:title="@string/prefStorageTitle">
         <CheckBoxPreference
                 android:key="storageTypeCache"
                 android:summary="@string/prefCacheSummary"
@@ -27,6 +26,11 @@
                 android:key="storageTypeDatabase"
                 android:summary="@string/prefDatabaseSummary"
                 android:title="@string/prefStorageDatabase"
+                android:defaultValue="false"/>
+        <CheckBoxPreference
+                android:key="storageTypeFirebase"
+                android:summary="@string/prefFirebaseSummary"
+                android:title="@string/prefFirebase"
                 android:defaultValue="false"/>
     </PreferenceCategory>
 </PreferenceScreen>
