@@ -130,8 +130,7 @@ class TaskArrayAdapter(
     }
 
     fun setSelectedStartedPosition() {
-        if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (taskList.isNotEmpty()) {
+        if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && taskList.isNotEmpty()) {
                 val position = if (taskList[0].favorite) {
                     if (posHeadOther > 0) {
                         1
@@ -143,7 +142,7 @@ class TaskArrayAdapter(
                 }
                 val offset = getOffset(posHeadOther, position, taskList[0].favorite)
                 presenter.editTask(taskList[position - offset])
-            }
+
         }
     }
 
