@@ -3,12 +3,15 @@ package com.example.planner.presenters
 import android.content.Context
 import android.content.res.Configuration
 import android.support.v4.app.LoaderManager
+import android.support.v7.preference.PreferenceManager
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.example.planner.enums.TaskAction
 import com.example.planner.fragments.StartingPositionChecker
 import com.example.planner.observer.ErrorObserver
 import com.example.planner.observer.StorageObserver
+import com.example.planner.storages.STORAGE_TYPE_DATABASE
+import com.example.planner.storages.STORAGE_TYPE_FIREBASE
 import com.example.planner.storages.Storage
 import com.example.planner.storages.StorageFactory
 import com.example.planner.task.Task
@@ -45,6 +48,15 @@ class MainPresenter(
     }
 
     override fun reloadStorage() {
+        val pref = PreferenceManager.getDefaultSharedPreferences(context)
+        val editor = pref.edit()
+        editor.putBoolean(STORAGE_TYPE_DATABASE, true)
+        editor.putBoolean(STORAGE_TYPE_FIREBASE, false)
+        editor.apply()
+
+        onStop()
+        onUnsubscribeError()
+
         viewState.onReloadStorage()
     }
 

@@ -112,15 +112,6 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
         if(this.isVisible) {
             hideProgressBars()
 
-            val pref = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            val editor = pref.edit()
-            editor.putBoolean(STORAGE_TYPE_DATABASE, true)
-            editor.putBoolean(STORAGE_TYPE_FIREBASE, false)
-            editor.apply()
-
-            presenter.onStop()
-            presenter.onUnsubscribeError()
-
             presenter.updateFields(requireContext(), LoaderManager.getInstance(this))
             presenter.onStart()
             presenter.getTasksList()
