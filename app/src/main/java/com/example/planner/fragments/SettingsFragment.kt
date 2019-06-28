@@ -22,7 +22,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var sExternal: CheckBoxPreference
     private lateinit var sDatabase: CheckBoxPreference
     private lateinit var sFirebase: CheckBoxPreference
-    private lateinit var mListener: FragmentListener
+    private var mListener: FragmentListener? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, p1: String?) {
         addPreferencesFromResource(R.xml.preferences)
@@ -51,14 +51,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 requireActivity().supportFragmentManager.beginTransaction().remove(it).commit()
             }
             uiThread {
-                mListener.setupActionBar(getString(R.string.settingsToolbarTitle))
+                mListener?.setupActionBar(getString(R.string.settingsToolbarTitle))
             }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mListener.setupActionBar(getString(R.string.mainToolbarTitle))
+        mListener?.setupActionBar(getString(R.string.mainToolbarTitle))
+        mListener = null
     }
 
 
