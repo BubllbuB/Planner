@@ -108,16 +108,6 @@ abstract class ListFragment : MvpAppCompatFragment(), MainView {
         adapterList.setSelectedTask(task)
     }
 
-    override fun onReloadStorage() {
-        if(this.isVisible) {
-            hideProgressBars()
-
-            presenter.updateFields(requireContext(), LoaderManager.getInstance(this))
-            presenter.onStart()
-            presenter.getTasksList()
-        }
-    }
-
     override fun onError(message: String, reload: Boolean) {}
 
     abstract override fun checkNotificationDetails()

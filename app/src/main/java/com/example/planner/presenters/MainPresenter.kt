@@ -57,7 +57,11 @@ class MainPresenter(
         onStop()
         onUnsubscribeError()
 
-        viewState.onReloadStorage()
+        if(attachedViews.isNotEmpty()) {
+            updateFields(context, loaderManager)
+            onStart()
+            getTasksList()
+        }
     }
 
     fun getTasksList() {

@@ -27,8 +27,5 @@ interface MainView: MvpView {
     fun checkNotificationDetails()
 
     @StateStrategyType(SkipStrategy::class)
-    fun onReloadStorage()
-
-    @StateStrategyType(SkipStrategy::class)
     fun onError(message: String, reload: Boolean)
 }
